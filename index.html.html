@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SkillSwap</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --dark-bg: #0a0a0f;
+      --card-bg: #12121f;
+      --neon-cyan: #00f5d4;
+      --neon-purple: #8338ec;
+      --neon-pink: #ff006e;
+    }
+    * { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    html { scroll-behavior: smooth; height: auto; min-height: 100%; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--dark-bg);
+      color: #e2e8f0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      min-height: 100vh;
+    }
+    .font-display { font-family: 'Space Grotesk', sans-serif; }
+    .perspective-container { perspective: 1200px; }
+    .preserve-3d { transform-style: preserve-3d; }
+    .tilt-card {
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .tilt-card:hover {
+      transform: rotateY(-8deg) rotateX(5deg) translateZ(20px);
+    }
+    .tilt-card::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
+      border-radius: inherit;
+      opacity: 0;
+      transition: opacity 0.5s;
+      z-index: -1;
+      filter: blur(12px);
+    }
+    .tilt-card:hover::before { opacity: 0.6; }
+    .glass {
+      background: rgba(18, 18, 31, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(0,245,212,0.3); }
+      50% { box-shadow: 0 0 40px rgba(131,56,236,0.5); }
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    @keyframes orbit {
+      0% { transform: rotate(0deg) translateX(60px) rotate(0deg); }
+      100% { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
+    }
+    @keyframes modal-in {
+      0% { opacity: 0; transform: scale(0.9) translateY(20px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes bounce-in {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+    @keyframes logo-spin {
+      0% { transform: rotateX(-10deg) rotateY(0deg); }
+      100% { transform: rotateX(-10deg) rotateY(360deg); }
+    }
+    @keyframes logo-float {
+      0%, 100% { transform: translateY(0) rotateX(-10deg) rotateY(15deg); }
+      50% { transform: translateY(-10px) rotateX(-10deg) rotateY(15deg); }
+    }
+    @keyframes arrow-bounce {
+      0%, 100% { transform: translateY(0); opacity: 0.6; }
+      50% { transform: translateY(10px); opacity: 1; }
+    }
+    .shimmer-text {
+      background: linear-gradient(90deg, #00f5d4, #8338ec, #ff006e, #00f5d4);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 4s linear infinite;
+    }
+    .orbit-particle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: orbit 4s linear infinite;
+    }
+    .orbit-particle:nth-child(1) { animation-duration: 3s; animation-delay: 0s; background: var(--neon-cyan); }
+    .orbit-particle:nth-child(2) { animation-duration: 4s; animation-delay: -1s; background: var(--neon-purple); }
+    .orbit-particle:nth-child(3) { animation-duration: 5s; animation-delay: -2s; background: var(--neon-pink); }
+    .orbit-particle:nth-child(4) { animation-duration: 3.5s; animation-delay: -0.5s; background: var(--neon-cyan); }
+    .orbit-particle:nth-child(5) { animation-duration: 4.5s; animation-delay: -1.5s; background: var(--neon-pink); }
+    .orbit-particle:nth-child(6) { animation-duration: 6s; animation-delay: -3s; background: var(--neon-purple); }
+    .btn-3d {
+      transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05);
+    }
+    .btn-3d:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,245,212,0.2), 0 0 0 1px rgba(0,245,212,0.3);
+    }
+    .btn-3d:active { transform: translateY(0) scale(0.98); }
+    .reveal {
+      opacity: 0;
+      transform: translateY(60px) rotateX(15deg);
+      transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0) rotateX(0deg);
+    }
+    .modal-overlay {
+      animation: modal-in 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .scroll-hint { animation: arrow-bounce 2s ease-in-out infinite; }
+    input, textarea, select {
+      background: rgba(18, 18, 31, 0.8);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #e2e8f0;
+      transition: all 0.3s;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 0 3px rgba(0,245,212,0.1);
+    }
+    input::placeholder, textarea::placeholder { color: #64748b; }
+    input[type="date"] { color-scheme: dark; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--dark-bg); }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    .grid-bg {
+      background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .skill-tag {
+      background: rgba(0,245,212,0.08);
+      border: 1px solid rgba(0,245,212,0.2);
+      color: #00f5d4;
+    }
+    .want-tag {
+      background: rgba(131,56,236,0.08);
+      border: 1px solid rgba(131,56,236,0.2);
+      color: #a78bfa;
+    }
+    .logo-3d {
+      animation: logo-float 4s ease-in-out infinite;
+      transform-style: preserve-3d;
+    }
+    .logo-3d:hover {
+      animation-play-state: paused;
+    }
+  </style>
+</head>
+<body class="bg-[#0a0a0f] text-slate-200 overflow-y-auto">
+  <div id="scroll-progress" class="fixed top-0 left-0 h-[2px] bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 z-[100] transition-all duration-100" style="width: 0%"></div>
+  <canvas id="particles" class="fixed inset-0 pointer-events-none z-0"></canvas>
+  <div id="app"></div>
+  <script>
+    // Particle System
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let mouseX = 0, mouseY = 0;
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 0.5) * 0.5;
+        this.radius = Math.random() * 2 + 1;
+        this.opacity = Math.random() * 0.5 + 0.2;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+        const dx = mouseX - this.x;
+        const dy = mouseY - this.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 150) {
+          this.x -= dx * 0.01;
+          this.y -= dy * 0.01;
+        }
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 245, 212, ${this.opacity})`;
+        ctx.fill();
+      }
+    }
+    for (let i = 0; i < 80; i++) particles.push(new Particle());
+    document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); });
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < 120) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(0, 245, 212, ${0.1 * (1 - dist/120)})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // Vue App
+    const { createApp, ref, computed, onMounted, onUnmounted, watch, nextTick } = Vue;
+    createApp({
+      template: `
+        <div class="relative z-10 min-h-screen">
+          <!-- Nav -->
+          <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" :class="scrollY > 50 ? 'glass' : 'bg-transparent'">
+            <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+              <div @click="goHome" class="flex items-center gap-3 cursor-pointer group">
+                <!-- SkillSwap Logo -->
+                <div class="relative w-10 h-10 preserve-3d" style="transform: rotateX(-10deg) rotateY(15deg);">
+                  <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-lg">
+                    <defs>
+                      <linearGradient id="logoGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#00f5d4"/>
+                        <stop offset="100%" style="stop-color:#8338ec"/>
+                      </linearGradient>
+                      <linearGradient id="logoGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#8338ec"/>
+                        <stop offset="100%" style="stop-color:#ff006e"/>
+                      </linearGradient>
+                      <filter id="glow">
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                        <feMerge>
+                          <feMergeNode in="coloredBlur"/>
+                          <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                      </filter>
+                    </defs>
+                    <!-- Arrow 1 -->
+                    <path d="M20 35 L50 20 L50 30 L80 30 L80 45 L50 45 L50 55 Z" fill="url(#logoGrad1)" filter="url(#glow)" opacity="0.9"/>
+                    <!-- Arrow 2 -->
+                    <path d="M80 65 L50 80 L50 70 L20 70 L20 55 L50 55 L50 45 Z" fill="url(#logoGrad2)" filter="url(#glow)" opacity="0.9"/>
+                    <!-- Center connection -->
+                    <circle cx="50" cy="50" r="6" fill="#fff" filter="url(#glow)"/>
+                  </svg>
+                </div>
+                <span class="font-display font-bold text-xl tracking-tight group-hover:text-cyan-400 transition-colors">SkillSwap</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <button v-if="!currentUser" @click="showSignup = true" class="btn-3d px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white text-sm font-medium">Sign Up</button>
+                <button v-else @click="viewProfile(currentUser.id)" class="btn-3d px-4 py-2 rounded-xl bg-slate-800 text-slate-200 text-sm font-medium border border-slate-700">My Profile</button>
+                <button v-if="currentUser" @click="logout" class="px-3 py-2 text-slate-400 hover:text-white text-sm transition-colors">Logout</button>
+              </div>
+            </div>
+          </nav>
+
+          <!-- LANDING PAGE -->
+          <div v-if="currentView === 'landing'" class="min-h-screen flex flex-col items-center px-4 pt-32 pb-20 relative">
+            <!-- Parallax Background Orbs -->
+            <div data-parallax="0.15" class="absolute top-[15%] left-[10%] pointer-events-none">
+              <div class="w-[500px] h-[500px] bg-purple-600/15 rounded-full blur-[120px]"></div>
+            </div>
+            <div data-parallax="0.25" class="absolute top-[40%] right-[5%] pointer-events-none">
+              <div class="w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[100px]"></div>
+            </div>
+            <div data-parallax="0.1" class="absolute bottom-[10%] left-[30%] pointer-events-none">
+              <div class="w-[600px] h-[600px] bg-pink-500/8 rounded-full blur-[150px]"></div>
+            </div>
+
+            <!-- Hero -->
+            <div class="hero-content text-center relative z-10 max-w-3xl mx-auto">
+              <!-- 3D Logo -->
+              <div class="logo-3d relative w-40 h-40 mx-auto mb-8 preserve-3d cursor-pointer" id="hero-logo">
+                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-2xl">
+                  <defs>
+                    <linearGradient id="heroGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#00f5d4"/>
+                      <stop offset="100%" style="stop-color:#8338ec"/>
+                    </linearGradient>
+                    <linearGradient id="heroGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#8338ec"/>
+                      <stop offset="100%" style="stop-color:#ff006e"/>
+                    </linearGradient>
+                    <filter id="heroGlow">
+                      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                      <feMerge>
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                      </feMerge>
+                    </filter>
+                  </defs>
+                  <path d="M15 32 L50 15 L50 28 L85 28 L85 48 L50 48 L50 62 Z" fill="url(#heroGrad1)" filter="url(#heroGlow)" opacity="0.95"/>
+                  <path d="M85 68 L50 85 L50 72 L15 72 L15 52 L50 52 L50 38 Z" fill="url(#heroGrad2)" filter="url(#heroGlow)" opacity="0.95"/>
+                  <circle cx="50" cy="50" r="7" fill="#fff" filter="url(#heroGlow)"/>
+                </svg>
+                <!-- Orbiting particles -->
+                <div class="orbit-particle" style="top:50%;left:50%;"></div>
+                <div class="orbit-particle" style="top:50%;left:50%;"></div>
+                <div class="orbit-particle" style="top:50%;left:50%;"></div>
+                <div class="orbit-particle" style="top:50%;left:50%;"></div>
+                <div class="orbit-particle" style="top:50%;left:50%;"></div>
+                <div class="orbit-particle" style="top:50%;left:50%;"></div>
+              </div>
+
+              <h1 class="font-display text-5xl md:text-7xl font-bold mb-6 shimmer-text leading-tight">SkillSwap</h1>
+              <p class="text-lg md:text-xl text-slate-400 mb-4 max-w-xl mx-auto leading-relaxed">Trade skills. Grow together. Teach what you know, learn what you don't.</p>
+              <p v-if="users.length > 0" class="text-slate-500 mb-8">{{ users.length }} member{{ users.length !== 1 ? 's' : '' }} already swapping skills</p>
+
+              <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button @click="showSignup = true" class="btn-3d px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold text-lg">Get Started</button>
+                <button @click="goToBrowse" class="btn-3d px-8 py-4 rounded-2xl bg-slate-800 text-slate-200 font-semibold text-lg border border-slate-700 hover:border-slate-500">Browse Members</button>
+              </div>
+
+              <div class="scroll-hint mt-16">
+                <svg class="w-6 h-6 mx-auto text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- How It Works -->
+            <div class="w-full max-w-5xl mt-32 relative z-10">
+              <h2 class="text-3xl md:text-4xl font-bold font-display text-center mb-4">How It Works</h2>
+              <p class="text-slate-500 text-center mb-16 max-w-md mx-auto">Three simple steps to start trading knowledge</p>
+              <div class="grid md:grid-cols-3 gap-8 perspective-container">
+                <div class="reveal tilt-card relative bg-[#12121f] rounded-2xl border border-slate-800 p-8 text-center group">
+                  <div class="absolute -inset-[1px] rounded-[inherit] bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 opacity-0 group-hover:opacity-40 blur-md transition-opacity duration-500 -z-10"></div>
+                  <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-cyan-400/20 to-purple-500/20 flex items-center justify-center border border-cyan-500/20 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                    </svg>
+                  </div>
+                  <h3 class="text-xl font-bold text-white mb-3">Share</h3>
+                  <p class="text-slate-400 leading-relaxed">Tell us what skills you have and what you want to learn. Build your profile in seconds.</p>
+                </div>
+                <div class="reveal tilt-card relative bg-[#12121f] rounded-2xl border border-slate-800 p-8 text-center group" style="transition-delay: 0.1s">
+                  <div class="absolute -inset-[1px] rounded-[inherit] bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 opacity-0 group-hover:opacity-40 blur-md transition-opacity duration-500 -z-10"></div>
+                  <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-400/20 to-pink-500/20 flex items-center justify-center border border-purple-500/20 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                  </div>
+                  <h3 class="text-xl font-bold text-white mb-3">Match</h3>
+                  <p class="text-slate-400 leading-relaxed">Browse members and find your perfect skill match. Our smart sorting puts the best fits first.</p>
+                </div>
+                <div class="reveal tilt-card relative bg-[#12121f] rounded-2xl border border-slate-800 p-8 text-center group" style="transition-delay: 0.2s">
+                  <div class="absolute -inset-[1px] rounded-[inherit] bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 opacity-0 group-hover:opacity-40 blur-md transition-opacity duration-500 -z-10"></div>
+                  <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-pink-400/20 to-cyan-500/20 flex items-center justify-center border border-pink-500/20 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-8 h-8 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                  </div>
+                  <h3 class="text-xl font-bold text-white mb-3">Swap</h3>
+                  <p class="text-slate-400 leading-relaxed">Book a session and start trading knowledge. We notify both parties so nothing gets missed.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="mt-32 text-center relative z-10 reveal">
+              <h2 class="text-3xl md:text-4xl font-bold font-display mb-4">Ready to start swapping?</h2>
+              <p class="text-slate-500 mb-8 max-w-md mx-auto">Join the community and start trading skills today. No fees, no fuss.</p>
+              <button @click="showSignup = true" class="btn-3d px-10 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold text-lg">Create Your Profile</button>
+            </div>
+
+            <footer class="mt-32 pt-8 border-t border-slate-800 text-center text-slate-600 text-sm relative z-10">
+              <p>SkillSwap - Trade skills, grow together.</p>
+            </footer>
+          </div>
+
+          <!-- SIGNUP MODAL -->
+          <div v-if="showSignup" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" @click="showSignup = false"></div>
+            <div class="modal-overlay relative bg-[#12121f] rounded-3xl border border-slate-700 p-8 max-w-md w-full max-h-[90vh] overflow-y-auto">
+              <button @click="showSignup = false" class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+              <h2 class="text-2xl font-bold font-display mb-6">Join SkillSwap</h2>
+              <form @submit.prevent="handleSignup" class="space-y-4">
+                <div>
+                  <label class="block text-sm text-slate-400 mb-1">Full Name</label>
+                  <input v-model="signupForm.name" type="text" required class="w-full px-4 py-3 rounded-xl" placeholder="Your name">
+                </div>
+                <div>
+                  <label class="block text-sm text-slate-400 mb-1">Email</label>
+                  <input v-model="signupForm.email" type="email" required class="w-full px-4 py-3 rounded-xl" placeholder="you@email.com">
+                </div>
+                <div>
+                  <label class="block text-sm text-slate-400 mb-1">Phone</label>
+                  <input v-model="signupForm.phone" type="tel" required class="w-full px-4 py-3 rounded-xl" placeholder="+1 234 567 8900">
+                </div>
+                <div>
+                  <label class="block text-sm text-slate-400 mb-1">Age</label>
+                  <input v-model="signupForm.age" type="number" required min="13" max="120" class="w-full px-4 py-3 rounded-xl" placeholder="25">
+                </div>
+                <div>
+                  <label class="block text-sm text-slate-400 mb-1">Skills You Can Teach (comma separated)</label>
+                  <input v-model="signupForm.skills" type="text" required class="w-full px-4 py-3 rounded-xl" placeholder="JavaScript, Guitar, Cooking...">
+                </div>
+                <div>
+                  <label class="block text-sm text-slate-400 mb-1">Skills You Want to Learn (comma separated)</label>
+                  <input v-model="signupForm.wants" type="text" required class="w-full px-4 py-3 rounded-xl" placeholder="Spanish, Photography, Piano...">
+                </div>
+                <div>
+                  <label class="block text-sm text-slate-400 mb-1">Bio</label>
+                  <textarea v-model="signupForm.bio" rows="3" class="w-full px-4 py-3 rounded-xl resize-none" placeholder="Tell us about yourself..."></textarea>
+                </div>
+                <button type="submit" class="btn-3d w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold">Create Account</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- BROWSE / HOME -->
+          <div v-if="currentView === 'home'" class="min-h-screen pt-24 pb-20 px-4 grid-bg">
+            <div class="max-w-6xl mx-auto">
+              <div class="text-center mb-10">
+                <h2 class="text-3xl md:text-4xl font-bold font-display mb-3">Browse Members</h2>
+                <p class="text-slate-500">Find people to learn from and teach</p>
+              </div>
+              <div class="max-w-xl mx-auto mb-10">
+                <div class="relative">
+                  <input v-model="searchQuery" type="text" placeholder="Search by name, skill, or interest..." class="w-full px-5 py-4 pl-12 rounded-2xl text-base">
+                  <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                  </svg>
+                </div>
+              </div>
+              <p v-if="users.length > 0" class="text-slate-500 mb-6 text-center">{{ filteredUsers.length }} member{{ filteredUsers.length !== 1 ? 's' : '' }} found</p>
+
+              <!-- Empty State -->
+              <div v-if="users.length === 0" class="text-center py-20">
+                <div class="relative w-24 h-24 mx-auto mb-6 preserve-3d" style="transform: rotateX(-10deg) rotateY(15deg);">
+                  <svg viewBox="0 0 100 100" class="w-full h-full opacity-30">
+                    <path d="M15 32 L50 15 L50 28 L85 28 L85 48 L50 48 L50 62 Z" fill="#00f5d4"/>
+                    <path d="M85 68 L50 85 L50 72 L15 72 L15 52 L50 52 L50 38 Z" fill="#8338ec"/>
+                    <circle cx="50" cy="50" r="7" fill="#fff"/>
+                  </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-3">No members yet</h3>
+                <p class="text-slate-400 mb-6 max-w-sm mx-auto">Be the first to join SkillSwap and start the community!</p>
+                <button @click="showSignup = true" class="btn-3d px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold">Sign Up First</button>
+              </div>
+
+              <!-- No Search Results -->
+              <div v-else-if="filteredUsers.length === 0" class="text-center py-20">
+                <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-slate-900 flex items-center justify-center border border-slate-800">
+                  <svg class="w-10 h-10 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                  </svg>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">No matches found</h3>
+                <p class="text-slate-400">Try a different search term.</p>
+              </div>
+
+              <!-- Grid -->
+              <div v-else class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 perspective-container">
+                <div v-for="user in filteredUsers" :key="user.id" @click="viewProfile(user.id)" class="tilt-card relative bg-[#12121f] rounded-2xl border border-slate-800 p-6 cursor-pointer group">
+                  <div class="absolute -inset-[1px] rounded-[inherit] bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 opacity-0 group-hover:opacity-40 blur-md transition-opacity duration-500 -z-10"></div>
+                  <div class="flex items-start justify-between mb-4">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center text-xl font-bold text-cyan-400 border border-cyan-500/20">
+                      {{ user.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() }}
+                    </div>
+                    <span class="text-sm text-slate-500">{{ user.age }} yrs</span>
+                  </div>
+                  <h3 class="text-lg font-bold text-white mb-1">{{ user.name }}</h3>
+                  <p class="text-slate-400 text-sm mb-4 line-clamp-2">{{ user.bio }}</p>
+                  <div class="mb-3">
+                    <p class="text-xs text-slate-500 mb-2 font-medium uppercase tracking-wider">Teaches</p>
+                    <div class="flex flex-wrap gap-1.5">
+                      <span v-for="skill in user.skills.slice(0,3)" :key="skill" class="skill-tag px-2.5 py-1 rounded-lg text-xs font-medium">{{ skill }}</span>
+                      <span v-if="user.skills.length > 3" class="text-xs text-slate-500 px-1">+{{ user.skills.length - 3 }}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p class="text-xs text-slate-500 mb-2 font-medium uppercase tracking-wider">Wants to Learn</p>
+                    <div class="flex flex-wrap gap-1.5">
+                      <span v-for="want in user.wants.slice(0,3)" :key="want" class="want-tag px-2.5 py-1 rounded-lg text-xs font-medium">{{ want }}</span>
+                      <span v-if="user.wants.length > 3" class="text-xs text-slate-500 px-1">+{{ user.wants.length - 3 }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PROFILE -->
+          <div v-if="currentView === 'profile' && viewedUser" class="min-h-screen pt-24 pb-20 px-4">
+            <div class="max-w-2xl mx-auto">
+              <button @click="goHome" class="mb-6 flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                Back to Browse
+              </button>
+              <div class="bg-[#12121f] rounded-3xl border border-slate-800 p-8 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-purple-600/10 rounded-full blur-[80px] pointer-events-none"></div>
+                <div class="relative z-10">
+                  <div class="flex items-start justify-between mb-6">
+                    <div class="flex items-center gap-4">
+                      <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center text-2xl font-bold text-cyan-400 border border-cyan-500/20">
+                        {{ viewedUser.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() }}
+                      </div>
+                      <div>
+                        <div class="flex items-center gap-3">
+                          <h2 v-if="!isEditing" class="text-2xl font-bold font-display">{{ viewedUser.name }}</h2>
+                          <input v-else v-model="editForm.name" class="text-2xl font-bold font-display bg-transparent border-b border-cyan-500/50 px-0 py-1 w-48" placeholder="Name">
+                          <span v-if="isOwnProfile" class="px-2 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium">You</span>
+                        </div>
+                        <p class="text-slate-500">{{ viewedUser.age }} years old</p>
+                      </div>
+                    </div>
+                    <button v-if="isOwnProfile" @click="toggleEdit" class="btn-3d px-4 py-2 rounded-xl bg-slate-800 text-sm font-medium border border-slate-700">
+                      {{ isEditing ? 'Cancel' : 'Edit Profile' }}
+                    </button>
+                  </div>
+
+                  <div class="mb-6">
+                    <h3 class="text-sm font-medium text-slate-500 mb-2 uppercase tracking-wider">Bio</h3>
+                    <p v-if="!isEditing" class="text-slate-300 leading-relaxed">{{ viewedUser.bio || 'No bio yet.' }}</p>
+                    <textarea v-else v-model="editForm.bio" rows="3" class="w-full rounded-xl resize-none" placeholder="Tell us about yourself..."></textarea>
+                  </div>
+
+                  <div class="mb-6">
+                    <h3 class="text-sm font-medium text-slate-500 mb-3 uppercase tracking-wider">Skills I Can Teach</h3>
+                    <div v-if="!isEditing" class="flex flex-wrap gap-2">
+                      <span v-for="skill in viewedUser.skills" :key="skill" class="skill-tag px-3 py-1.5 rounded-lg text-sm font-medium">{{ skill }}</span>
+                    </div>
+                    <input v-else v-model="editForm.skills" class="w-full rounded-xl" placeholder="Comma separated skills...">
+                  </div>
+
+                  <div class="mb-8">
+                    <h3 class="text-sm font-medium text-slate-500 mb-3 uppercase tracking-wider">Skills I Want to Learn</h3>
+                    <div v-if="!isEditing" class="flex flex-wrap gap-2">
+                      <span v-for="want in viewedUser.wants" :key="want" class="want-tag px-3 py-1.5 rounded-lg text-sm font-medium">{{ want }}</span>
+                    </div>
+                    <input v-else v-model="editForm.wants" class="w-full rounded-xl" placeholder="Comma separated wants...">
+                  </div>
+
+                  <div v-if="isEditing" class="flex gap-3 mb-6">
+                    <button @click="saveProfile" class="btn-3d flex-1 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold">Save Changes</button>
+                  </div>
+
+                  <div v-if="!isOwnProfile" class="border-t border-slate-800 pt-6">
+                    <button @click="openBooking" class="btn-3d w-full py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold text-lg flex items-center justify-center gap-2">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                      </svg>
+                      Book a Session
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BOOKING MODAL -->
+          <div v-if="showBooking" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" @click="showBooking = false"></div>
+            <div class="modal-overlay relative bg-[#12121f] rounded-3xl border border-slate-700 p-8 max-w-md w-full">
+              <button @click="showBooking = false" class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+              <h2 class="text-2xl font-bold font-display mb-2">Book a Session</h2>
+              <p class="text-slate-500 mb-6">with {{ viewedUser.name }}</p>
+              <form @submit.prevent="confirmBooking" class="space-y-4">
+                <div>
+                  <label class="block text-sm text-slate-400 mb-1">Date</label>
+                  <input v-model="bookingForm.date" type="date" required class="w-full px-4 py-3 rounded-xl">
+                </div>
+                <div>
+                  <label class="block text-sm text-slate-400 mb-1">Time</label>
+                  <select v-model="bookingForm.time" required class="w-full px-4 py-3 rounded-xl">
+                    <option value="">Select a time</option>
+                    <option v-for="t in timeSlots" :key="t" :value="t">{{ t }}</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm text-slate-400 mb-1">What skill do you want to learn?</label>
+                  <select v-model="bookingForm.skill" required class="w-full px-4 py-3 rounded-xl">
+                    <option value="">Select a skill</option>
+                    <option v-for="skill in viewedUser.skills" :key="skill" :value="skill">{{ skill }}</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm text-slate-400 mb-1">Message (optional)</label>
+                  <textarea v-model="bookingForm.message" rows="2" class="w-full px-4 py-3 rounded-xl resize-none" placeholder="Hey, I'd love to learn..."></textarea>
+                </div>
+                <button type="submit" class="btn-3d w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold">Send Request</button>
+              </form>
+              <div v-if="bookingPreview" class="mt-6 p-4 rounded-xl bg-slate-900/50 border border-slate-800 text-sm space-y-2">
+                <p class="text-cyan-400 font-medium">Notifications that would be sent:</p>
+                <div class="text-slate-400">
+                  <p><strong>Email to {{ viewedUser.email }}:</strong></p>
+                  <p class="text-slate-500 italic">"{{ currentUser.name }} wants to book a {{ bookingForm.skill }} session on {{ bookingForm.date }} at {{ bookingForm.time }}. Reply to confirm!"</p>
+                </div>
+                <div class="text-slate-400">
+                  <p><strong>SMS to {{ viewedUser.phone }}:</strong></p>
+                  <p class="text-slate-500 italic">"SkillSwap: {{ currentUser.name }} booked {{ bookingForm.skill }} - {{ bookingForm.date }} {{ bookingForm.time }}. Reply YES to confirm."</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NOTIFICATION TOAST -->
+          <div v-if="notification" class="fixed bottom-6 right-6 z-[70] max-w-sm">
+            <div class="bg-[#12121f] border border-slate-700 rounded-2xl p-4 shadow-2xl flex items-start gap-3" :class="notification.type === 'success' ? 'border-cyan-500/30' : 'border-red-500/30'">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" :class="notification.type === 'success' ? 'bg-cyan-500/10 text-cyan-400' : 'bg-red-500/10 text-red-400'">
+                <svg v-if="notification.type === 'success'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </div>
+              <div>
+                <p class="font-medium text-white">{{ notification.title }}</p>
+                <p class="text-sm text-slate-400">{{ notification.message }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `,
+      setup() {
+        const users = ref([]);
+        const currentUser = ref(null);
+        const currentView = ref('landing');
+        const viewedUserId = ref(null);
+        const isEditing = ref(false);
+        const showSignup = ref(false);
+        const showBooking = ref(false);
+        const searchQuery = ref('');
+        const scrollY = ref(0);
+        const notification = ref(null);
+        const bookingPreview = ref(false);
+
+        const signupForm = ref({ name: '', email: '', phone: '', age: '', skills: '', wants: '', bio: '' });
+        const bookingForm = ref({ date: '', time: '', skill: '', message: '' });
+        const editForm = ref({ name: '', bio: '', skills: '', wants: '' });
+
+        const timeSlots = ['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM', '6:00 PM', '7:00 PM'];
+
+        const viewedUser = computed(() => users.value.find(u => u.id === viewedUserId.value));
+        const isOwnProfile = computed(() => currentUser.value && viewedUser.value && currentUser.value.id === viewedUser.value.id);
+
+        const filteredUsers = computed(() => {
+          let result = users.value;
+          const q = searchQuery.value.toLowerCase();
+          if (q) {
+            result = result.filter(u => 
+              u.name.toLowerCase().includes(q) ||
+              u.skills.some(s => s.toLowerCase().includes(q)) ||
+              u.wants.some(w => w.toLowerCase().includes(q)) ||
+              u.bio.toLowerCase().includes(q)
+            );
+          }
+          if (currentUser.value) {
+            result = [...result].sort((a, b) => {
+              const aMatch = a.skills.filter(s => currentUser.value.wants.includes(s)).length;
+              const bMatch = b.skills.filter(s => currentUser.value.wants.includes(s)).length;
+              return bMatch - aMatch;
+            });
+          }
+          return result;
+        });
+
+        function showNotify(title, message, type = 'success') {
+          notification.value = { title, message, type };
+          setTimeout(() => notification.value = null, 4000);
+        }
+
+        function handleSignup() {
+          const newUser = {
+            id: Date.now(),
+            name: signupForm.value.name,
+            email: signupForm.value.email,
+            phone: signupForm.value.phone,
+            age: parseInt(signupForm.value.age),
+            skills: signupForm.value.skills.split(',').map(s => s.trim()).filter(Boolean),
+            wants: signupForm.value.wants.split(',').map(s => s.trim()).filter(Boolean),
+            bio: signupForm.value.bio
+          };
+          users.value.push(newUser);
+          currentUser.value = newUser;
+          showSignup.value = false;
+          signupForm.value = { name: '', email: '', phone: '', age: '', skills: '', wants: '', bio: '' };
+          showNotify('Welcome!', 'Your profile has been created. Start browsing members!', 'success');
+          goToBrowse();
+        }
+
+        function goHome() {
+          currentView.value = 'home';
+          viewedUserId.value = null;
+          isEditing.value = false;
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          setTimeout(handleScroll, 150);
+        }
+
+        function goToBrowse() {
+          currentView.value = 'home';
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          setTimeout(handleScroll, 150);
+        }
+
+        function viewProfile(id) {
+          viewedUserId.value = id;
+          currentView.value = 'profile';
+          isEditing.value = false;
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          setTimeout(handleScroll, 150);
+        }
+
+        function toggleEdit() {
+          if (isEditing.value) {
+            isEditing.value = false;
+            return;
+          }
+          editForm.value = {
+            name: viewedUser.value.name,
+            bio: viewedUser.value.bio,
+            skills: viewedUser.value.skills.join(', '),
+            wants: viewedUser.value.wants.join(', ')
+          };
+          isEditing.value = true;
+        }
+
+        function saveProfile() {
+          const user = users.value.find(u => u.id === currentUser.value.id);
+          if (user) {
+            user.name = editForm.value.name;
+            user.bio = editForm.value.bio;
+            user.skills = editForm.value.skills.split(',').map(s => s.trim()).filter(Boolean);
+            user.wants = editForm.value.wants.split(',').map(s => s.trim()).filter(Boolean);
+            currentUser.value = { ...user };
+          }
+          isEditing.value = false;
+          showNotify('Profile Updated', 'Your changes have been saved.', 'success');
+        }
+
+        function openBooking() {
+          bookingForm.value = { date: '', time: '', skill: '', message: '' };
+          bookingPreview.value = false;
+          showBooking.value = true;
+        }
+
+        function confirmBooking() {
+          if (!bookingForm.value.date || !bookingForm.value.time || !bookingForm.value.skill) return;
+          bookingPreview.value = true;
+          showNotify('Booking Request Sent!', `We notified ${viewedUser.value.name} via email and SMS.`, 'success');
+          setTimeout(() => { showBooking.value = false; bookingPreview.value = false; }, 3000);
+        }
+
+        function logout() {
+          currentUser.value = null;
+          currentView.value = 'landing';
+          showNotify('Logged Out', 'See you next time!', 'success');
+        }
+
+        function handleScroll() {
+          scrollY.value = window.scrollY;
+          const reveals = document.querySelectorAll('.reveal');
+          reveals.forEach(el => {
+            const top = el.getBoundingClientRect().top;
+            const visible = top < window.innerHeight - 80;
+            if (visible) el.classList.add('visible');
+          });
+          const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+          const progress = docHeight > 0 ? (scrollY.value / docHeight) * 100 : 0;
+          const bar = document.getElementById('scroll-progress');
+          if (bar) bar.style.width = progress + '%';
+
+          // Parallax
+          const parallaxEls = document.querySelectorAll('[data-parallax]');
+          parallaxEls.forEach(el => {
+            const speed = parseFloat(el.dataset.parallax) || 0.5;
+            const yPos = -(scrollY.value * speed);
+            el.style.transform = `translateY(${yPos}px)`;
+          });
+
+          // Hero fade on scroll
+          const heroContent = document.querySelector('.hero-content');
+          if (heroContent && currentView.value === 'landing') {
+            const opacity = Math.max(0, 1 - scrollY.value / 500);
+            heroContent.style.opacity = opacity;
+          }
+        }
+
+        watch(currentView, () => {
+          setTimeout(handleScroll, 100);
+        });
+
+        onMounted(() => {
+          window.addEventListener('scroll', handleScroll);
+          setTimeout(handleScroll, 100);
+
+          // Logo mouse interaction
+          const logo = document.getElementById('hero-logo');
+          if (logo) {
+            logo.addEventListener('mousemove', (e) => {
+              const rect = logo.getBoundingClientRect();
+              const x = (e.clientX - rect.left) / rect.width - 0.5;
+              const y = (e.clientY - rect.top) / rect.height - 0.5;
+              logo.style.animationPlayState = 'paused';
+              logo.style.transform = `rotateY(${15 + x * 40}deg) rotateX(${-10 - y * 30}deg)`;
+            });
+            logo.addEventListener('mouseleave', () => {
+              logo.style.animationPlayState = 'running';
+              logo.style.transform = '';
+            });
+          }
+        });
+
+        onUnmounted(() => {
+          window.removeEventListener('scroll', handleScroll);
+        });
+
+        return {
+          users, currentUser, currentView, viewedUserId, isEditing, showSignup, showBooking,
+          searchQuery, scrollY, notification, bookingPreview, signupForm, bookingForm, editForm,
+          timeSlots, viewedUser, isOwnProfile, filteredUsers,
+          handleSignup, goHome, goToBrowse, viewProfile, toggleEdit, saveProfile,
+          openBooking, confirmBooking, logout
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
