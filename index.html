@@ -14,7 +14,6 @@
       --teal: #0d9488;
       --teal-light: #5eead4;
       --teal-dark: #0f766e;
-      --teal-pale: #ccfbf1;
       --charcoal: #1e293b;
       --slate: #475569;
       --slate-light: #94a3b8;
@@ -32,7 +31,6 @@
     }
     .font-display { font-family: 'Playfair Display', serif; }
     .perspective-container { perspective: 1200px; }
-    .preserve-3d { transform-style: preserve-3d; }
     .tilt-card {
       transform-style: preserve-3d;
       transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
@@ -58,10 +56,6 @@
       -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid rgba(0,0,0,0.05);
     }
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-12px); }
-    }
     @keyframes shimmer {
       0% { background-position: -200% center; }
       100% { background-position: 200% center; }
@@ -70,21 +64,9 @@
       0% { opacity: 0; transform: scale(0.95) translateY(20px); }
       100% { opacity: 1; transform: scale(1) translateY(0); }
     }
-    @keyframes arrow-bounce {
-      0%, 100% { transform: translateY(0); opacity: 0.5; }
-      50% { transform: translateY(8px); opacity: 1; }
-    }
     @keyframes typing-dot {
       0%, 60%, 100% { transform: translateY(0); }
       30% { transform: translateY(-6px); }
-    }
-    @keyframes fade-up {
-      0% { opacity: 0; transform: translateY(30px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes pulse-ring {
-      0% { transform: scale(0.8); opacity: 1; }
-      100% { transform: scale(1.5); opacity: 0; }
     }
     .shimmer-text {
       background: linear-gradient(90deg, #0d9488, #5eead4, #0f766e, #0d9488);
@@ -124,7 +106,6 @@
     .modal-overlay {
       animation: modal-in 0.3s cubic-bezier(0.23, 1, 0.32, 1);
     }
-    .scroll-hint { animation: arrow-bounce 2s ease-in-out infinite; }
     input, textarea, select {
       background: var(--white);
       border: 1px solid var(--border);
@@ -217,17 +198,6 @@
       align-items: center;
       justify-content: center;
     }
-    .testimonial-card {
-      background: white;
-      border-radius: 20px;
-      border: 1px solid #e2e8f0;
-      padding: 28px;
-      transition: all 0.3s;
-    }
-    .testimonial-card:hover {
-      box-shadow: 0 20px 40px rgba(13,148,136,0.08);
-      transform: translateY(-4px);
-    }
     .category-pill {
       padding: 8px 20px;
       border-radius: 100px;
@@ -253,19 +223,30 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .wave-divider {
+    .demo-badge {
       position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      overflow: hidden;
-      line-height: 0;
+      top: 12px;
+      right: 12px;
+      background: linear-gradient(135deg, #0d9488, #14b8a6);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 100px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .wave-divider svg {
-      position: relative;
-      display: block;
-      width: calc(100% + 1.3px);
-      height: 80px;
+    .export-box {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 16px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #64748b;
+      word-break: break-all;
+      max-height: 120px;
+      overflow-y: auto;
     }
   </style>
 </head>
@@ -275,6 +256,71 @@
 
   <script>
     const { createApp, ref, computed, onMounted, onUnmounted, watch, nextTick } = Vue;
+
+    // DEMO USERS - these are baked into the code so EVERYONE sees them
+    const DEMO_USERS = [
+      {
+        id: 1001,
+        name: "Sarah Chen",
+        email: "sarah.chen@email.com",
+        phone: "+1 555-0101",
+        age: 28,
+        skills: ["Python", "Data Science", "Machine Learning"],
+        wants: ["Guitar", "Spanish", "Photography"],
+        bio: "Software engineer with 5 years of experience. Love hiking and trying new cuisines. Looking to pick up creative skills outside of tech."
+      },
+      {
+        id: 1002,
+        name: "Marcus Johnson",
+        email: "marcus.j@email.com",
+        phone: "+1 555-0102",
+        age: 34,
+        skills: ["Guitar", "Music Theory", "Songwriting"],
+        wants: ["JavaScript", "Web Design", "Marketing"],
+        bio: "Professional musician and guitar teacher. Played in bands for 10 years. Want to build my own website and learn digital marketing."
+      },
+      {
+        id: 1003,
+        name: "Aisha Patel",
+        email: "aisha.patel@email.com",
+        phone: "+1 555-0103",
+        age: 26,
+        skills: ["Photography", "Photo Editing", "Adobe Lightroom"],
+        wants: ["Cooking", "Yoga", "Public Speaking"],
+        bio: "Freelance photographer specializing in portraits and events. Always looking to expand my creative and wellness skills."
+      },
+      {
+        id: 1004,
+        name: "David Kim",
+        email: "david.kim@email.com",
+        phone: "+1 555-0104",
+        age: 31,
+        skills: ["Cooking", "Baking", "Meal Prep"],
+        wants: ["Photography", "Video Editing", "Social Media"],
+        bio: "Chef with a passion for fusion cuisine. I teach cooking classes on weekends and want to start a food blog with great visuals."
+      },
+      {
+        id: 1005,
+        name: "Emma Rodriguez",
+        email: "emma.r@email.com",
+        phone: "+1 555-0105",
+        age: 24,
+        skills: ["Spanish", "Translation", "Creative Writing"],
+        wants: ["Coding", "UI/UX Design", "Illustration"],
+        bio: "Bilingual writer and translator. Fluent in Spanish and English. Fascinated by tech and want to transition into design."
+      },
+      {
+        id: 1006,
+        name: "James Wilson",
+        email: "james.w@email.com",
+        phone: "+1 555-0106",
+        age: 29,
+        skills: ["Fitness Training", "Nutrition", "Yoga"],
+        wants: ["Business Strategy", "Public Speaking", "Meditation"],
+        bio: "Certified personal trainer and nutrition coach. Help people build healthy habits. Looking to grow my coaching business."
+      }
+    ];
+
     createApp({
       template: `
         <div class="relative z-10 min-h-screen">
@@ -289,7 +335,7 @@
                 </div>
                 <span class="font-display font-bold text-xl tracking-tight group-hover:text-[#0d9488] transition-colors">SkillSwap</span>
               </div>
-              <div class="flex items-center gap-3">
+              <div class="flex items-center gap-2">
                 <button v-if="currentUser" @click="toggleChat" class="relative p-2 rounded-xl hover:bg-slate-100 transition-colors">
                   <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
@@ -330,8 +376,6 @@
 
           <!-- LANDING PAGE -->
           <div v-if="currentView === 'landing'" class="min-h-screen flex flex-col items-center px-4 pt-28 pb-20 relative">
-
-            <!-- Hero Section -->
             <div class="w-full max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center mb-24">
               <div class="hero-content relative z-10">
                 <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-50 border border-teal-100 text-[#0f766e] text-sm font-medium mb-6">
@@ -342,7 +386,7 @@
                   Exchange<br><span class="teal-text">Knowledge</span><br>With Experts
                 </h1>
                 <p class="text-lg text-slate-500 mb-8 max-w-md leading-relaxed">
-                  Teach what you know, learn what you don't. Connect with professionals and grow your skills through one-on-one exchanges. No fees, no middlemen — just pure skill trading.
+                  Teach what you know, learn what you don't. Connect with professionals and grow your skills through one-on-one exchanges. No fees, no middlemen.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4">
                   <button @click="showSignup = true" class="btn-teal px-8 py-4 rounded-2xl teal-gradient text-white font-semibold text-lg shadow-xl">Get Started</button>
@@ -376,22 +420,13 @@
                     </div>
                   </div>
                 </div>
-                <div class="absolute -top-4 -right-4 bg-white rounded-2xl shadow-lg p-4 border border-slate-100">
-                  <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-full bg-teal-50 flex items-center justify-center">
-                      <svg class="w-4 h-4 text-[#0d9488]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    </div>
-                    <span class="text-sm font-medium text-slate-700">Flexible Scheduling</span>
-                  </div>
-                </div>
               </div>
             </div>
 
-            <!-- Stats Bar -->
             <div class="w-full max-w-5xl mx-auto mb-24 reveal">
               <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-8 grid grid-cols-2 md:grid-cols-4 gap-8">
                 <div class="text-center">
-                  <p class="stat-number">{{ users.length || 0 }}</p>
+                  <p class="stat-number">{{ allUsers.length }}</p>
                   <p class="text-sm text-slate-500 mt-1">Active Members</p>
                 </div>
                 <div class="text-center">
@@ -409,13 +444,11 @@
               </div>
             </div>
 
-            <!-- How It Works -->
             <div class="w-full max-w-5xl mb-24 relative z-10">
               <div class="text-center mb-16">
                 <p class="text-[#0d9488] text-sm font-semibold uppercase tracking-widest mb-3">How It Works</p>
                 <h2 class="text-3xl md:text-4xl font-bold font-display mb-4">Three Simple Steps</h2>
                 <div class="section-divider mx-auto"></div>
-                <p class="text-slate-500 mt-4 max-w-md mx-auto">Getting started takes less than two minutes. Here's how the magic happens.</p>
               </div>
               <div class="grid md:grid-cols-3 gap-8 perspective-container">
                 <div class="reveal tilt-card relative bg-white rounded-2xl border border-slate-100 p-8 text-center shadow-sm hover:shadow-xl transition-shadow">
@@ -426,7 +459,7 @@
                   </div>
                   <div class="w-8 h-8 rounded-full bg-teal-50 text-[#0d9488] text-sm font-bold flex items-center justify-center mx-auto mb-4">1</div>
                   <h3 class="text-xl font-bold text-slate-800 mb-3">Create Profile</h3>
-                  <p class="text-slate-500 leading-relaxed">Share your expertise and what you want to learn. Build your professional profile in seconds with just your name, skills, and interests.</p>
+                  <p class="text-slate-500 leading-relaxed">Share your expertise and what you want to learn. Build your professional profile in seconds.</p>
                 </div>
                 <div class="reveal tilt-card relative bg-white rounded-2xl border border-slate-100 p-8 text-center shadow-sm hover:shadow-xl transition-shadow" style="transition-delay: 0.1s">
                   <div class="w-16 h-16 mx-auto mb-6 rounded-2xl teal-gradient flex items-center justify-center shadow-lg">
@@ -436,7 +469,7 @@
                   </div>
                   <div class="w-8 h-8 rounded-full bg-teal-50 text-[#0d9488] text-sm font-bold flex items-center justify-center mx-auto mb-4">2</div>
                   <h3 class="text-xl font-bold text-slate-800 mb-3">Find Matches</h3>
-                  <p class="text-slate-500 leading-relaxed">Browse professionals and find your perfect skill match. Our smart sorting puts the best fits first based on what you want to learn.</p>
+                  <p class="text-slate-500 leading-relaxed">Browse professionals and find your perfect skill match. Smart sorting puts the best fits first.</p>
                 </div>
                 <div class="reveal tilt-card relative bg-white rounded-2xl border border-slate-100 p-8 text-center shadow-sm hover:shadow-xl transition-shadow" style="transition-delay: 0.2s">
                   <div class="w-16 h-16 mx-auto mb-6 rounded-2xl teal-gradient flex items-center justify-center shadow-lg">
@@ -446,22 +479,18 @@
                   </div>
                   <div class="w-8 h-8 rounded-full bg-teal-50 text-[#0d9488] text-sm font-bold flex items-center justify-center mx-auto mb-4">3</div>
                   <h3 class="text-xl font-bold text-slate-800 mb-3">Book & Chat</h3>
-                  <p class="text-slate-500 leading-relaxed">Schedule a session and start trading knowledge. Built-in chat keeps you connected before, during, and after your skill swap.</p>
+                  <p class="text-slate-500 leading-relaxed">Schedule a session and start trading knowledge. Built-in chat keeps you connected.</p>
                 </div>
               </div>
             </div>
 
-            <!-- Featured Image Section -->
             <div class="w-full max-w-6xl mb-24 grid lg:grid-cols-2 gap-12 items-center reveal">
               <div class="order-2 lg:order-1">
                 <p class="text-[#0d9488] text-sm font-semibold uppercase tracking-widest mb-3">Why SkillSwap</p>
                 <h2 class="text-3xl md:text-4xl font-bold font-display mb-6">Learn From Real Professionals</h2>
                 <div class="section-divider mb-6"></div>
                 <p class="text-slate-500 leading-relaxed mb-6">
-                  Unlike traditional courses, SkillSwap connects you directly with people who have real-world experience. Learn guitar from a touring musician, coding from a startup founder, or photography from a published artist. Every connection is a doorway to practical, hands-on knowledge.
-                </p>
-                <p class="text-slate-500 leading-relaxed mb-6">
-                  Our platform is built on the belief that everyone has something valuable to teach and something new to learn. Whether you are a beginner looking to pick up a hobby or a professional seeking to expand your expertise, there is someone here ready to help you grow.
+                  Unlike traditional courses, SkillSwap connects you directly with people who have real-world experience. Learn guitar from a touring musician, coding from a startup founder, or photography from a published artist.
                 </p>
                 <ul class="space-y-3">
                   <li class="flex items-center gap-3 text-slate-600">
@@ -487,7 +516,6 @@
               </div>
             </div>
 
-            <!-- Second Image Section -->
             <div class="w-full max-w-6xl mb-24 grid lg:grid-cols-2 gap-12 items-center reveal">
               <div>
                 <img src="https://kimi-web-img.moonshot.cn/img/www.mksgroup.com.au/45abaaa2279e35ce39f11b5f10c7d506e2c12ce0.png" alt="Team collaboration workshop" class="hero-img w-full h-[420px] object-cover">
@@ -499,12 +527,9 @@
                 <p class="text-slate-500 leading-relaxed mb-6">
                   SkillSwap is more than a platform — it is a community of lifelong learners. Whether you are looking to pick up a new hobby, advance your career, or simply meet like-minded people, there is someone here ready to help.
                 </p>
-                <p class="text-slate-500 leading-relaxed mb-8">
-                  Our members range from college students to seasoned professionals, from artists to engineers. The diversity of skills and backgrounds means you will always find someone who can teach you something new — and someone who wants to learn what you know.
-                </p>
                 <div class="grid grid-cols-3 gap-6">
                   <div class="text-center p-4 rounded-2xl bg-white border border-slate-100">
-                    <p class="stat-number text-2xl">{{ users.length || 0 }}</p>
+                    <p class="stat-number text-2xl">{{ allUsers.length }}</p>
                     <p class="text-xs text-slate-400 mt-1">Members</p>
                   </div>
                   <div class="text-center p-4 rounded-2xl bg-white border border-slate-100">
@@ -519,7 +544,6 @@
               </div>
             </div>
 
-            <!-- Popular Categories -->
             <div class="w-full max-w-5xl mb-24 reveal">
               <div class="text-center mb-12">
                 <p class="text-[#0d9488] text-sm font-semibold uppercase tracking-widest mb-3">Explore</p>
@@ -565,7 +589,6 @@
               </div>
             </div>
 
-            <!-- How It Works Deep Dive -->
             <div class="w-full max-w-6xl mb-24 reveal">
               <div class="text-center mb-16">
                 <p class="text-[#0d9488] text-sm font-semibold uppercase tracking-widest mb-3">Details</p>
@@ -580,7 +603,7 @@
                     </div>
                     <div>
                       <h4 class="font-bold text-slate-800 text-lg mb-2">Is it really free?</h4>
-                      <p class="text-slate-500 text-sm leading-relaxed">Yes, absolutely. SkillSwap operates on a barter system — you teach someone a skill, and they teach you one in return. No money changes hands. Ever. Our mission is to make knowledge accessible to everyone.</p>
+                      <p class="text-slate-500 text-sm leading-relaxed">Yes, absolutely. SkillSwap operates on a barter system — you teach someone a skill, and they teach you one in return. No money changes hands. Ever.</p>
                     </div>
                   </div>
                 </div>
@@ -591,7 +614,7 @@
                     </div>
                     <div>
                       <h4 class="font-bold text-slate-800 text-lg mb-2">Who can join?</h4>
-                      <p class="text-slate-500 text-sm leading-relaxed">Anyone with a skill to share and a desire to learn. Whether you are a student, professional, retiree, or hobbyist — if you have knowledge worth sharing, you belong here. Age 13 and up.</p>
+                      <p class="text-slate-500 text-sm leading-relaxed">Anyone with a skill to share and a desire to learn. Whether you are a student, professional, retiree, or hobbyist — if you have knowledge worth sharing, you belong here.</p>
                     </div>
                   </div>
                 </div>
@@ -602,7 +625,7 @@
                     </div>
                     <div>
                       <h4 class="font-bold text-slate-800 text-lg mb-2">How do sessions work?</h4>
-                      <p class="text-slate-500 text-sm leading-relaxed">Once you find a match, use our built-in booking system to schedule a time. Sessions can be in-person or virtual — you decide what works best. Our chat keeps you connected every step of the way.</p>
+                      <p class="text-slate-500 text-sm leading-relaxed">Once you find a match, use our built-in booking system to schedule a time. Sessions can be in-person or virtual — you decide what works best.</p>
                     </div>
                   </div>
                 </div>
@@ -613,14 +636,13 @@
                     </div>
                     <div>
                       <h4 class="font-bold text-slate-800 text-lg mb-2">Is it safe?</h4>
-                      <p class="text-slate-500 text-sm leading-relaxed">We recommend meeting in public spaces for in-person sessions and using our built-in chat to get to know your match first. Always trust your instincts and report any concerns immediately.</p>
+                      <p class="text-slate-500 text-sm leading-relaxed">We recommend meeting in public spaces for in-person sessions and using our built-in chat to get to know your match first. Always trust your instincts.</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Third Image Section -->
             <div class="w-full max-w-6xl mb-24 grid lg:grid-cols-2 gap-12 items-center reveal">
               <div class="order-2 lg:order-1">
                 <p class="text-[#0d9488] text-sm font-semibold uppercase tracking-widest mb-3">Success Stories</p>
@@ -628,9 +650,6 @@
                 <div class="section-divider mb-6"></div>
                 <p class="text-slate-500 leading-relaxed mb-6">
                   Every day, our members are trading skills and transforming their lives. From a graphic designer learning Python to a chef mastering Spanish, the possibilities are endless when knowledge flows freely.
-                </p>
-                <p class="text-slate-500 leading-relaxed mb-8">
-                  The best part? You are not just learning a skill — you are building meaningful connections with people who share your passion for growth. Many of our members have formed lasting friendships and even business partnerships through SkillSwap.
                 </p>
                 <div class="flex items-center gap-4">
                   <div class="flex -space-x-2">
@@ -646,7 +665,6 @@
               </div>
             </div>
 
-            <!-- CTA Section -->
             <div class="w-full max-w-4xl mx-auto text-center relative z-10 reveal mb-24">
               <div class="bg-gradient-to-br from-[#0d9488] to-[#0f766e] rounded-3xl p-12 text-white shadow-2xl relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-[80px]"></div>
@@ -740,20 +758,9 @@
                   </svg>
                 </div>
               </div>
-              <p v-if="users.length > 0" class="text-slate-400 mb-6 text-center text-sm">{{ filteredUsers.length }} member{{ filteredUsers.length !== 1 ? 's' : '' }} found</p>
+              <p class="text-slate-400 mb-6 text-center text-sm">{{ filteredUsers.length }} member{{ filteredUsers.length !== 1 ? 's' : '' }} found</p>
 
-              <div v-if="users.length === 0" class="text-center py-20">
-                <div class="w-24 h-24 mx-auto mb-6 rounded-2xl bg-teal-50 flex items-center justify-center">
-                  <svg viewBox="0 0 24 24" class="w-10 h-10 text-[#0d9488]" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
-                  </svg>
-                </div>
-                <h3 class="text-2xl font-bold text-slate-800 mb-3">No members yet</h3>
-                <p class="text-slate-400 mb-6 max-w-sm mx-auto">Be the first to join SkillSwap and start the community! Create your profile and others will follow.</p>
-                <button @click="showSignup = true" class="btn-teal px-6 py-3 rounded-xl teal-gradient text-white font-semibold shadow-lg">Sign Up First</button>
-              </div>
-
-              <div v-else-if="filteredUsers.length === 0" class="text-center py-20">
+              <div v-if="filteredUsers.length === 0" class="text-center py-20">
                 <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100">
                   <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -765,6 +772,7 @@
 
               <div v-else class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 perspective-container">
                 <div v-for="user in filteredUsers" :key="user.id" @click="viewProfile(user.id)" class="tilt-card relative bg-white rounded-2xl border border-slate-100 p-6 cursor-pointer shadow-sm hover:shadow-xl transition-all group">
+                  <span v-if="user.isDemo" class="demo-badge">Demo</span>
                   <div class="flex items-start justify-between mb-4">
                     <div class="w-14 h-14 rounded-xl teal-gradient flex items-center justify-center text-lg font-bold text-white shadow-md">
                       {{ user.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() }}
@@ -812,11 +820,12 @@
                           <h2 v-if="!isEditing" class="text-2xl font-bold font-display text-slate-800">{{ viewedUser.name }}</h2>
                           <input v-else v-model="editForm.name" class="text-2xl font-bold font-display bg-transparent border-b border-[#0d9488]/50 px-0 py-1 w-48 text-slate-800" placeholder="Name">
                           <span v-if="isOwnProfile" class="px-2.5 py-1 rounded-lg bg-teal-50 border border-teal-200 text-[#0f766e] text-xs font-bold">You</span>
+                          <span v-if="viewedUser.isDemo" class="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 text-xs font-bold">Demo</span>
                         </div>
                         <p class="text-slate-400 text-sm">{{ viewedUser.age }} years old</p>
                       </div>
                     </div>
-                    <button v-if="isOwnProfile" @click="toggleEdit" class="btn-outline px-4 py-2 rounded-xl text-sm font-medium">
+                    <button v-if="isOwnProfile && !viewedUser.isDemo" @click="toggleEdit" class="btn-outline px-4 py-2 rounded-xl text-sm font-medium">
                       {{ isEditing ? 'Cancel' : 'Edit Profile' }}
                     </button>
                   </div>
@@ -847,7 +856,7 @@
                     <button @click="saveProfile" class="btn-teal flex-1 py-3 rounded-xl teal-gradient text-white font-semibold shadow-lg">Save Changes</button>
                   </div>
 
-                  <div v-if="!isOwnProfile" class="border-t border-slate-100 pt-6 flex gap-3">
+                  <div v-if="!isOwnProfile && !viewedUser.isDemo" class="border-t border-slate-100 pt-6 flex gap-3">
                     <button @click="openBooking" class="btn-teal flex-1 py-4 rounded-2xl teal-gradient text-white font-semibold text-lg shadow-lg flex items-center justify-center gap-2">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -860,6 +869,12 @@
                       </svg>
                       Message
                     </button>
+                  </div>
+                  <div v-else-if="viewedUser.isDemo" class="border-t border-slate-100 pt-6">
+                    <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-sm">
+                      <p class="text-amber-700 font-medium mb-1">Demo Profile</p>
+                      <p class="text-amber-600">This is a demo user. Sign up to create your own profile and message real members!</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -996,6 +1011,34 @@
             </div>
           </div>
 
+          <!-- EXPORT/SHARE MODAL -->
+          <div v-if="showExport" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" @click="showExport = false"></div>
+            <div class="modal-overlay relative bg-white rounded-3xl border border-slate-100 p-8 max-w-lg w-full shadow-2xl">
+              <button @click="showExport = false" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+              <h2 class="text-2xl font-bold font-display mb-2 text-slate-800">Share Your Profile</h2>
+              <p class="text-slate-400 text-sm mb-6">Copy this code and send it to friends so they can see you on their device!</p>
+
+              <div class="mb-4">
+                <label class="block text-sm text-slate-500 mb-1 font-medium">Your Profile Code</label>
+                <div class="export-box">{{ exportCode }}</div>
+              </div>
+              <button @click="copyExportCode" class="btn-teal w-full py-3 rounded-xl teal-gradient text-white font-semibold shadow-lg mb-6">
+                {{ copied ? 'Copied!' : 'Copy to Clipboard' }}
+              </button>
+
+              <div class="border-t border-slate-100 pt-6">
+                <label class="block text-sm text-slate-500 mb-1 font-medium">Paste Friend's Code</label>
+                <textarea v-model="importCode" rows="3" class="w-full px-4 py-3 rounded-xl resize-none text-sm" placeholder="Paste their code here..."></textarea>
+                <button @click="importFriend" :disabled="!importCode.trim()" class="btn-teal w-full py-3 rounded-xl teal-gradient text-white font-semibold shadow-lg mt-3 disabled:opacity-50 disabled:cursor-not-allowed">
+                  Add Friend
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- NOTIFICATION TOAST -->
           <div v-if="notification" class="fixed bottom-6 right-6 z-[80] max-w-sm">
             <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-2xl flex items-start gap-3" :class="notification.type === 'success' ? 'border-l-4 border-l-[#0d9488]' : 'border-l-4 border-l-red-400'">
@@ -1013,23 +1056,36 @@
       `,
 
       setup() {
-        const STORAGE_KEY = 'skillswap_data_v3';
+        const STORAGE_KEY = 'skillswap_data_v5';
 
+        // Load from localStorage
         const loadData = () => {
           try {
             const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) return JSON.parse(saved);
-          } catch(e) {}
-          return null;
+            if (saved) {
+              const parsed = JSON.parse(saved);
+              if (parsed && typeof parsed === 'object') {
+                return {
+                  localUsers: Array.isArray(parsed.localUsers) ? parsed.localUsers : [],
+                  currentUser: parsed.currentUser || null,
+                  messages: Array.isArray(parsed.messages) ? parsed.messages : [],
+                  notifications: Array.isArray(parsed.notifications) ? parsed.notifications : [],
+                  bookings: Array.isArray(parsed.bookings) ? parsed.bookings : []
+                };
+              }
+            }
+          } catch(e) { console.error('Load error:', e); }
+          return { localUsers: [], currentUser: null, messages: [], notifications: [], bookings: [] };
         };
 
-        const savedData = loadData();
+        const saved = loadData();
 
-        const users = ref(savedData?.users || []);
-        const currentUser = ref(savedData?.currentUser || null);
-        const messages = ref(savedData?.messages || []);
-        const notifications = ref(savedData?.notifications || []);
-        const bookings = ref(savedData?.bookings || []);
+        // localUsers = real people who signed up on THIS browser
+        const localUsers = ref(saved.localUsers);
+        const currentUser = ref(saved.currentUser);
+        const messages = ref(saved.messages);
+        const notifications = ref(saved.notifications);
+        const bookings = ref(saved.bookings);
 
         const currentView = ref('landing');
         const viewedUserId = ref(null);
@@ -1038,6 +1094,7 @@
         const showBooking = ref(false);
         const showChat = ref(false);
         const showNotifications = ref(false);
+        const showExport = ref(false);
         const searchQuery = ref('');
         const scrollY = ref(0);
         const notification = ref(null);
@@ -1046,6 +1103,9 @@
         const chatInput = ref('');
         const isTyping = ref(false);
         const chatMessagesRef = ref(null);
+        const exportCode = ref('');
+        const importCode = ref('');
+        const copied = ref(false);
 
         const signupForm = ref({ name: '', email: '', phone: '', age: '', skills: '', wants: '', bio: '' });
         const bookingForm = ref({ date: '', time: '', skill: '', message: '' });
@@ -1053,9 +1113,16 @@
 
         const timeSlots = ['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM', '6:00 PM', '7:00 PM'];
 
-        const viewedUser = computed(() => users.value.find(u => u.id === viewedUserId.value));
-        const isOwnProfile = computed(() => currentUser.value && viewedUser.value && currentUser.value.id === viewedUser.value.id);
-        const chatPartner = computed(() => users.value.find(u => u.id === chatUserId.value));
+        // allUsers = DEMO_USERS + localUsers (so everyone sees demo users + real signups)
+        const allUsers = computed(() => {
+          const demos = DEMO_USERS.map(u => ({ ...u, isDemo: true }));
+          const locals = localUsers.value.map(u => ({ ...u, isDemo: false }));
+          return [...demos, ...locals];
+        });
+
+        const viewedUser = computed(() => allUsers.value.find(u => u.id === viewedUserId.value));
+        const isOwnProfile = computed(() => currentUser.value && viewedUser.value && currentUser.value.id === viewedUser.value.id && !viewedUser.value.isDemo);
+        const chatPartner = computed(() => allUsers.value.find(u => u.id === chatUserId.value));
 
         const currentChatMessages = computed(() => {
           if (!currentUser.value || !chatUserId.value) return [];
@@ -1074,17 +1141,14 @@
               convos.set(otherId, { userId: otherId, lastMessage: m.text, time: m.time, unread: 0 });
             } else {
               const c = convos.get(otherId);
-              if (m.time > c.time) {
-                c.lastMessage = m.text;
-                c.time = m.time;
-              }
+              if (m.time > c.time) { c.lastMessage = m.text; c.time = m.time; }
             }
             if (m.receiverId === currentUser.value.id && !m.read) {
               convos.get(otherId).unread++;
             }
           });
           return Array.from(convos.values()).map(c => {
-            const user = users.value.find(u => u.id === c.userId);
+            const user = allUsers.value.find(u => u.id === c.userId);
             return { ...c, name: user?.name || 'Unknown' };
           }).sort((a, b) => b.time - a.time);
         });
@@ -1098,7 +1162,7 @@
 
         const totalSkills = computed(() => {
           const all = new Set();
-          users.value.forEach(u => u.skills.forEach(s => all.add(s)));
+          allUsers.value.forEach(u => u.skills.forEach(s => all.add(s)));
           return all.size;
         });
 
@@ -1106,7 +1170,7 @@
         const totalBookings = computed(() => bookings.value.length);
 
         const filteredUsers = computed(() => {
-          let result = users.value;
+          let result = allUsers.value;
           const q = searchQuery.value.toLowerCase();
           if (q) {
             result = result.filter(u => 
@@ -1126,18 +1190,19 @@
           return result;
         });
 
+        // SAVE FUNCTION - called after EVERY mutation
         const saveData = () => {
-          const data = {
-            users: users.value,
-            currentUser: currentUser.value,
-            messages: messages.value,
-            notifications: notifications.value,
-            bookings: bookings.value
-          };
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+          try {
+            const data = {
+              localUsers: localUsers.value,
+              currentUser: currentUser.value,
+              messages: messages.value,
+              notifications: notifications.value,
+              bookings: bookings.value
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+          } catch(e) { console.error('Save error:', e); }
         };
-
-        watch([users, currentUser, messages, notifications, bookings], saveData, { deep: true });
 
         function showNotify(title, message, type = 'success') {
           notification.value = { title, message, type };
@@ -1160,10 +1225,11 @@
             wants: signupForm.value.wants.split(',').map(s => s.trim()).filter(Boolean),
             bio: signupForm.value.bio
           };
-          users.value.push(newUser);
+          localUsers.value.push(newUser);
           currentUser.value = newUser;
           showSignup.value = false;
           signupForm.value = { name: '', email: '', phone: '', age: '', skills: '', wants: '', bio: '' };
+          saveData();
           showNotify('Welcome!', 'Your profile has been created. Start browsing members!', 'success');
           goToBrowse();
         }
@@ -1191,10 +1257,7 @@
         }
 
         function toggleEdit() {
-          if (isEditing.value) {
-            isEditing.value = false;
-            return;
-          }
+          if (isEditing.value) { isEditing.value = false; return; }
           editForm.value = {
             name: viewedUser.value.name,
             bio: viewedUser.value.bio,
@@ -1205,7 +1268,7 @@
         }
 
         function saveProfile() {
-          const user = users.value.find(u => u.id === currentUser.value.id);
+          const user = localUsers.value.find(u => u.id === currentUser.value.id);
           if (user) {
             user.name = editForm.value.name;
             user.bio = editForm.value.bio;
@@ -1214,6 +1277,7 @@
             currentUser.value = { ...user };
           }
           isEditing.value = false;
+          saveData();
           showNotify('Profile Updated', 'Your changes have been saved.', 'success');
         }
 
@@ -1227,36 +1291,33 @@
           if (!bookingForm.value.date || !bookingForm.value.time || !bookingForm.value.skill) return;
           bookingPreview.value = true;
           bookings.value.push({
-            id: Date.now(),
-            fromId: currentUser.value.id,
-            toId: viewedUser.value.id,
-            skill: bookingForm.value.skill,
-            date: bookingForm.value.date,
-            time: bookingForm.value.time,
-            message: bookingForm.value.message,
-            timeCreated: Date.now()
+            id: Date.now(), fromId: currentUser.value.id, toId: viewedUser.value.id,
+            skill: bookingForm.value.skill, date: bookingForm.value.date,
+            time: bookingForm.value.time, message: bookingForm.value.message, timeCreated: Date.now()
           });
           notifications.value.push({
-            id: Date.now(),
-            userId: viewedUser.value.id,
+            id: Date.now(), userId: viewedUser.value.id,
             title: 'New Booking Request',
             message: `${currentUser.value.name} wants to learn ${bookingForm.value.skill}`,
-            read: false,
-            time: Date.now(),
-            type: 'booking',
-            fromId: currentUser.value.id
+            read: false, time: Date.now(), type: 'booking', fromId: currentUser.value.id
           });
+          saveData();
           showNotify('Booking Request Sent!', `We notified ${viewedUser.value.name}.`, 'success');
           setTimeout(() => { showBooking.value = false; bookingPreview.value = false; }, 3000);
         }
 
         function startChat(userId) {
+          if (allUsers.value.find(u => u.id === userId)?.isDemo) {
+            showNotify('Demo User', 'This is a demo profile. Sign up to chat with real members!', 'success');
+            return;
+          }
           chatUserId.value = userId;
           showChat.value = true;
           showNotifications.value = false;
           messages.value.forEach(m => {
             if (m.senderId === userId && m.receiverId === currentUser.value?.id) m.read = true;
           });
+          saveData();
           nextTick(() => {
             if (chatMessagesRef.value) chatMessagesRef.value.scrollTop = chatMessagesRef.value.scrollHeight;
           });
@@ -1267,6 +1328,7 @@
           messages.value.forEach(m => {
             if (m.senderId === userId && m.receiverId === currentUser.value?.id) m.read = true;
           });
+          saveData();
           nextTick(() => {
             if (chatMessagesRef.value) chatMessagesRef.value.scrollTop = chatMessagesRef.value.scrollHeight;
           });
@@ -1281,15 +1343,12 @@
         function sendMessage() {
           if (!chatInput.value.trim() || !chatUserId.value || !currentUser.value) return;
           const msg = {
-            id: Date.now(),
-            senderId: currentUser.value.id,
-            receiverId: chatUserId.value,
-            text: chatInput.value.trim(),
-            time: Date.now(),
-            read: false
+            id: Date.now(), senderId: currentUser.value.id, receiverId: chatUserId.value,
+            text: chatInput.value.trim(), time: Date.now(), read: false
           };
           messages.value.push(msg);
           chatInput.value = '';
+          saveData();
           nextTick(() => {
             if (chatMessagesRef.value) chatMessagesRef.value.scrollTop = chatMessagesRef.value.scrollHeight;
           });
@@ -1304,25 +1363,17 @@
               "I'm excited to share what I know. Any questions before we begin?"
             ];
             const reply = {
-              id: Date.now() + 1,
-              senderId: chatUserId.value,
-              receiverId: currentUser.value.id,
-              text: replies[Math.floor(Math.random() * replies.length)],
-              time: Date.now(),
-              read: false
+              id: Date.now() + 1, senderId: chatUserId.value, receiverId: currentUser.value.id,
+              text: replies[Math.floor(Math.random() * replies.length)], time: Date.now(), read: false
             };
             messages.value.push(reply);
-            const partner = users.value.find(u => u.id === chatUserId.value);
+            const partner = allUsers.value.find(u => u.id === chatUserId.value);
             notifications.value.push({
-              id: Date.now() + 2,
-              userId: currentUser.value.id,
-              title: 'New Message',
+              id: Date.now() + 2, userId: currentUser.value.id, title: 'New Message',
               message: `${partner?.name || 'Someone'}: ${reply.text}`,
-              read: false,
-              time: Date.now(),
-              type: 'message',
-              fromId: chatUserId.value
+              read: false, time: Date.now(), type: 'message', fromId: chatUserId.value
             });
+            saveData();
             if (!showChat.value) {
               showNotify('New Message', `${partner?.name || 'Someone'} sent you a message!`, 'success');
             }
@@ -1339,15 +1390,67 @@
 
         function handleNotificationClick(notif) {
           notif.read = true;
+          saveData();
           showNotifications.value = false;
           if (notif.type === 'message' || notif.type === 'booking') {
-            const user = users.value.find(u => u.id === notif.fromId);
+            const user = allUsers.value.find(u => u.id === notif.fromId);
             if (user) viewProfile(user.id);
           }
         }
 
         function markAllRead() {
           notifications.value.forEach(n => { if (n.userId === currentUser.value?.id) n.read = true; });
+          saveData();
+        }
+
+        // Export / Import for cross-device sharing
+        function openExport() {
+          if (!currentUser.value) {
+            showNotify('Sign Up First', 'Create a profile to share it with friends!', 'success');
+            return;
+          }
+          const data = JSON.stringify(currentUser.value);
+          exportCode.value = btoa(data);
+          showExport.value = true;
+        }
+
+        function copyExportCode() {
+          navigator.clipboard.writeText(exportCode.value).then(() => {
+            copied.value = true;
+            setTimeout(() => copied.value = false, 2000);
+          }).catch(() => {
+            // Fallback
+            const el = document.createElement('textarea');
+            el.value = exportCode.value;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            copied.value = true;
+            setTimeout(() => copied.value = false, 2000);
+          });
+        }
+
+        function importFriend() {
+          try {
+            const decoded = atob(importCode.value.trim());
+            const friend = JSON.parse(decoded);
+            if (friend && friend.id && friend.name) {
+              // Check if already exists
+              const exists = localUsers.value.find(u => u.id === friend.id);
+              if (!exists) {
+                localUsers.value.push({ ...friend, isDemo: false });
+                saveData();
+                showNotify('Friend Added!', `${friend.name} has been added to your community.`, 'success');
+                importCode.value = '';
+                showExport.value = false;
+              } else {
+                showNotify('Already Added', `${friend.name} is already in your community.`, 'success');
+              }
+            }
+          } catch(e) {
+            showNotify('Invalid Code', 'The code you pasted is not valid. Please check and try again.', 'error');
+          }
         }
 
         function logout() {
@@ -1356,6 +1459,7 @@
           showChat.value = false;
           showNotifications.value = false;
           chatUserId.value = null;
+          saveData();
           showNotify('Logged Out', 'See you next time!', 'success');
         }
 
@@ -1373,14 +1477,11 @@
           if (bar) bar.style.width = progress + '%';
           const heroContent = document.querySelector('.hero-content');
           if (heroContent && currentView.value === 'landing') {
-            const opacity = Math.max(0, 1 - scrollY.value / 400);
-            heroContent.style.opacity = opacity;
+            heroContent.style.opacity = Math.max(0, 1 - scrollY.value / 400);
           }
         }
 
-        watch(currentView, () => {
-          setTimeout(handleScroll, 100);
-        });
+        watch(currentView, () => { setTimeout(handleScroll, 100); });
 
         onMounted(() => {
           window.addEventListener('scroll', handleScroll);
@@ -1393,15 +1494,16 @@
         });
 
         return {
-          users, currentUser, currentView, viewedUserId, isEditing, showSignup, showBooking, showChat, showNotifications,
+          users: localUsers, currentUser, currentView, viewedUserId, isEditing, showSignup, showBooking, showChat, showNotifications, showExport,
           searchQuery, scrollY, notification, bookingPreview, signupForm, bookingForm, editForm,
           timeSlots, viewedUser, isOwnProfile, filteredUsers, chatUserId, chatInput, isTyping,
           chatMessagesRef, chatPartner, currentChatMessages, chatList, totalUnreadMessages,
           notifications, unreadNotifications, totalSkills, totalMessages, totalBookings,
+          allUsers, exportCode, importCode, copied,
           handleSignup, goHome, goToBrowse, viewProfile, toggleEdit, saveProfile,
           openBooking, confirmBooking, logout, showNotify, formatTime,
           startChat, openChat, toggleChat, sendMessage, toggleNotifications,
-          handleNotificationClick, markAllRead
+          handleNotificationClick, markAllRead, openExport, copyExportCode, importFriend
         };
       }
     }).mount('#app');
