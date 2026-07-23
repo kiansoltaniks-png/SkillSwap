@@ -645,6 +645,10 @@
                   <input v-model="signupForm.email" type="email" required class="w-full px-4 py-3 rounded-xl" placeholder="you@email.com">
                 </div>
                 <div>
+                  <label class="block text-sm text-slate-500 mb-1 font-medium">Password</label>
+                  <input v-model="signupForm.password" type="password" required minlength="4" class="w-full px-4 py-3 rounded-xl" placeholder="Create a password">
+                </div>
+                <div>
                   <label class="block text-sm text-slate-500 mb-1 font-medium">Phone</label>
                   <input v-model="signupForm.phone" type="tel" required class="w-full px-4 py-3 rounded-xl" placeholder="+1 234 567 8900">
                 </div>
@@ -696,7 +700,6 @@
                 <div>
                   <label class="block text-sm text-slate-500 mb-1 font-medium">Password</label>
                   <input v-model="loginForm.password" type="password" required class="w-full px-4 py-3 rounded-xl" placeholder="Your password">
-                  <p class="text-xs text-slate-400 mt-1">For this demo, use any password. We verify by email only.</p>
                 </div>
                 <button type="submit" class="btn-teal w-full py-3.5 rounded-xl teal-gradient text-white font-semibold shadow-lg">Log In</button>
               </form>
@@ -1071,7 +1074,7 @@
         const importCode = ref('');
         const copied = ref(false);
 
-        const signupForm = ref({ name: '', email: '', phone: '', age: '', skills: '', wants: '', bio: '' });
+        const signupForm = ref({ name: '', email: '', password: '', phone: '', age: '', skills: '', wants: '', bio: '' });
         const loginForm = ref({ email: '', password: '' });
         const bookingForm = ref({ date: '', time: '', skill: '', message: '' });
         const editForm = ref({ name: '', bio: '', skills: '', wants: '' });
@@ -1175,17 +1178,22 @@
 
         function handleLogin() {
           const email = loginForm.value.email.trim().toLowerCase();
+          const password = loginForm.value.password;
           const user = localUsers.value.find(u => u.email.toLowerCase() === email);
-          if (user) {
-            currentUser.value = user;
-            showLogin.value = false;
-            loginForm.value = { email: '', password: '' };
-            saveData();
-            showNotify('Welcome Back!', `Good to see you, ${user.name}!`, 'success');
-            goToBrowse();
-          } else {
+          if (!user) {
             showNotify('Account Not Found', 'No account found with that email. Try signing up instead!', 'error');
+            return;
           }
+          if (user.password !== password) {
+            showNotify('Wrong Password', 'The password you entered is incorrect. Please try again.', 'error');
+            return;
+          }
+          currentUser.value = user;
+          showLogin.value = false;
+          loginForm.value = { email: '', password: '' };
+          saveData();
+          showNotify('Welcome Back!', `Good to see you, ${user.name}!`, 'success');
+          goToBrowse();
         }
 
         function handleSignup() {
@@ -1193,6 +1201,7 @@
             id: Date.now(),
             name: signupForm.value.name,
             email: signupForm.value.email,
+            password: signupForm.value.password,
             phone: signupForm.value.phone,
             age: parseInt(signupForm.value.age),
             skills: signupForm.value.skills.split(',').map(s => s.trim()).filter(Boolean),
@@ -1202,7 +1211,7 @@
           localUsers.value.push(newUser);
           currentUser.value = newUser;
           showSignup.value = false;
-          signupForm.value = { name: '', email: '', phone: '', age: '', skills: '', wants: '', bio: '' };
+          signupForm.value = { name: '', email: '', password: '', phone: '', age: '', skills: '', wants: '', bio: '' };
           saveData();
           showNotify('Welcome!', 'Your profile has been created. Start browsing members!', 'success');
           goToBrowse();
