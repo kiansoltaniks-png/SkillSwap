@@ -9,17 +9,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --cream: #faf8f5;
+      --cream: #f8fafb;
       --white: #ffffff;
-      --gold: #c9a96e;
-      --gold-light: #e8d5a3;
-      --gold-dark: #a08040;
-      --charcoal: #1a1a2e;
-      --navy: #16213e;
-      --slate: #4a5568;
-      --slate-light: #718096;
+      --teal: #0d9488;
+      --teal-light: #5eead4;
+      --teal-dark: #0f766e;
+      --teal-pale: #ccfbf1;
+      --charcoal: #1e293b;
+      --slate: #475569;
+      --slate-light: #94a3b8;
       --border: #e2e8f0;
-      --border-light: #f1f5f9;
     }
     * { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     html { scroll-behavior: smooth; height: auto; min-height: 100%; }
@@ -45,7 +44,7 @@
       content: '';
       position: absolute;
       inset: -1px;
-      background: linear-gradient(135deg, var(--gold), var(--gold-light), var(--gold-dark));
+      background: linear-gradient(135deg, var(--teal), var(--teal-light), var(--teal-dark));
       border-radius: inherit;
       opacity: 0;
       transition: opacity 0.5s;
@@ -54,7 +53,7 @@
     }
     .tilt-card:hover::before { opacity: 0.4; }
     .glass {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid rgba(0,0,0,0.05);
@@ -79,30 +78,38 @@
       0%, 60%, 100% { transform: translateY(0); }
       30% { transform: translateY(-6px); }
     }
+    @keyframes fade-up {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.8); opacity: 1; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
     .shimmer-text {
-      background: linear-gradient(90deg, #c9a96e, #e8d5a3, #a08040, #c9a96e);
+      background: linear-gradient(90deg, #0d9488, #5eead4, #0f766e, #0d9488);
       background-size: 200% auto;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       animation: shimmer 4s linear infinite;
     }
-    .btn-luxury {
+    .btn-teal {
       transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-      box-shadow: 0 4px 15px rgba(201,169,110,0.2), 0 0 0 1px rgba(201,169,110,0.1);
+      box-shadow: 0 4px 15px rgba(13,148,136,0.2), 0 0 0 1px rgba(13,148,136,0.1);
     }
-    .btn-luxury:hover {
+    .btn-teal:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(201,169,110,0.3), 0 0 0 1px rgba(201,169,110,0.2);
+      box-shadow: 0 8px 25px rgba(13,148,136,0.3), 0 0 0 1px rgba(13,148,136,0.2);
     }
-    .btn-luxury:active { transform: translateY(0) scale(0.98); }
+    .btn-teal:active { transform: translateY(0) scale(0.98); }
     .btn-outline {
       transition: all 0.3s;
       border: 1px solid var(--border);
     }
     .btn-outline:hover {
-      border-color: var(--gold);
-      color: var(--gold-dark);
+      border-color: var(--teal);
+      color: var(--teal-dark);
       transform: translateY(-1px);
     }
     .reveal {
@@ -126,30 +133,30 @@
     }
     input:focus, textarea:focus, select:focus {
       outline: none;
-      border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(201,169,110,0.1);
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
     }
     input::placeholder, textarea::placeholder { color: var(--slate-light); }
     input[type="date"] { color-scheme: light; }
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--cream); }
-    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3af; }
     .skill-tag {
-      background: rgba(201,169,110,0.08);
-      border: 1px solid rgba(201,169,110,0.2);
-      color: var(--gold-dark);
+      background: rgba(13,148,136,0.08);
+      border: 1px solid rgba(13,148,136,0.2);
+      color: var(--teal-dark);
     }
     .want-tag {
-      background: rgba(22,33,62,0.06);
-      border: 1px solid rgba(22,33,62,0.12);
-      color: var(--navy);
+      background: rgba(30,41,59,0.06);
+      border: 1px solid rgba(30,41,59,0.12);
+      color: var(--charcoal);
     }
-    .gold-gradient {
-      background: linear-gradient(135deg, #c9a96e 0%, #e8d5a3 50%, #a08040 100%);
+    .teal-gradient {
+      background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #0f766e 100%);
     }
-    .gold-text {
-      background: linear-gradient(135deg, #c9a96e, #e8d5a3, #a08040);
+    .teal-text {
+      background: linear-gradient(135deg, #0d9488, #5eead4, #0f766e);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -157,10 +164,10 @@
     .hero-img {
       object-fit: cover;
       border-radius: 24px;
-      box-shadow: 0 25px 80px rgba(0,0,0,0.12);
+      box-shadow: 0 25px 80px rgba(0,0,0,0.1);
     }
     .chat-bubble-sent {
-      background: linear-gradient(135deg, #c9a96e, #e8d5a3);
+      background: linear-gradient(135deg, #0d9488, #14b8a6);
       color: white;
       border-radius: 20px 20px 4px 20px;
     }
@@ -197,13 +204,73 @@
     .section-divider {
       width: 60px;
       height: 3px;
-      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      background: linear-gradient(90deg, var(--teal), var(--teal-light));
       border-radius: 2px;
+    }
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(13,148,136,0.1), rgba(20,184,166,0.1));
+      border: 1px solid rgba(13,148,136,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .testimonial-card {
+      background: white;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      padding: 28px;
+      transition: all 0.3s;
+    }
+    .testimonial-card:hover {
+      box-shadow: 0 20px 40px rgba(13,148,136,0.08);
+      transform: translateY(-4px);
+    }
+    .category-pill {
+      padding: 8px 20px;
+      border-radius: 100px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      font-size: 14px;
+      font-weight: 500;
+      color: #475569;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .category-pill:hover, .category-pill.active {
+      background: linear-gradient(135deg, #0d9488, #14b8a6);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(13,148,136,0.25);
+    }
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #0d9488, #14b8a6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .wave-divider {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      overflow: hidden;
+      line-height: 0;
+    }
+    .wave-divider svg {
+      position: relative;
+      display: block;
+      width: calc(100% + 1.3px);
+      height: 80px;
     }
   </style>
 </head>
-<body class="bg-[#faf8f5] text-[#1a1a2e] overflow-y-auto">
-  <div id="scroll-progress" class="fixed top-0 left-0 h-[2px] bg-gradient-to-r from-[#c9a96e] via-[#e8d5a3] to-[#a08040] z-[100] transition-all duration-100" style="width: 0%"></div>
+<body class="bg-[#f8fafb] text-[#1e293b] overflow-y-auto">
+  <div id="scroll-progress" class="fixed top-0 left-0 h-[2px] bg-gradient-to-r from-[#0d9488] via-[#14b8a6] to-[#0f766e] z-[100] transition-all duration-100" style="width: 0%"></div>
   <div id="app"></div>
 
   <script>
@@ -215,41 +282,36 @@
           <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" :class="scrollY > 50 ? 'glass shadow-sm' : 'bg-transparent'">
             <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
               <div @click="goHome" class="flex items-center gap-3 cursor-pointer group">
-                <div class="w-10 h-10 rounded-xl gold-gradient flex items-center justify-center shadow-lg">
+                <div class="w-10 h-10 rounded-xl teal-gradient flex items-center justify-center shadow-lg">
                   <svg viewBox="0 0 24 24" class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
                   </svg>
                 </div>
-                <span class="font-display font-bold text-xl tracking-tight group-hover:text-[#c9a96e] transition-colors">SkillSwap</span>
+                <span class="font-display font-bold text-xl tracking-tight group-hover:text-[#0d9488] transition-colors">SkillSwap</span>
               </div>
               <div class="flex items-center gap-3">
-                <!-- Chat Icon -->
                 <button v-if="currentUser" @click="toggleChat" class="relative p-2 rounded-xl hover:bg-slate-100 transition-colors">
                   <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                   </svg>
                   <span v-if="totalUnreadMessages > 0" class="notification-dot">{{ totalUnreadMessages }}</span>
                 </button>
-                <!-- Notification Bell -->
                 <button v-if="currentUser" @click="toggleNotifications" class="relative p-2 rounded-xl hover:bg-slate-100 transition-colors">
                   <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                   </svg>
                   <span v-if="unreadNotifications.length > 0" class="notification-dot">{{ unreadNotifications.length }}</span>
                 </button>
-                <!-- Notification Dropdown -->
                 <div v-if="showNotifications && currentUser" class="absolute top-14 right-4 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-[60]">
                   <div class="p-4 border-b border-slate-100 flex items-center justify-between">
                     <h3 class="font-semibold text-sm">Notifications</h3>
-                    <button v-if="notifications.length > 0" @click="markAllRead" class="text-xs text-[#c9a96e] hover:underline">Mark all read</button>
+                    <button v-if="notifications.length > 0" @click="markAllRead" class="text-xs text-[#0d9488] hover:underline">Mark all read</button>
                   </div>
-                  <div v-if="notifications.length === 0" class="p-6 text-center text-slate-400 text-sm">
-                    No notifications yet
-                  </div>
+                  <div v-if="notifications.length === 0" class="p-6 text-center text-slate-400 text-sm">No notifications yet</div>
                   <div v-else class="max-h-64 overflow-y-auto">
-                    <div v-for="notif in notifications" :key="notif.id" @click="handleNotificationClick(notif)" class="p-3 border-b border-slate-50 cursor-pointer hover:bg-slate-50 transition-colors" :class="!notif.read ? 'border-l-4 border-l-[#c9a96e] bg-amber-50/30' : ''">
+                    <div v-for="notif in notifications" :key="notif.id" @click="handleNotificationClick(notif)" class="p-3 border-b border-slate-50 cursor-pointer hover:bg-slate-50 transition-colors" :class="!notif.read ? 'border-l-4 border-l-[#0d9488] bg-teal-50/30' : ''">
                       <div class="flex items-start gap-3">
-                        <div class="w-2 h-2 rounded-full mt-1.5 shrink-0" :class="!notif.read ? 'bg-[#c9a96e]' : 'bg-slate-300'"></div>
+                        <div class="w-2 h-2 rounded-full mt-1.5 shrink-0" :class="!notif.read ? 'bg-[#0d9488]' : 'bg-slate-300'"></div>
                         <div>
                           <p class="text-sm font-medium text-slate-800">{{ notif.title }}</p>
                           <p class="text-xs text-slate-500 mt-0.5">{{ notif.message }}</p>
@@ -259,7 +321,7 @@
                     </div>
                   </div>
                 </div>
-                <button v-if="!currentUser" @click="showSignup = true" class="btn-luxury px-5 py-2.5 rounded-xl gold-gradient text-white text-sm font-semibold shadow-lg">Sign Up</button>
+                <button v-if="!currentUser" @click="showSignup = true" class="btn-teal px-5 py-2.5 rounded-xl teal-gradient text-white text-sm font-semibold shadow-lg">Sign Up</button>
                 <button v-else @click="viewProfile(currentUser.id)" class="btn-outline px-4 py-2.5 rounded-xl text-sm font-medium">My Profile</button>
                 <button v-if="currentUser" @click="logout" class="px-3 py-2 text-slate-400 hover:text-slate-600 text-sm transition-colors">Logout</button>
               </div>
@@ -268,161 +330,347 @@
 
           <!-- LANDING PAGE -->
           <div v-if="currentView === 'landing'" class="min-h-screen flex flex-col items-center px-4 pt-28 pb-20 relative">
+
             <!-- Hero Section -->
-            <div class="w-full max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center mb-20">
+            <div class="w-full max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center mb-24">
               <div class="hero-content relative z-10">
-                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 border border-amber-100 text-[#a08040] text-sm font-medium mb-6">
-                  <span class="w-2 h-2 rounded-full bg-[#c9a96e] animate-pulse"></span>
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-50 border border-teal-100 text-[#0f766e] text-sm font-medium mb-6">
+                  <span class="w-2 h-2 rounded-full bg-[#0d9488] animate-pulse"></span>
                   Trade Skills. Grow Together.
                 </div>
                 <h1 class="font-display text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-[1.1]">
-                  Exchange<br><span class="gold-text">Knowledge</span><br>With Experts
+                  Exchange<br><span class="teal-text">Knowledge</span><br>With Experts
                 </h1>
                 <p class="text-lg text-slate-500 mb-8 max-w-md leading-relaxed">
-                  Teach what you know, learn what you don't. Connect with professionals and grow your skills through one-on-one exchanges.
+                  Teach what you know, learn what you don't. Connect with professionals and grow your skills through one-on-one exchanges. No fees, no middlemen — just pure skill trading.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4">
-                  <button @click="showSignup = true" class="btn-luxury px-8 py-4 rounded-2xl gold-gradient text-white font-semibold text-lg shadow-xl">Get Started</button>
+                  <button @click="showSignup = true" class="btn-teal px-8 py-4 rounded-2xl teal-gradient text-white font-semibold text-lg shadow-xl">Get Started</button>
                   <button @click="goToBrowse" class="btn-outline px-8 py-4 rounded-2xl text-slate-600 font-semibold text-lg bg-white">Browse Members</button>
                 </div>
-                <div v-if="users.length > 0" class="mt-8 flex items-center gap-4">
-                  <div class="flex -space-x-3">
-                    <div v-for="(u, i) in users.slice(0,4)" :key="i" class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 border-2 border-white flex items-center justify-center text-xs font-bold text-[#a08040]">
-                      {{ u.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() }}
-                    </div>
+                <div class="mt-10 flex items-center gap-6">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-[#0d9488]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <span class="text-sm text-slate-500">100% Free</span>
                   </div>
-                  <p class="text-sm text-slate-500">{{ users.length }} professional{{ users.length !== 1 ? 's' : '' }} already swapping</p>
+                  <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-[#0d9488]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <span class="text-sm text-slate-500">Built-in Chat</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-[#0d9488]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <span class="text-sm text-slate-500">Smart Matching</span>
+                  </div>
                 </div>
               </div>
               <div class="relative">
-                <img src="https://kimi-web-img.moonshot.cn/img/chronus.com/ec3988d2e333b0df398d2888bd679869f7c40590.jpg" alt="Professional mentoring session" class="hero-img w-full h-[450px] object-cover">
-                <div class="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl p-4 border border-slate-100">
+                <img src="https://kimi-web-img.moonshot.cn/img/chronus.com/ec3988d2e333b0df398d2888bd679869f7c40590.jpg" alt="Professional mentoring session" class="hero-img w-full h-[480px] object-cover">
+                <div class="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl p-5 border border-slate-100">
                   <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-xl gold-gradient flex items-center justify-center">
+                    <div class="w-12 h-12 rounded-xl teal-gradient flex items-center justify-center">
                       <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                     </div>
                     <div>
-                      <p class="font-bold text-lg">500+</p>
-                      <p class="text-xs text-slate-500">Skills Exchanged</p>
+                      <p class="font-bold text-lg text-slate-800">Skill Trading</p>
+                      <p class="text-xs text-slate-500">Made Simple</p>
                     </div>
                   </div>
+                </div>
+                <div class="absolute -top-4 -right-4 bg-white rounded-2xl shadow-lg p-4 border border-slate-100">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-teal-50 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-[#0d9488]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <span class="text-sm font-medium text-slate-700">Flexible Scheduling</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="w-full max-w-5xl mx-auto mb-24 reveal">
+              <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-8 grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="text-center">
+                  <p class="stat-number">{{ users.length || 0 }}</p>
+                  <p class="text-sm text-slate-500 mt-1">Active Members</p>
+                </div>
+                <div class="text-center">
+                  <p class="stat-number">{{ totalSkills }}</p>
+                  <p class="text-sm text-slate-500 mt-1">Skills Listed</p>
+                </div>
+                <div class="text-center">
+                  <p class="stat-number">{{ totalMessages }}</p>
+                  <p class="text-sm text-slate-500 mt-1">Messages Sent</p>
+                </div>
+                <div class="text-center">
+                  <p class="stat-number">{{ totalBookings }}</p>
+                  <p class="text-sm text-slate-500 mt-1">Sessions Booked</p>
                 </div>
               </div>
             </div>
 
             <!-- How It Works -->
-            <div class="w-full max-w-5xl mt-20 relative z-10">
+            <div class="w-full max-w-5xl mb-24 relative z-10">
               <div class="text-center mb-16">
-                <p class="text-[#c9a96e] text-sm font-semibold uppercase tracking-widest mb-3">How It Works</p>
+                <p class="text-[#0d9488] text-sm font-semibold uppercase tracking-widest mb-3">How It Works</p>
                 <h2 class="text-3xl md:text-4xl font-bold font-display mb-4">Three Simple Steps</h2>
                 <div class="section-divider mx-auto"></div>
+                <p class="text-slate-500 mt-4 max-w-md mx-auto">Getting started takes less than two minutes. Here's how the magic happens.</p>
               </div>
               <div class="grid md:grid-cols-3 gap-8 perspective-container">
                 <div class="reveal tilt-card relative bg-white rounded-2xl border border-slate-100 p-8 text-center shadow-sm hover:shadow-xl transition-shadow">
-                  <div class="w-16 h-16 mx-auto mb-6 rounded-2xl gold-gradient flex items-center justify-center shadow-lg">
+                  <div class="w-16 h-16 mx-auto mb-6 rounded-2xl teal-gradient flex items-center justify-center shadow-lg">
                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
                   </div>
+                  <div class="w-8 h-8 rounded-full bg-teal-50 text-[#0d9488] text-sm font-bold flex items-center justify-center mx-auto mb-4">1</div>
                   <h3 class="text-xl font-bold text-slate-800 mb-3">Create Profile</h3>
-                  <p class="text-slate-500 leading-relaxed">Share your expertise and what you want to learn. Build your professional profile in seconds.</p>
+                  <p class="text-slate-500 leading-relaxed">Share your expertise and what you want to learn. Build your professional profile in seconds with just your name, skills, and interests.</p>
                 </div>
                 <div class="reveal tilt-card relative bg-white rounded-2xl border border-slate-100 p-8 text-center shadow-sm hover:shadow-xl transition-shadow" style="transition-delay: 0.1s">
-                  <div class="w-16 h-16 mx-auto mb-6 rounded-2xl gold-gradient flex items-center justify-center shadow-lg">
+                  <div class="w-16 h-16 mx-auto mb-6 rounded-2xl teal-gradient flex items-center justify-center shadow-lg">
                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
                   </div>
+                  <div class="w-8 h-8 rounded-full bg-teal-50 text-[#0d9488] text-sm font-bold flex items-center justify-center mx-auto mb-4">2</div>
                   <h3 class="text-xl font-bold text-slate-800 mb-3">Find Matches</h3>
-                  <p class="text-slate-500 leading-relaxed">Browse professionals and find your perfect skill match. Smart sorting puts the best fits first.</p>
+                  <p class="text-slate-500 leading-relaxed">Browse professionals and find your perfect skill match. Our smart sorting puts the best fits first based on what you want to learn.</p>
                 </div>
                 <div class="reveal tilt-card relative bg-white rounded-2xl border border-slate-100 p-8 text-center shadow-sm hover:shadow-xl transition-shadow" style="transition-delay: 0.2s">
-                  <div class="w-16 h-16 mx-auto mb-6 rounded-2xl gold-gradient flex items-center justify-center shadow-lg">
+                  <div class="w-16 h-16 mx-auto mb-6 rounded-2xl teal-gradient flex items-center justify-center shadow-lg">
                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
                   </div>
+                  <div class="w-8 h-8 rounded-full bg-teal-50 text-[#0d9488] text-sm font-bold flex items-center justify-center mx-auto mb-4">3</div>
                   <h3 class="text-xl font-bold text-slate-800 mb-3">Book & Chat</h3>
-                  <p class="text-slate-500 leading-relaxed">Schedule a session and start trading knowledge. Built-in chat keeps you connected.</p>
+                  <p class="text-slate-500 leading-relaxed">Schedule a session and start trading knowledge. Built-in chat keeps you connected before, during, and after your skill swap.</p>
                 </div>
               </div>
             </div>
 
             <!-- Featured Image Section -->
-            <div class="w-full max-w-6xl mt-32 grid lg:grid-cols-2 gap-12 items-center reveal">
+            <div class="w-full max-w-6xl mb-24 grid lg:grid-cols-2 gap-12 items-center reveal">
               <div class="order-2 lg:order-1">
-                <p class="text-[#c9a96e] text-sm font-semibold uppercase tracking-widest mb-3">Why SkillSwap</p>
+                <p class="text-[#0d9488] text-sm font-semibold uppercase tracking-widest mb-3">Why SkillSwap</p>
                 <h2 class="text-3xl md:text-4xl font-bold font-display mb-6">Learn From Real Professionals</h2>
                 <div class="section-divider mb-6"></div>
                 <p class="text-slate-500 leading-relaxed mb-6">
-                  Unlike traditional courses, SkillSwap connects you directly with people who have real-world experience. Learn guitar from a touring musician, coding from a startup founder, or photography from a published artist.
+                  Unlike traditional courses, SkillSwap connects you directly with people who have real-world experience. Learn guitar from a touring musician, coding from a startup founder, or photography from a published artist. Every connection is a doorway to practical, hands-on knowledge.
+                </p>
+                <p class="text-slate-500 leading-relaxed mb-6">
+                  Our platform is built on the belief that everyone has something valuable to teach and something new to learn. Whether you are a beginner looking to pick up a hobby or a professional seeking to expand your expertise, there is someone here ready to help you grow.
                 </p>
                 <ul class="space-y-3">
                   <li class="flex items-center gap-3 text-slate-600">
-                    <div class="w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center"><svg class="w-3 h-3 text-[#c9a96e]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+                    <div class="w-5 h-5 rounded-full bg-teal-50 flex items-center justify-center"><svg class="w-3 h-3 text-[#0d9488]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
                     No fees — trade skills directly
                   </li>
                   <li class="flex items-center gap-3 text-slate-600">
-                    <div class="w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center"><svg class="w-3 h-3 text-[#c9a96e]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+                    <div class="w-5 h-5 rounded-full bg-teal-50 flex items-center justify-center"><svg class="w-3 h-3 text-[#0d9488]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
                     Built-in messaging & scheduling
                   </li>
                   <li class="flex items-center gap-3 text-slate-600">
-                    <div class="w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center"><svg class="w-3 h-3 text-[#c9a96e]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+                    <div class="w-5 h-5 rounded-full bg-teal-50 flex items-center justify-center"><svg class="w-3 h-3 text-[#0d9488]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
                     Smart matching based on your goals
+                  </li>
+                  <li class="flex items-center gap-3 text-slate-600">
+                    <div class="w-5 h-5 rounded-full bg-teal-50 flex items-center justify-center"><svg class="w-3 h-3 text-[#0d9488]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+                    Real-time notifications & chat
                   </li>
                 </ul>
               </div>
               <div class="order-1 lg:order-2">
-                <img src="https://kimi-web-img.moonshot.cn/img/advancedandfulfilled.com/ecce728888112a796df44ac3193babadcfe70c6f.jpg" alt="One-on-one coaching" class="hero-img w-full h-[400px] object-cover">
+                <img src="https://kimi-web-img.moonshot.cn/img/advancedandfulfilled.com/ecce728888112a796df44ac3193babadcfe70c6f.jpg" alt="One-on-one coaching" class="hero-img w-full h-[420px] object-cover">
               </div>
             </div>
 
             <!-- Second Image Section -->
-            <div class="w-full max-w-6xl mt-32 grid lg:grid-cols-2 gap-12 items-center reveal">
+            <div class="w-full max-w-6xl mb-24 grid lg:grid-cols-2 gap-12 items-center reveal">
               <div>
-                <img src="https://kimi-web-img.moonshot.cn/img/www.mksgroup.com.au/45abaaa2279e35ce39f11b5f10c7d506e2c12ce0.png" alt="Team collaboration workshop" class="hero-img w-full h-[400px] object-cover">
+                <img src="https://kimi-web-img.moonshot.cn/img/www.mksgroup.com.au/45abaaa2279e35ce39f11b5f10c7d506e2c12ce0.png" alt="Team collaboration workshop" class="hero-img w-full h-[420px] object-cover">
               </div>
               <div>
-                <p class="text-[#c9a96e] text-sm font-semibold uppercase tracking-widest mb-3">Community</p>
+                <p class="text-[#0d9488] text-sm font-semibold uppercase tracking-widest mb-3">Community</p>
                 <h2 class="text-3xl md:text-4xl font-bold font-display mb-6">Join a Growing Network</h2>
                 <div class="section-divider mb-6"></div>
                 <p class="text-slate-500 leading-relaxed mb-6">
-                  SkillSwap is more than a platform — it's a community of lifelong learners. Whether you're looking to pick up a new hobby or advance your career, there's someone here ready to help.
+                  SkillSwap is more than a platform — it is a community of lifelong learners. Whether you are looking to pick up a new hobby, advance your career, or simply meet like-minded people, there is someone here ready to help.
+                </p>
+                <p class="text-slate-500 leading-relaxed mb-8">
+                  Our members range from college students to seasoned professionals, from artists to engineers. The diversity of skills and backgrounds means you will always find someone who can teach you something new — and someone who wants to learn what you know.
                 </p>
                 <div class="grid grid-cols-3 gap-6">
-                  <div class="text-center">
-                    <p class="text-2xl font-bold gold-text">{{ users.length || 0 }}</p>
+                  <div class="text-center p-4 rounded-2xl bg-white border border-slate-100">
+                    <p class="stat-number text-2xl">{{ users.length || 0 }}</p>
                     <p class="text-xs text-slate-400 mt-1">Members</p>
                   </div>
-                  <div class="text-center">
-                    <p class="text-2xl font-bold gold-text">{{ totalSkills }}</p>
+                  <div class="text-center p-4 rounded-2xl bg-white border border-slate-100">
+                    <p class="stat-number text-2xl">{{ totalSkills }}</p>
                     <p class="text-xs text-slate-400 mt-1">Skills</p>
                   </div>
-                  <div class="text-center">
-                    <p class="text-2xl font-bold gold-text">{{ totalMessages }}</p>
+                  <div class="text-center p-4 rounded-2xl bg-white border border-slate-100">
+                    <p class="stat-number text-2xl">{{ totalMessages }}</p>
                     <p class="text-xs text-slate-400 mt-1">Messages</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- CTA -->
-            <div class="mt-32 text-center relative z-10 reveal max-w-2xl mx-auto">
-              <h2 class="text-3xl md:text-4xl font-bold font-display mb-4">Ready to start swapping?</h2>
-              <p class="text-slate-500 mb-8 max-w-md mx-auto">Join the community and start trading skills today. No fees, no fuss — just growth.</p>
-              <button @click="showSignup = true" class="btn-luxury px-10 py-4 rounded-2xl gold-gradient text-white font-semibold text-lg shadow-xl">Create Your Profile</button>
+            <!-- Popular Categories -->
+            <div class="w-full max-w-5xl mb-24 reveal">
+              <div class="text-center mb-12">
+                <p class="text-[#0d9488] text-sm font-semibold uppercase tracking-widest mb-3">Explore</p>
+                <h2 class="text-3xl md:text-4xl font-bold font-display mb-4">Popular Skill Categories</h2>
+                <div class="section-divider mx-auto"></div>
+              </div>
+              <div class="flex flex-wrap justify-center gap-3">
+                <span class="category-pill">Programming</span>
+                <span class="category-pill">Design</span>
+                <span class="category-pill">Music</span>
+                <span class="category-pill">Languages</span>
+                <span class="category-pill">Photography</span>
+                <span class="category-pill">Cooking</span>
+                <span class="category-pill">Fitness</span>
+                <span class="category-pill">Business</span>
+                <span class="category-pill">Writing</span>
+                <span class="category-pill">Art</span>
+                <span class="category-pill">Marketing</span>
+                <span class="category-pill">Data Science</span>
+              </div>
+              <div class="mt-12 grid md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+                  <div class="feature-icon mb-4">
+                    <svg class="w-6 h-6 text-[#0d9488]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                  </div>
+                  <h4 class="font-bold text-slate-800 mb-2">Technical Skills</h4>
+                  <p class="text-sm text-slate-500">Coding, data analysis, web development, and more. Learn from working developers and engineers.</p>
+                </div>
+                <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+                  <div class="feature-icon mb-4">
+                    <svg class="w-6 h-6 text-[#0d9488]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                  </div>
+                  <h4 class="font-bold text-slate-800 mb-2">Creative Skills</h4>
+                  <p class="text-sm text-slate-500">Design, photography, music, writing. Unleash your creativity with guidance from practicing artists.</p>
+                </div>
+                <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+                  <div class="feature-icon mb-4">
+                    <svg class="w-6 h-6 text-[#0d9488]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+                  </div>
+                  <h4 class="font-bold text-slate-800 mb-2">Languages & Culture</h4>
+                  <p class="text-sm text-slate-500">Learn new languages, explore cuisines, and discover cultures from native speakers around the world.</p>
+                </div>
+              </div>
             </div>
 
-            <footer class="mt-32 pt-8 border-t border-slate-200 text-center text-slate-400 text-sm relative z-10">
-              <div class="flex items-center justify-center gap-2 mb-2">
-                <div class="w-6 h-6 rounded-lg gold-gradient flex items-center justify-center">
-                  <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5">
+            <!-- How It Works Deep Dive -->
+            <div class="w-full max-w-6xl mb-24 reveal">
+              <div class="text-center mb-16">
+                <p class="text-[#0d9488] text-sm font-semibold uppercase tracking-widest mb-3">Details</p>
+                <h2 class="text-3xl md:text-4xl font-bold font-display mb-4">Everything You Need to Know</h2>
+                <div class="section-divider mx-auto"></div>
+              </div>
+              <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm">
+                  <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl teal-gradient flex items-center justify-center shrink-0 shadow-md">
+                      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    </div>
+                    <div>
+                      <h4 class="font-bold text-slate-800 text-lg mb-2">Is it really free?</h4>
+                      <p class="text-slate-500 text-sm leading-relaxed">Yes, absolutely. SkillSwap operates on a barter system — you teach someone a skill, and they teach you one in return. No money changes hands. Ever. Our mission is to make knowledge accessible to everyone.</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm">
+                  <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl teal-gradient flex items-center justify-center shrink-0 shadow-md">
+                      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    </div>
+                    <div>
+                      <h4 class="font-bold text-slate-800 text-lg mb-2">Who can join?</h4>
+                      <p class="text-slate-500 text-sm leading-relaxed">Anyone with a skill to share and a desire to learn. Whether you are a student, professional, retiree, or hobbyist — if you have knowledge worth sharing, you belong here. Age 13 and up.</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm">
+                  <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl teal-gradient flex items-center justify-center shrink-0 shadow-md">
+                      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <div>
+                      <h4 class="font-bold text-slate-800 text-lg mb-2">How do sessions work?</h4>
+                      <p class="text-slate-500 text-sm leading-relaxed">Once you find a match, use our built-in booking system to schedule a time. Sessions can be in-person or virtual — you decide what works best. Our chat keeps you connected every step of the way.</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm">
+                  <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl teal-gradient flex items-center justify-center shrink-0 shadow-md">
+                      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    </div>
+                    <div>
+                      <h4 class="font-bold text-slate-800 text-lg mb-2">Is it safe?</h4>
+                      <p class="text-slate-500 text-sm leading-relaxed">We recommend meeting in public spaces for in-person sessions and using our built-in chat to get to know your match first. Always trust your instincts and report any concerns immediately.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Third Image Section -->
+            <div class="w-full max-w-6xl mb-24 grid lg:grid-cols-2 gap-12 items-center reveal">
+              <div class="order-2 lg:order-1">
+                <p class="text-[#0d9488] text-sm font-semibold uppercase tracking-widest mb-3">Success Stories</p>
+                <h2 class="text-3xl md:text-4xl font-bold font-display mb-6">Real People, Real Growth</h2>
+                <div class="section-divider mb-6"></div>
+                <p class="text-slate-500 leading-relaxed mb-6">
+                  Every day, our members are trading skills and transforming their lives. From a graphic designer learning Python to a chef mastering Spanish, the possibilities are endless when knowledge flows freely.
+                </p>
+                <p class="text-slate-500 leading-relaxed mb-8">
+                  The best part? You are not just learning a skill — you are building meaningful connections with people who share your passion for growth. Many of our members have formed lasting friendships and even business partnerships through SkillSwap.
+                </p>
+                <div class="flex items-center gap-4">
+                  <div class="flex -space-x-2">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 border-2 border-white flex items-center justify-center text-xs font-bold text-white">JS</div>
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 border-2 border-white flex items-center justify-center text-xs font-bold text-white">MK</div>
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 border-2 border-white flex items-center justify-center text-xs font-bold text-white">AL</div>
+                  </div>
+                  <p class="text-sm text-slate-500">Join the community today</p>
+                </div>
+              </div>
+              <div class="order-1 lg:order-2">
+                <img src="https://kimi-web-img.moonshot.cn/img/images.stockcake.com/727ca93432439a50283f938458778d5308441799.jpg" alt="Corporate team meeting" class="hero-img w-full h-[420px] object-cover">
+              </div>
+            </div>
+
+            <!-- CTA Section -->
+            <div class="w-full max-w-4xl mx-auto text-center relative z-10 reveal mb-24">
+              <div class="bg-gradient-to-br from-[#0d9488] to-[#0f766e] rounded-3xl p-12 text-white shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-[80px]"></div>
+                <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-[60px]"></div>
+                <div class="relative z-10">
+                  <h2 class="text-3xl md:text-4xl font-bold font-display mb-4">Ready to Start Swapping?</h2>
+                  <p class="text-teal-100 mb-8 max-w-md mx-auto text-lg">Join the community and start trading skills today. No fees, no fuss — just growth and connection.</p>
+                  <button @click="showSignup = true" class="px-10 py-4 rounded-2xl bg-white text-[#0d9488] font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all">Create Your Profile</button>
+                  <p class="text-teal-200 text-sm mt-4">Takes less than 60 seconds</p>
+                </div>
+              </div>
+            </div>
+
+            <footer class="w-full max-w-6xl mx-auto pt-12 border-t border-slate-200 text-center text-slate-400 text-sm relative z-10">
+              <div class="flex items-center justify-center gap-2 mb-3">
+                <div class="w-8 h-8 rounded-lg teal-gradient flex items-center justify-center">
+                  <svg viewBox="0 0 24 24" class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
                   </svg>
                 </div>
-                <span class="font-display font-bold text-slate-600">SkillSwap</span>
+                <span class="font-display font-bold text-slate-600 text-lg">SkillSwap</span>
               </div>
-              <p>Trade skills, grow together.</p>
+              <p class="mb-2">Trade skills, grow together.</p>
+              <p class="text-xs text-slate-300">Built with passion for lifelong learners everywhere.</p>
             </footer>
           </div>
 
@@ -434,7 +682,7 @@
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
               </button>
               <div class="text-center mb-6">
-                <div class="w-14 h-14 mx-auto rounded-2xl gold-gradient flex items-center justify-center shadow-lg mb-4">
+                <div class="w-14 h-14 mx-auto rounded-2xl teal-gradient flex items-center justify-center shadow-lg mb-4">
                   <svg viewBox="0 0 24 24" class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
                   </svg>
@@ -471,7 +719,7 @@
                   <label class="block text-sm text-slate-500 mb-1 font-medium">Bio</label>
                   <textarea v-model="signupForm.bio" rows="3" class="w-full px-4 py-3 rounded-xl resize-none" placeholder="Tell us about yourself..."></textarea>
                 </div>
-                <button type="submit" class="btn-luxury w-full py-3.5 rounded-xl gold-gradient text-white font-semibold shadow-lg">Create Account</button>
+                <button type="submit" class="btn-teal w-full py-3.5 rounded-xl teal-gradient text-white font-semibold shadow-lg">Create Account</button>
               </form>
             </div>
           </div>
@@ -480,7 +728,7 @@
           <div v-if="currentView === 'home'" class="min-h-screen pt-24 pb-20 px-4">
             <div class="max-w-6xl mx-auto">
               <div class="text-center mb-10">
-                <p class="text-[#c9a96e] text-sm font-semibold uppercase tracking-widest mb-2">Community</p>
+                <p class="text-[#0d9488] text-sm font-semibold uppercase tracking-widest mb-2">Community</p>
                 <h2 class="text-3xl md:text-4xl font-bold font-display mb-3">Browse Members</h2>
                 <p class="text-slate-500">Find people to learn from and teach</p>
               </div>
@@ -494,19 +742,17 @@
               </div>
               <p v-if="users.length > 0" class="text-slate-400 mb-6 text-center text-sm">{{ filteredUsers.length }} member{{ filteredUsers.length !== 1 ? 's' : '' }} found</p>
 
-              <!-- Empty State -->
               <div v-if="users.length === 0" class="text-center py-20">
-                <div class="w-24 h-24 mx-auto mb-6 rounded-2xl bg-amber-50 flex items-center justify-center">
-                  <svg viewBox="0 0 24 24" class="w-10 h-10 text-[#c9a96e]" fill="none" stroke="currentColor" stroke-width="1.5">
+                <div class="w-24 h-24 mx-auto mb-6 rounded-2xl bg-teal-50 flex items-center justify-center">
+                  <svg viewBox="0 0 24 24" class="w-10 h-10 text-[#0d9488]" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
                   </svg>
                 </div>
                 <h3 class="text-2xl font-bold text-slate-800 mb-3">No members yet</h3>
-                <p class="text-slate-400 mb-6 max-w-sm mx-auto">Be the first to join SkillSwap and start the community!</p>
-                <button @click="showSignup = true" class="btn-luxury px-6 py-3 rounded-xl gold-gradient text-white font-semibold shadow-lg">Sign Up First</button>
+                <p class="text-slate-400 mb-6 max-w-sm mx-auto">Be the first to join SkillSwap and start the community! Create your profile and others will follow.</p>
+                <button @click="showSignup = true" class="btn-teal px-6 py-3 rounded-xl teal-gradient text-white font-semibold shadow-lg">Sign Up First</button>
               </div>
 
-              <!-- No Search Results -->
               <div v-else-if="filteredUsers.length === 0" class="text-center py-20">
                 <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100">
                   <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -517,11 +763,10 @@
                 <p class="text-slate-400">Try a different search term.</p>
               </div>
 
-              <!-- Grid -->
               <div v-else class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 perspective-container">
                 <div v-for="user in filteredUsers" :key="user.id" @click="viewProfile(user.id)" class="tilt-card relative bg-white rounded-2xl border border-slate-100 p-6 cursor-pointer shadow-sm hover:shadow-xl transition-all group">
                   <div class="flex items-start justify-between mb-4">
-                    <div class="w-14 h-14 rounded-xl gold-gradient flex items-center justify-center text-lg font-bold text-white shadow-md">
+                    <div class="w-14 h-14 rounded-xl teal-gradient flex items-center justify-center text-lg font-bold text-white shadow-md">
                       {{ user.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() }}
                     </div>
                     <span class="text-sm text-slate-400 font-medium">{{ user.age }} yrs</span>
@@ -555,18 +800,18 @@
                 Back to Browse
               </button>
               <div class="bg-white rounded-3xl border border-slate-100 p-8 relative overflow-hidden shadow-sm">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-amber-100/30 rounded-full blur-[80px] pointer-events-none"></div>
+                <div class="absolute top-0 right-0 w-64 h-64 bg-teal-100/30 rounded-full blur-[80px] pointer-events-none"></div>
                 <div class="relative z-10">
                   <div class="flex items-start justify-between mb-6">
                     <div class="flex items-center gap-4">
-                      <div class="w-20 h-20 rounded-2xl gold-gradient flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                      <div class="w-20 h-20 rounded-2xl teal-gradient flex items-center justify-center text-2xl font-bold text-white shadow-lg">
                         {{ viewedUser.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() }}
                       </div>
                       <div>
                         <div class="flex items-center gap-3">
                           <h2 v-if="!isEditing" class="text-2xl font-bold font-display text-slate-800">{{ viewedUser.name }}</h2>
-                          <input v-else v-model="editForm.name" class="text-2xl font-bold font-display bg-transparent border-b border-[#c9a96e]/50 px-0 py-1 w-48 text-slate-800" placeholder="Name">
-                          <span v-if="isOwnProfile" class="px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-[#a08040] text-xs font-bold">You</span>
+                          <input v-else v-model="editForm.name" class="text-2xl font-bold font-display bg-transparent border-b border-[#0d9488]/50 px-0 py-1 w-48 text-slate-800" placeholder="Name">
+                          <span v-if="isOwnProfile" class="px-2.5 py-1 rounded-lg bg-teal-50 border border-teal-200 text-[#0f766e] text-xs font-bold">You</span>
                         </div>
                         <p class="text-slate-400 text-sm">{{ viewedUser.age }} years old</p>
                       </div>
@@ -599,11 +844,11 @@
                   </div>
 
                   <div v-if="isEditing" class="flex gap-3 mb-6">
-                    <button @click="saveProfile" class="btn-luxury flex-1 py-3 rounded-xl gold-gradient text-white font-semibold shadow-lg">Save Changes</button>
+                    <button @click="saveProfile" class="btn-teal flex-1 py-3 rounded-xl teal-gradient text-white font-semibold shadow-lg">Save Changes</button>
                   </div>
 
                   <div v-if="!isOwnProfile" class="border-t border-slate-100 pt-6 flex gap-3">
-                    <button @click="openBooking" class="btn-luxury flex-1 py-4 rounded-2xl gold-gradient text-white font-semibold text-lg shadow-lg flex items-center justify-center gap-2">
+                    <button @click="openBooking" class="btn-teal flex-1 py-4 rounded-2xl teal-gradient text-white font-semibold text-lg shadow-lg flex items-center justify-center gap-2">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                       </svg>
@@ -653,10 +898,10 @@
                   <label class="block text-sm text-slate-500 mb-1 font-medium">Message (optional)</label>
                   <textarea v-model="bookingForm.message" rows="2" class="w-full px-4 py-3 rounded-xl resize-none" placeholder="Hey, I'd love to learn..."></textarea>
                 </div>
-                <button type="submit" class="btn-luxury w-full py-3.5 rounded-xl gold-gradient text-white font-semibold shadow-lg">Send Request</button>
+                <button type="submit" class="btn-teal w-full py-3.5 rounded-xl teal-gradient text-white font-semibold shadow-lg">Send Request</button>
               </form>
               <div v-if="bookingPreview" class="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-100 text-sm space-y-2">
-                <p class="text-[#a08040] font-semibold">Notifications sent:</p>
+                <p class="text-[#0f766e] font-semibold">Notifications sent:</p>
                 <div class="text-slate-500">
                   <p class="font-medium text-slate-600">Email to {{ viewedUser.email }}:</p>
                   <p class="text-slate-400 italic mt-1">"{{ currentUser.name }} wants to book a {{ bookingForm.skill }} session on {{ bookingForm.date }} at {{ bookingForm.time }}."</p>
@@ -673,7 +918,6 @@
           <div v-if="showChat" class="fixed inset-0 z-[70] flex items-center justify-center p-4">
             <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="showChat = false"></div>
             <div class="modal-overlay relative bg-white rounded-3xl border border-slate-100 w-full max-w-4xl h-[80vh] shadow-2xl flex overflow-hidden">
-              <!-- Sidebar -->
               <div class="w-72 border-r border-slate-100 flex flex-col bg-slate-50/50">
                 <div class="p-4 border-b border-slate-100">
                   <h3 class="font-bold font-display text-lg text-slate-800">Messages</h3>
@@ -682,9 +926,9 @@
                   <div v-if="chatList.length === 0" class="p-6 text-center text-slate-400 text-sm">
                     No conversations yet.<br>Visit a profile to start chatting!
                   </div>
-                  <div v-for="chat in chatList" :key="chat.userId" @click="openChat(chat.userId)" class="p-3 border-b border-slate-100 cursor-pointer hover:bg-white transition-colors" :class="chatUserId === chat.userId ? 'bg-white border-l-4 border-l-[#c9a96e]' : ''">
+                  <div v-for="chat in chatList" :key="chat.userId" @click="openChat(chat.userId)" class="p-3 border-b border-slate-100 cursor-pointer hover:bg-white transition-colors" :class="chatUserId === chat.userId ? 'bg-white border-l-4 border-l-[#0d9488]' : ''">
                     <div class="flex items-center gap-3">
-                      <div class="w-10 h-10 rounded-xl gold-gradient flex items-center justify-center text-sm font-bold text-white shrink-0">
+                      <div class="w-10 h-10 rounded-xl teal-gradient flex items-center justify-center text-sm font-bold text-white shrink-0">
                         {{ chat.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() }}
                       </div>
                       <div class="flex-1 min-w-0">
@@ -698,7 +942,6 @@
                   </div>
                 </div>
               </div>
-              <!-- Chat Area -->
               <div class="flex-1 flex flex-col bg-white">
                 <div v-if="!chatUserId" class="flex-1 flex items-center justify-center text-slate-400">
                   <div class="text-center">
@@ -713,7 +956,7 @@
                 <template v-else>
                   <div class="p-4 border-b border-slate-100 flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                      <div class="w-9 h-9 rounded-lg gold-gradient flex items-center justify-center text-sm font-bold text-white">
+                      <div class="w-9 h-9 rounded-lg teal-gradient flex items-center justify-center text-sm font-bold text-white">
                         {{ chatPartner?.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() }}
                       </div>
                       <div>
@@ -743,7 +986,7 @@
                   <div class="p-4 border-t border-slate-100">
                     <form @submit.prevent="sendMessage" class="flex gap-2">
                       <input v-model="chatInput" type="text" placeholder="Type a message..." class="flex-1 px-4 py-3 rounded-xl" required>
-                      <button type="submit" class="btn-luxury px-5 py-3 rounded-xl gold-gradient text-white shadow-lg">
+                      <button type="submit" class="btn-teal px-5 py-3 rounded-xl teal-gradient text-white shadow-lg">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                       </button>
                     </form>
@@ -755,8 +998,8 @@
 
           <!-- NOTIFICATION TOAST -->
           <div v-if="notification" class="fixed bottom-6 right-6 z-[80] max-w-sm">
-            <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-2xl flex items-start gap-3" :class="notification.type === 'success' ? 'border-l-4 border-l-[#c9a96e]' : 'border-l-4 border-l-red-400'">
-              <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" :class="notification.type === 'success' ? 'bg-amber-50 text-[#c9a96e]' : 'bg-red-50 text-red-400'">
+            <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-2xl flex items-start gap-3" :class="notification.type === 'success' ? 'border-l-4 border-l-[#0d9488]' : 'border-l-4 border-l-red-400'">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" :class="notification.type === 'success' ? 'bg-teal-50 text-[#0d9488]' : 'bg-red-50 text-red-400'">
                 <svg v-if="notification.type === 'success'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                 <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
               </div>
@@ -770,9 +1013,8 @@
       `,
 
       setup() {
-        const STORAGE_KEY = 'skillswap_data_v2';
+        const STORAGE_KEY = 'skillswap_data_v3';
 
-        // Load from localStorage
         const loadData = () => {
           try {
             const saved = localStorage.getItem(STORAGE_KEY);
@@ -787,6 +1029,7 @@
         const currentUser = ref(savedData?.currentUser || null);
         const messages = ref(savedData?.messages || []);
         const notifications = ref(savedData?.notifications || []);
+        const bookings = ref(savedData?.bookings || []);
 
         const currentView = ref('landing');
         const viewedUserId = ref(null);
@@ -860,6 +1103,7 @@
         });
 
         const totalMessages = computed(() => messages.value.length);
+        const totalBookings = computed(() => bookings.value.length);
 
         const filteredUsers = computed(() => {
           let result = users.value;
@@ -882,18 +1126,18 @@
           return result;
         });
 
-        // Save to localStorage
         const saveData = () => {
           const data = {
             users: users.value,
             currentUser: currentUser.value,
             messages: messages.value,
-            notifications: notifications.value
+            notifications: notifications.value,
+            bookings: bookings.value
           };
           localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         };
 
-        watch([users, currentUser, messages, notifications], saveData, { deep: true });
+        watch([users, currentUser, messages, notifications, bookings], saveData, { deep: true });
 
         function showNotify(title, message, type = 'success') {
           notification.value = { title, message, type };
@@ -982,7 +1226,16 @@
         function confirmBooking() {
           if (!bookingForm.value.date || !bookingForm.value.time || !bookingForm.value.skill) return;
           bookingPreview.value = true;
-          // Add notification
+          bookings.value.push({
+            id: Date.now(),
+            fromId: currentUser.value.id,
+            toId: viewedUser.value.id,
+            skill: bookingForm.value.skill,
+            date: bookingForm.value.date,
+            time: bookingForm.value.time,
+            message: bookingForm.value.message,
+            timeCreated: Date.now()
+          });
           notifications.value.push({
             id: Date.now(),
             userId: viewedUser.value.id,
@@ -997,12 +1250,10 @@
           setTimeout(() => { showBooking.value = false; bookingPreview.value = false; }, 3000);
         }
 
-        // Chat functions
         function startChat(userId) {
           chatUserId.value = userId;
           showChat.value = true;
           showNotifications.value = false;
-          // Mark messages as read
           messages.value.forEach(m => {
             if (m.senderId === userId && m.receiverId === currentUser.value?.id) m.read = true;
           });
@@ -1042,7 +1293,6 @@
           nextTick(() => {
             if (chatMessagesRef.value) chatMessagesRef.value.scrollTop = chatMessagesRef.value.scrollHeight;
           });
-          // Simulate reply
           isTyping.value = true;
           setTimeout(() => {
             isTyping.value = false;
@@ -1062,7 +1312,6 @@
               read: false
             };
             messages.value.push(reply);
-            // Add notification
             const partner = users.value.find(u => u.id === chatUserId.value);
             notifications.value.push({
               id: Date.now() + 2,
@@ -1083,7 +1332,6 @@
           }, 1500 + Math.random() * 2000);
         }
 
-        // Notification functions
         function toggleNotifications() {
           showNotifications.value = !showNotifications.value;
           showChat.value = false;
@@ -1094,9 +1342,7 @@
           showNotifications.value = false;
           if (notif.type === 'message' || notif.type === 'booking') {
             const user = users.value.find(u => u.id === notif.fromId);
-            if (user) {
-              viewProfile(user.id);
-            }
+            if (user) viewProfile(user.id);
           }
         }
 
@@ -1125,7 +1371,6 @@
           const progress = docHeight > 0 ? (scrollY.value / docHeight) * 100 : 0;
           const bar = document.getElementById('scroll-progress');
           if (bar) bar.style.width = progress + '%';
-
           const heroContent = document.querySelector('.hero-content');
           if (heroContent && currentView.value === 'landing') {
             const opacity = Math.max(0, 1 - scrollY.value / 400);
@@ -1140,10 +1385,7 @@
         onMounted(() => {
           window.addEventListener('scroll', handleScroll);
           setTimeout(handleScroll, 100);
-          // If user was logged in, go to browse
-          if (currentUser.value) {
-            currentView.value = 'home';
-          }
+          if (currentUser.value) currentView.value = 'home';
         });
 
         onUnmounted(() => {
@@ -1155,7 +1397,7 @@
           searchQuery, scrollY, notification, bookingPreview, signupForm, bookingForm, editForm,
           timeSlots, viewedUser, isOwnProfile, filteredUsers, chatUserId, chatInput, isTyping,
           chatMessagesRef, chatPartner, currentChatMessages, chatList, totalUnreadMessages,
-          notifications, unreadNotifications, totalSkills, totalMessages,
+          notifications, unreadNotifications, totalSkills, totalMessages, totalBookings,
           handleSignup, goHome, goToBrowse, viewProfile, toggleEdit, saveProfile,
           openBooking, confirmBooking, logout, showNotify, formatTime,
           startChat, openChat, toggleChat, sendMessage, toggleNotifications,
