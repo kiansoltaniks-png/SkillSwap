@@ -223,19 +223,6 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .demo-badge {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: linear-gradient(135deg, #0d9488, #14b8a6);
-      color: white;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 100px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
     .export-box {
       background: #f8fafc;
       border: 1px dashed #cbd5e1;
@@ -258,68 +245,7 @@
     const { createApp, ref, computed, onMounted, onUnmounted, watch, nextTick } = Vue;
 
     // DEMO USERS - these are baked into the code so EVERYONE sees them
-    const DEMO_USERS = [
-      {
-        id: 1001,
-        name: "Sarah Chen",
-        email: "sarah.chen@email.com",
-        phone: "+1 555-0101",
-        age: 28,
-        skills: ["Python", "Data Science", "Machine Learning"],
-        wants: ["Guitar", "Spanish", "Photography"],
-        bio: "Software engineer with 5 years of experience. Love hiking and trying new cuisines. Looking to pick up creative skills outside of tech."
-      },
-      {
-        id: 1002,
-        name: "Marcus Johnson",
-        email: "marcus.j@email.com",
-        phone: "+1 555-0102",
-        age: 34,
-        skills: ["Guitar", "Music Theory", "Songwriting"],
-        wants: ["JavaScript", "Web Design", "Marketing"],
-        bio: "Professional musician and guitar teacher. Played in bands for 10 years. Want to build my own website and learn digital marketing."
-      },
-      {
-        id: 1003,
-        name: "Aisha Patel",
-        email: "aisha.patel@email.com",
-        phone: "+1 555-0103",
-        age: 26,
-        skills: ["Photography", "Photo Editing", "Adobe Lightroom"],
-        wants: ["Cooking", "Yoga", "Public Speaking"],
-        bio: "Freelance photographer specializing in portraits and events. Always looking to expand my creative and wellness skills."
-      },
-      {
-        id: 1004,
-        name: "David Kim",
-        email: "david.kim@email.com",
-        phone: "+1 555-0104",
-        age: 31,
-        skills: ["Cooking", "Baking", "Meal Prep"],
-        wants: ["Photography", "Video Editing", "Social Media"],
-        bio: "Chef with a passion for fusion cuisine. I teach cooking classes on weekends and want to start a food blog with great visuals."
-      },
-      {
-        id: 1005,
-        name: "Emma Rodriguez",
-        email: "emma.r@email.com",
-        phone: "+1 555-0105",
-        age: 24,
-        skills: ["Spanish", "Translation", "Creative Writing"],
-        wants: ["Coding", "UI/UX Design", "Illustration"],
-        bio: "Bilingual writer and translator. Fluent in Spanish and English. Fascinated by tech and want to transition into design."
-      },
-      {
-        id: 1006,
-        name: "James Wilson",
-        email: "james.w@email.com",
-        phone: "+1 555-0106",
-        age: 29,
-        skills: ["Fitness Training", "Nutrition", "Yoga"],
-        wants: ["Business Strategy", "Public Speaking", "Meditation"],
-        bio: "Certified personal trainer and nutrition coach. Help people build healthy habits. Looking to grow my coaching business."
-      }
-    ];
+    
 
     createApp({
       template: `
@@ -772,8 +698,7 @@
 
               <div v-else class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 perspective-container">
                 <div v-for="user in filteredUsers" :key="user.id" @click="viewProfile(user.id)" class="tilt-card relative bg-white rounded-2xl border border-slate-100 p-6 cursor-pointer shadow-sm hover:shadow-xl transition-all group">
-                  <span v-if="user.isDemo" class="demo-badge">Demo</span>
-                  <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-start justify-between mb-4">
                     <div class="w-14 h-14 rounded-xl teal-gradient flex items-center justify-center text-lg font-bold text-white shadow-md">
                       {{ user.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() }}
                     </div>
@@ -820,12 +745,11 @@
                           <h2 v-if="!isEditing" class="text-2xl font-bold font-display text-slate-800">{{ viewedUser.name }}</h2>
                           <input v-else v-model="editForm.name" class="text-2xl font-bold font-display bg-transparent border-b border-[#0d9488]/50 px-0 py-1 w-48 text-slate-800" placeholder="Name">
                           <span v-if="isOwnProfile" class="px-2.5 py-1 rounded-lg bg-teal-50 border border-teal-200 text-[#0f766e] text-xs font-bold">You</span>
-                          <span v-if="viewedUser.isDemo" class="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 text-xs font-bold">Demo</span>
                         </div>
                         <p class="text-slate-400 text-sm">{{ viewedUser.age }} years old</p>
                       </div>
                     </div>
-                    <button v-if="isOwnProfile && !viewedUser.isDemo" @click="toggleEdit" class="btn-outline px-4 py-2 rounded-xl text-sm font-medium">
+                    <button v-if="isOwnProfile" @click="toggleEdit" class="btn-outline px-4 py-2 rounded-xl text-sm font-medium">
                       {{ isEditing ? 'Cancel' : 'Edit Profile' }}
                     </button>
                   </div>
@@ -856,7 +780,7 @@
                     <button @click="saveProfile" class="btn-teal flex-1 py-3 rounded-xl teal-gradient text-white font-semibold shadow-lg">Save Changes</button>
                   </div>
 
-                  <div v-if="!isOwnProfile && !viewedUser.isDemo" class="border-t border-slate-100 pt-6 flex gap-3">
+                  <div v-if="!isOwnProfile" class="border-t border-slate-100 pt-6 flex gap-3">
                     <button @click="openBooking" class="btn-teal flex-1 py-4 rounded-2xl teal-gradient text-white font-semibold text-lg shadow-lg flex items-center justify-center gap-2">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -870,12 +794,7 @@
                       Message
                     </button>
                   </div>
-                  <div v-else-if="viewedUser.isDemo" class="border-t border-slate-100 pt-6">
-                    <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-sm">
-                      <p class="text-amber-700 font-medium mb-1">Demo Profile</p>
-                      <p class="text-amber-600">This is a demo user. Sign up to create your own profile and message real members!</p>
-                    </div>
-                  </div>
+
                 </div>
               </div>
             </div>
@@ -1113,15 +1032,12 @@
 
         const timeSlots = ['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM', '6:00 PM', '7:00 PM'];
 
-        // allUsers = DEMO_USERS + localUsers (so everyone sees demo users + real signups)
         const allUsers = computed(() => {
-          const demos = DEMO_USERS.map(u => ({ ...u, isDemo: true }));
-          const locals = localUsers.value.map(u => ({ ...u, isDemo: false }));
-          return [...demos, ...locals];
+          return localUsers.value;
         });
 
         const viewedUser = computed(() => allUsers.value.find(u => u.id === viewedUserId.value));
-        const isOwnProfile = computed(() => currentUser.value && viewedUser.value && currentUser.value.id === viewedUser.value.id && !viewedUser.value.isDemo);
+        const isOwnProfile = computed(() => currentUser.value && viewedUser.value && currentUser.value.id === viewedUser.value.id);
         const chatPartner = computed(() => allUsers.value.find(u => u.id === chatUserId.value));
 
         const currentChatMessages = computed(() => {
@@ -1307,10 +1223,6 @@
         }
 
         function startChat(userId) {
-          if (allUsers.value.find(u => u.id === userId)?.isDemo) {
-            showNotify('Demo User', 'This is a demo profile. Sign up to chat with real members!', 'success');
-            return;
-          }
           chatUserId.value = userId;
           showChat.value = true;
           showNotifications.value = false;
@@ -1439,7 +1351,7 @@
               // Check if already exists
               const exists = localUsers.value.find(u => u.id === friend.id);
               if (!exists) {
-                localUsers.value.push({ ...friend, isDemo: false });
+                localUsers.value.push(friend);
                 saveData();
                 showNotify('Friend Added!', `${friend.name} has been added to your community.`, 'success');
                 importCode.value = '';
