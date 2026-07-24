@@ -3,335 +3,406 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SkillSwap</title>
+<title>SkillSwap - Learn & Teach</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>
+:root{--teal:#0d9488;--teal-light:#14b8a6;--teal-dark:#0f766e;--teal-50:#f0fdfa;--teal-100:#ccfbf1;--cream:#faf9f6;--white:#ffffff;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;--red:#ef4444;--red-light:#fef2f2;--yellow:#f59e0b;--green:#10b981;}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:#faf9f7;color:#1a1a2e;overflow-x:hidden}
-.gold{color:#0d9488}
-.gold-bg{background:#0d9488}
-.gold-gradient{background:linear-gradient(135deg,#0d9488,#14b8a6)}
-.gold-text{color:#0d9488}
-.gold-border{border-color:#0d9488}
-.gold-shadow{box-shadow:0 4px 20px rgba(13,148,136,0.15)}
-nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(250,249,247,0.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,0.05);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center}
-.logo{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:#1a1a2e;cursor:pointer}
-.logo span{color:#0d9488}
-.nav-links{display:flex;gap:2rem;align-items:center}
-.nav-links a{text-decoration:none;color:#555;font-weight:500;transition:color 0.3s;cursor:pointer}
-.nav-links a:hover{color:#0d9488}
-.btn{padding:0.7rem 1.5rem;border-radius:50px;border:none;cursor:pointer;font-weight:600;transition:all 0.3s;font-size:0.9rem}
-.btn-primary{background:#0d9488;color:#fff}
-.btn-primary:hover{background:#0f766e;transform:translateY(-2px)}
-.btn-outline{border:2px solid #0d9488;color:#0d9488;background:transparent}
-.btn-outline:hover{background:#0d9488;color:#fff}
-.btn-sm{padding:0.5rem 1rem;font-size:0.8rem}
-.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:8rem 2rem 4rem}
-.hero-bg{position:absolute;inset:0;z-index:0}
-.hero-bg img{width:100%;height:100%;object-fit:cover;opacity:0.15}
-.hero-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(250,249,247,0.9),rgba(250,249,247,0.7));z-index:1}
-.hero-content{position:relative;z-index:2;text-align:center;max-width:900px}
-.hero h1{font-family:'Playfair Display',serif;font-size:4rem;font-weight:700;color:#1a1a2e;margin-bottom:1.5rem;line-height:1.1}
-.hero h1 span{color:#0d9488}
-.hero p{font-size:1.3rem;color:#555;margin-bottom:2.5rem;line-height:1.7}
-.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
-.section{padding:5rem 2rem;max-width:1200px;margin:0 auto}
-.section-title{font-family:'Playfair Display',serif;font-size:2.5rem;text-align:center;margin-bottom:1rem;color:#1a1a2e}
-.section-subtitle{text-align:center;color:#777;margin-bottom:3rem;font-size:1.1rem}
-.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2rem;margin-bottom:4rem}
-.stat-card{background:#fff;padding:2rem;border-radius:16px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.04)}
-.stat-number{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:700;color:#0d9488}
-.stat-label{color:#777;font-size:0.95rem;margin-top:0.3rem}
-.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem;margin-bottom:3rem}
-.feature-card{background:#fff;padding:2.5rem;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.04);transition:all 0.3s}
-.feature-card:hover{transform:translateY(-5px);box-shadow:0 8px 30px rgba(13,148,136,0.12)}
-.feature-icon{width:60px;height:60px;border-radius:12px;background:linear-gradient(135deg,#0d9488,#14b8a6);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;font-size:1.5rem}
-.feature-card h3{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:0.8rem;color:#1a1a2e}
-.feature-card p{color:#666;line-height:1.6}
-.member-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem}
-.member-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.04);transition:all 0.3s;cursor:pointer}
-.member-card:hover{transform:translateY(-5px);box-shadow:0 8px 30px rgba(13,148,136,0.15)}
-.member-card img{width:100%;height:200px;object-fit:cover}
-.member-info{padding:1.5rem}
-.member-name{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:600;color:#1a1a2e;margin-bottom:0.3rem}
-.member-skills{display:flex;flex-wrap:wrap;gap:0.4rem;margin:0.8rem 0}
-.skill-tag{background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;padding:0.3rem 0.8rem;border-radius:20px;font-size:0.75rem;font-weight:500}
-.member-bio{color:#666;font-size:0.9rem;line-height:1.5;margin-bottom:1rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.member-actions{display:flex;gap:0.5rem}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;padding:2rem;backdrop-filter:blur(5px)}
-.modal{background:#fff;border-radius:20px;padding:2.5rem;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
-.modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#999}
-.modal-close:hover{color:#333}
-.modal h2{font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:1.5rem;color:#1a1a2e}
-.form-group{margin-bottom:1.2rem}
-.form-group label{display:block;margin-bottom:0.5rem;font-weight:500;color:#333}
-.form-group input,.form-group textarea,.form-group select{width:100%;padding:0.9rem 1rem;border:2px solid #e5e5e5;border-radius:12px;font-size:1rem;transition:all 0.3s;font-family:'Inter',sans-serif}
-.form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:#0d9488;box-shadow:0 0 0 3px rgba(13,148,136,0.1)}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--gray-800);line-height:1.6;overflow-x:hidden}
+
+/* Scroll progress */
+#scroll-progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--teal-light),var(--teal-dark));z-index:9999;width:0%;transition:width 0.1s}
+
+/* Navbar */
+.navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--gray-200);transition:all 0.3s ease}
+.navbar.scrolled{box-shadow:0 4px 30px rgba(0,0,0,0.08)}
+.nav-container{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:72px}
+.logo{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--teal);cursor:pointer;display:flex;align-items:center;gap:8px}
+.logo i{font-size:1.3rem}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{color:var(--gray-600);text-decoration:none;font-weight:500;font-size:0.95rem;transition:color 0.2s;cursor:pointer}
+.nav-links a:hover{color:var(--teal)}
+.nav-links a.active{color:var(--teal);font-weight:600}
+.nav-right{display:flex;align-items:center;gap:16px}
+.credits-badge{background:linear-gradient(135deg,var(--teal),var(--teal-light));color:white;padding:6px 16px;border-radius:20px;font-weight:600;font-size:0.85rem;display:flex;align-items:center;gap:6px}
+.btn{padding:10px 24px;border-radius:8px;font-weight:600;font-size:0.9rem;cursor:pointer;transition:all 0.3s;border:none;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:linear-gradient(135deg,var(--teal),var(--teal-light));color:white;box-shadow:0 4px 15px rgba(13,148,136,0.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(13,148,136,0.4)}
+.btn-outline{background:transparent;color:var(--teal);border:2px solid var(--teal)}
+.btn-outline:hover{background:var(--teal);color:white}
+.btn-small{padding:6px 14px;font-size:0.8rem}
+.btn-ghost{background:transparent;color:var(--gray-500)}
+.btn-ghost:hover{color:var(--teal)}
+.btn-danger{background:var(--red);color:white}
+.btn-danger:hover{background:#dc2626}
+
+/* Notification Bell */
+.notif-bell{position:relative;cursor:pointer;padding:8px;color:var(--gray-600);font-size:1.2rem;transition:color 0.2s}
+.notif-bell:hover{color:var(--teal)}
+.notif-badge{position:absolute;top:2px;right:2px;background:var(--red);color:white;font-size:0.65rem;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.notif-dropdown{position:absolute;top:50px;right:0;width:320px;background:white;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.15);border:1px solid var(--gray-200);overflow:hidden;z-index:1001}
+.notif-header{padding:16px;border-bottom:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:center}
+.notif-header h4{font-size:0.95rem;color:var(--gray-800)}
+.notif-header span{font-size:0.8rem;color:var(--teal);cursor:pointer}
+.notif-list{max-height:300px;overflow-y:auto}
+.notif-item{padding:12px 16px;border-bottom:1px solid var(--gray-50);cursor:pointer;transition:background 0.2s;display:flex;gap:12px;align-items:flex-start}
+.notif-item:hover{background:var(--gray-50)}
+.notif-item.unread{background:rgba(13,148,136,0.05);border-left:3px solid var(--teal)}
+.notif-item i{color:var(--teal);margin-top:2px}
+.notif-content p{font-size:0.85rem;color:var(--gray-700);margin-bottom:2px}
+.notif-content span{font-size:0.75rem;color:var(--gray-400)}
+.notif-empty{padding:24px;text-align:center;color:var(--gray-400);font-size:0.85rem}
+
+/* Hero */
+.hero{min-height:100vh;display:flex;align-items:center;padding:120px 24px 80px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;z-index:0;background:linear-gradient(135deg,var(--cream) 0%,#f0fdf4 50%,var(--white) 100%)}
+.hero-bg::before{content:'';position:absolute;top:-20%;right:-10%;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(13,148,136,0.08) 0%,transparent 70%);animation:float 8s ease-in-out infinite}
+.hero-bg::after{content:'';position:absolute;bottom:-10%;left:-5%;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(20,184,166,0.06) 0%,transparent 70%);animation:float 10s ease-in-out infinite reverse}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+.hero-content{position:relative;z-index:1;max-width:600px}
+.hero h1{font-family:'Playfair Display',serif;font-size:3.8rem;font-weight:700;line-height:1.1;color:var(--gray-900);margin-bottom:24px}
+.hero h1 span{background:linear-gradient(135deg,var(--teal),var(--teal-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:1.15rem;color:var(--gray-500);margin-bottom:32px;max-width:540px}
+.hero-btns{display:flex;gap:16px;flex-wrap:wrap}
+.hero-img{position:absolute;right:4rem;top:50%;transform:translateY(-50%);width:520px;height:420px;border-radius:24px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,0.12);z-index:1}
+.hero-img img{width:100%;height:100%;object-fit:cover}
+
+/* Sections */
+.section{padding:80px 24px;max-width:1200px;margin:0 auto}
+.section-title{text-align:center;margin-bottom:48px}
+.section-title h2{font-size:2.4rem;color:var(--gray-900);margin-bottom:12px}
+.section-title p{color:var(--gray-500);font-size:1.05rem;max-width:600px;margin:0 auto}
+
+/* Stats */
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;margin-bottom:48px}
+.stat-card{background:white;padding:28px 20px;border-radius:16px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.06);border:1px solid var(--gray-100);transition:transform 0.3s}
+.stat-card:hover{transform:translateY(-4px)}
+.stat-card i{font-size:1.8rem;color:var(--teal);margin-bottom:12px}
+.stat-number{font-size:2.2rem;font-weight:700;color:var(--teal);font-family:'Playfair Display',serif}
+.stat-label{font-size:0.85rem;color:var(--gray-500);margin-top:4px}
+
+/* How It Works */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:40px}
+.step-card{background:white;border-radius:16px;padding:40px 30px;text-align:center;border:1px solid var(--gray-100);transition:all 0.3s;position:relative;overflow:hidden}
+.step-card:hover{transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,0.08);border-color:var(--teal-200)}
+.step-number{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--teal),var(--teal-light));color:white;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700;margin:0 auto 20px;font-family:'Playfair Display',serif}
+.step-card h3{font-size:1.2rem;margin-bottom:10px;color:var(--gray-800)}
+.step-card p{color:var(--gray-500);font-size:0.95rem}
+
+/* Categories */
+.categories-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:40px}
+.category-pill{padding:10px 22px;border-radius:30px;background:white;border:1.5px solid rgba(13,148,136,0.15);color:var(--gray-600);font-size:0.85rem;font-weight:500;cursor:pointer;transition:all 0.3s}
+.category-pill:hover,.category-pill.active{background:linear-gradient(135deg,var(--teal),var(--teal-light));color:white;border-color:transparent}
+
+/* Feature Cards */
+.feature-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.feature-card{background:white;border-radius:16px;overflow:hidden;border:1px solid var(--gray-100);transition:all 0.3s}
+.feature-card:hover{transform:translateY(-5px);box-shadow:0 20px 50px rgba(0,0,0,0.08)}
+.feature-card img{width:100%;height:200px;object-fit:cover}
+.feature-card-content{padding:24px}
+.feature-card-content h3{font-size:1.1rem;font-weight:600;margin-bottom:8px}
+.feature-card-content p{color:var(--gray-500);font-size:0.9rem}
+
+/* FAQ */
+.faq-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.faq-card{background:white;border-radius:16px;padding:30px;border:1px solid var(--gray-100);transition:all 0.3s}
+.faq-card:hover{border-color:var(--teal-200);box-shadow:0 10px 30px rgba(0,0,0,0.05)}
+.faq-card h4{font-size:1.1rem;margin-bottom:10px;color:var(--teal);display:flex;align-items:center;gap:8px}
+.faq-card p{color:var(--gray-500);font-size:0.9rem;line-height:1.6}
+
+/* Browse Members */
+.search-bar{max-width:600px;margin:0 auto 40px;position:relative}
+.search-bar input{width:100%;padding:14px 20px 14px 48px;border:2px solid var(--gray-200);border-radius:12px;font-size:1rem;transition:all 0.3s;background:white}
+.search-bar input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 4px rgba(13,148,136,0.1)}
+.search-bar i{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--gray-400)}
+
+.members-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px}
+.member-card{background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);border:1px solid var(--gray-100);transition:all 0.3s;cursor:pointer}
+.member-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.1)}
+.member-card-img{width:100%;height:200px;background:linear-gradient(135deg,var(--teal),var(--teal-light));display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.member-card-img .avatar-large{width:80px;height:80px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:var(--teal)}
+.member-info{padding:24px}
+.member-info h4{font-size:1.15rem;margin-bottom:4px;color:var(--gray-900)}
+.member-info .role{color:var(--teal);font-size:0.85rem;font-weight:500;margin-bottom:10px}
+.member-skills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.skill-tag{padding:4px 12px;border-radius:20px;background:var(--teal-50);color:var(--teal-dark);font-size:0.8rem;font-weight:500}
+.member-rating{display:flex;align-items:center;gap:6px;font-size:0.9rem;color:var(--gray-500);margin-bottom:16px}
+.member-rating .stars{color:var(--yellow)}
+.member-actions{display:flex;gap:8px}
+.member-actions .btn{flex:1;justify-content:center}
+
+/* Profile */
+.profile-header{background:linear-gradient(135deg,var(--teal),var(--teal-light));padding:60px 40px 40px;text-align:center;color:white;border-radius:0 0 24px 24px}
+.profile-avatar-large{width:100px;height:100px;border-radius:50%;background:white;color:var(--teal);display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:700;margin:0 auto 16px;border:4px solid rgba(255,255,255,0.3)}
+.profile-header h2{font-size:2rem;margin-bottom:8px}
+.profile-header p{opacity:0.9}
+.profile-stats{display:flex;gap:20px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+.profile-stat{background:rgba(255,255,255,0.2);padding:8px 20px;border-radius:20px;font-size:0.9rem}
+.profile-body{padding:40px;max-width:800px;margin:0 auto}
+.profile-section{margin-bottom:32px}
+.profile-section h3{font-size:1.2rem;margin-bottom:16px;color:var(--gray-800);display:flex;align-items:center;gap:8px}
+.profile-section h3 i{color:var(--teal)}
+.profile-section p{color:var(--gray-600);line-height:1.7}
+.review-item{background:var(--gray-50);padding:20px;border-radius:12px;margin-bottom:12px}
+.review-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.review-author{font-weight:600;color:var(--gray-800)}
+.review-stars{color:var(--yellow);font-size:0.9rem}
+.review-text{color:var(--gray-600);font-size:0.9rem;line-height:1.5}
+.review-meta{font-size:0.8rem;color:var(--gray-400);margin-top:6px}
+
+/* Share Box */
+.share-box{background:var(--teal-50);border:2px dashed var(--teal);border-radius:12px;padding:20px;margin-top:16px}
+.share-box p{font-weight:600;color:var(--teal-dark);margin-bottom:8px}
+.share-code{background:white;padding:12px;border-radius:8px;border:1px solid var(--gray-200);font-family:monospace;font-size:0.85rem;word-break:break-all;margin-bottom:12px}
+
+/* Modals */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px)}
+.modal{background:white;border-radius:20px;padding:32px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--gray-400);width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all 0.2s}
+.modal-close:hover{background:var(--gray-100);color:var(--gray-700)}
+.modal h2{font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:8px;color:var(--gray-900)}
+.modal p.subtitle{color:var(--gray-500);margin-bottom:24px;font-size:0.95rem}
+.form-group{margin-bottom:20px}
+.form-group label{display:block;margin-bottom:6px;font-weight:500;color:var(--gray-700);font-size:0.9rem}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:12px 16px;border:2px solid var(--gray-200);border-radius:10px;font-size:0.95rem;transition:all 0.3s;font-family:'Inter',sans-serif}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,0.1)}
 .form-group textarea{min-height:100px;resize:vertical}
-.skills-input{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem}
-.skill-pill{background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;padding:0.4rem 0.9rem;border-radius:20px;font-size:0.8rem;display:flex;align-items:center;gap:0.4rem}
-.skill-pill button{background:none;border:none;color:#fff;cursor:pointer;font-size:1rem;line-height:1}
-.search-box{width:100%;padding:1rem 1.5rem;border:2px solid #e5e5e5;border-radius:50px;font-size:1rem;margin-bottom:2rem;transition:all 0.3s}
-.search-box:focus{outline:none;border-color:#0d9488;box-shadow:0 0 0 3px rgba(13,148,136,0.1)}
-.chat-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;padding:2rem;backdrop-filter:blur(5px)}
-.chat-modal{background:#fff;border-radius:20px;width:100%;max-width:700px;height:80vh;display:flex;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
-.chat-sidebar{width:250px;background:#f8f8f8;border-right:1px solid #e5e5e5;padding:1rem;overflow-y:auto}
-.chat-sidebar h3{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid #e5e5e5}
-.chat-contact{padding:0.8rem;border-radius:10px;cursor:pointer;transition:all 0.2s;margin-bottom:0.3rem}
-.chat-contact:hover{background:#fff}
-.chat-contact.active{background:#0d9488;color:#fff}
-.chat-contact-name{font-weight:600;font-size:0.9rem}
-.chat-contact-preview{font-size:0.75rem;opacity:0.7;margin-top:0.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.error-msg{color:var(--red);font-size:0.85rem;margin-top:4px}
+.switch-link{text-align:center;margin-top:16px;font-size:0.9rem;color:var(--gray-500)}
+.switch-link a{color:var(--teal);cursor:pointer;font-weight:600}
+.modal-actions{display:flex;gap:12px;margin-top:24px}
+.modal-actions .btn{flex:1;justify-content:center}
+
+/* Delete Account Modal */
+.delete-warning{background:var(--red-light);border:1px solid #fecaca;border-radius:12px;padding:16px;margin-bottom:20px}
+.delete-warning p{color:#991b1b;font-size:0.9rem;margin:0}
+.delete-warning i{color:var(--red);margin-right:8px}
+
+/* Chat */
+.chat-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px)}
+.chat-container{background:white;border-radius:20px;width:100%;max-width:900px;height:80vh;display:flex;overflow:hidden;box-shadow:0 25px 80px rgba(0,0,0,0.3)}
+.chat-sidebar{width:280px;border-right:1px solid var(--gray-200);background:var(--gray-50);display:flex;flex-direction:column}
+.chat-sidebar-header{padding:20px;border-bottom:1px solid var(--gray-200)}
+.chat-sidebar-header h3{font-size:1rem;color:var(--gray-800)}
+.chat-conversations{flex:1;overflow-y:auto}
+.chat-conv-item{padding:14px 20px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:background 0.2s;border-bottom:1px solid var(--gray-100)}
+.chat-conv-item:hover,.chat-conv-item.active{background:white}
+.chat-conv-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-light));color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;flex-shrink:0}
+.chat-conv-info{flex:1;min-width:0}
+.chat-conv-info p{font-size:0.85rem;color:var(--gray-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-conv-info span{font-size:0.75rem;color:var(--gray-400)}
+.chat-conv-unread{width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0}
 .chat-main{flex:1;display:flex;flex-direction:column}
-.chat-header{padding:1rem 1.5rem;border-bottom:1px solid #e5e5e5;display:flex;justify-content:space-between;align-items:center}
-.chat-header-info h4{margin:0;font-size:1rem}
-.chat-header-info p{margin:0;font-size:0.8rem;color:#777}
-.chat-messages{flex:1;overflow-y:auto;padding:1.5rem;display:flex;flex-direction:column;gap:0.8rem}
-.message{max-width:70%;padding:0.8rem 1.2rem;border-radius:16px;font-size:0.9rem;line-height:1.4}
-.message-sent{align-self:flex-end;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;border-bottom-right-radius:4px}
-.message-received{align-self:flex-start;background:#f0f0f0;color:#333;border-bottom-left-radius:4px}
-.chat-input-area{padding:1rem;border-top:1px solid #e5e5e5;display:flex;gap:0.5rem}
-.chat-input{flex:1;padding:0.8rem 1rem;border:2px solid #e5e5e5;border-radius:50px;font-size:0.9rem}
-.chat-input:focus{outline:none;border-color:#0d9488}
-.chat-send-btn{padding:0.8rem 1.2rem;background:#0d9488;color:#fff;border:none;border-radius:50px;cursor:pointer;font-weight:600}
-.notification-bell{position:relative;cursor:pointer;padding:0.5rem}
-.notification-badge{position:absolute;top:0;right:0;background:#e74c3c;color:#fff;font-size:0.65rem;padding:0.15rem 0.4rem;border-radius:10px;font-weight:700}
-.notification-dropdown{position:absolute;top:100%;right:0;background:#fff;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.15);width:320px;max-height:400px;overflow-y:auto;margin-top:0.5rem;padding:1rem;z-index:1001}
-.notification-item{padding:0.8rem;border-radius:8px;cursor:pointer;transition:all 0.2s;border-bottom:1px solid #f0f0f0}
-.notification-item:hover{background:#f8f8f8}
-.notification-item.unread{background:rgba(13,148,136,0.05)}
-.notification-time{font-size:0.7rem;color:#999;margin-top:0.2rem}
-.toast{position:fixed;bottom:2rem;right:2rem;background:#fff;padding:1rem 1.5rem;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.15);z-index:3000;display:flex;align-items:center;gap:0.8rem;animation:slideIn 0.3s ease;max-width:350px;border-left:4px solid #0d9488}
+.chat-header{padding:16px 24px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between}
+.chat-header-info{display:flex;align-items:center;gap:12px}
+.chat-header-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-light));color:white;display:flex;align-items:center;justify-content:center;font-weight:700}
+.chat-header-name{font-size:1rem;font-weight:600}
+.chat-header-status{font-size:0.8rem;color:#22c55e;display:flex;align-items:center;gap:4px}
+.chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+.chat-msg{max-width:70%;padding:12px 16px;border-radius:16px;font-size:0.9rem;line-height:1.5}
+.chat-msg.sent{align-self:flex-end;background:linear-gradient(135deg,var(--teal),var(--teal-light));color:white;border-bottom-right-radius:4px}
+.chat-msg.received{align-self:flex-start;background:var(--gray-100);color:var(--gray-700);border-bottom-left-radius:4px}
+.chat-msg-time{font-size:0.7rem;opacity:0.7;margin-top:4px}
+.chat-input-area{padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:12px}
+.chat-input{flex:1;padding:12px 18px;border:2px solid var(--gray-200);border-radius:50px;font-size:0.9rem;outline:none;transition:all 0.3s}
+.chat-input:focus{border-color:var(--teal)}
+.chat-send-btn{padding:12px 24px;border-radius:50px;background:var(--teal);color:white;border:none;cursor:pointer;font-weight:600;transition:all 0.2s}
+.chat-send-btn:hover{background:var(--teal-dark)}
+.typing-indicator{display:flex;gap:4px;padding:12px 16px;background:var(--gray-100);border-radius:16px;align-self:flex-start;border-bottom-left-radius:4px}
+.typing-indicator span{width:6px;height:6px;border-radius:50%;background:var(--gray-400);animation:typing 1.4s infinite}
+.typing-indicator span:nth-child(2){animation-delay:0.2s}
+.typing-indicator span:nth-child(3){animation-delay:0.4s}
+@keyframes typing{0%,60%,100%{opacity:0.3;transform:scale(1)}30%{opacity:1;transform:scale(1.2)}}
+
+/* Review Modal Stars */
+.star-rating{display:flex;gap:8px;font-size:1.8rem;margin-bottom:16px}
+.star-rating .star{color:var(--gray-300);cursor:pointer;transition:all 0.2s}
+.star-rating .star.active{color:var(--yellow)}
+.star-rating .star:hover{transform:scale(1.15)}
+.credit-preview{background:var(--teal-50);border-radius:10px;padding:16px;text-align:center;margin-bottom:20px}
+.credit-preview .amount{font-size:2rem;font-weight:700;color:var(--teal)}
+.credit-preview p{color:var(--gray-500);font-size:0.85rem}
+
+/* Toast */
+.toast-container{position:fixed;top:90px;right:20px;z-index:3000;display:flex;flex-direction:column;gap:10px}
+.toast{background:white;padding:16px 20px;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.15);border-left:4px solid var(--teal);display:flex;align-items:center;gap:12px;animation:slideIn 0.3s ease;max-width:320px}
+.toast.error{border-left-color:var(--red)}
+.toast i{color:var(--teal);font-size:1.1rem}
+.toast.error i{color:var(--red)}
+.toast p{font-size:0.9rem;color:var(--gray-700)}
 @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
-.toast-close{background:none;border:none;font-size:1.2rem;cursor:pointer;color:#999;margin-left:auto}
-.profile-header{text-align:center;padding:3rem 2rem;background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;border-radius:20px;margin-bottom:2rem}
-.profile-header h2{font-family:'Playfair Display',serif;font-size:2.5rem;margin-bottom:0.5rem}
-.profile-header p{font-size:1.1rem;opacity:0.9}
-.profile-section{background:#fff;padding:2rem;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.06);margin-bottom:1.5rem}
-.profile-section h3{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:1rem;color:#1a1a2e}
-.review-card{background:#f8f8f8;padding:1.2rem;border-radius:12px;margin-bottom:0.8rem}
-.review-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem}
-.review-stars{color:#f39c12;font-size:1rem}
-.review-text{color:#555;line-height:1.5}
-.review-meta{font-size:0.8rem;color:#999;margin-top:0.3rem}
-.star-rating{display:flex;gap:0.3rem;font-size:1.5rem;cursor:pointer}
-.star-rating span{color:#ddd;transition:color 0.2s}
-.star-rating span.filled{color:#f39c12}
-.credit-display{background:linear-gradient(135deg,#0d9488,#14b8a6);color:#fff;padding:0.5rem 1rem;border-radius:50px;font-weight:600;font-size:0.9rem}
-.empty-state{text-align:center;padding:4rem 2rem;color:#999}
-.empty-state-icon{font-size:4rem;margin-bottom:1rem;opacity:0.3}
-.loading-spinner{width:40px;height:40px;border:3px solid #e5e5e5;border-top-color:#0d9488;border-radius:50%;animation:spin 1s linear infinite;margin:2rem auto}
+
+/* Empty State */
+.empty-state{text-align:center;padding:60px 20px;color:var(--gray-400)}
+.empty-state i{font-size:3rem;margin-bottom:16px;color:var(--gray-300)}
+.empty-state h3{font-size:1.2rem;margin-bottom:8px;color:var(--gray-700)}
+.empty-state p{font-size:0.95rem}
+
+/* Loading */
+.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,0.95);z-index:5000;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.loading-spinner{width:50px;height:50px;border:4px solid var(--gray-200);border-top-color:var(--teal);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:20px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.category-pills{display:flex;flex-wrap:wrap;gap:0.6rem;justify-content:center;margin-bottom:2rem}
-.category-pill{padding:0.6rem 1.2rem;border-radius:50px;border:2px solid #e5e5e5;background:#fff;cursor:pointer;transition:all 0.3s;font-weight:500;font-size:0.9rem}
-.category-pill:hover,.category-pill.active{border-color:#0d9488;background:rgba(13,148,136,0.05);color:#0d9488}
-.faq-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem;margin-top:2rem}
-.faq-card{background:#fff;padding:1.8rem;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.06)}
-.faq-card h4{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:0.8rem;color:#0d9488}
-.faq-card p{color:#666;line-height:1.6;font-size:0.9rem}
-.share-box{background:#f0fdf4;padding:1.5rem;border-radius:12px;border:2px dashed #0d9488;margin-top:1rem}
-.share-code{font-family:monospace;background:#fff;padding:0.8rem;border-radius:8px;border:1px solid #e5e5e5;word-break:break-all;font-size:0.85rem;margin:0.5rem 0}
+.loading-text{color:var(--teal);font-weight:600}
+
+/* Scroll Animations */
 .scroll-reveal{opacity:0;transform:translateY(30px);transition:all 0.6s ease}
 .scroll-reveal.visible{opacity:1;transform:translateY(0)}
-.progress-bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#0d9488,#14b8a6);z-index:1001;transition:width 0.1s}
-footer{background:#1a1a2e;color:#fff;padding:3rem 2rem;text-align:center;margin-top:4rem}
-footer p{color:rgba(255,255,255,0.6)}
-@media(max-width:768px){.hero h1{font-size:2.5rem}.nav-links{display:none}.chat-modal{flex-direction:column;height:90vh}.chat-sidebar{width:100%;height:120px;border-right:none;border-bottom:1px solid #e5e5e5}.section{padding:3rem 1rem}}
+
+/* Footer */
+.footer{background:var(--gray-900);color:var(--gray-400);padding:60px 24px 30px;text-align:center}
+.footer h3{font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:12px;color:white}
+.footer p{font-size:0.9rem;opacity:0.7;margin-bottom:8px}
+.footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:30px;flex-wrap:wrap}
+.footer-link{color:var(--gray-400);text-decoration:none;font-size:0.85rem;transition:color 0.2s;cursor:pointer}
+.footer-link:hover{color:white}
+
+/* Responsive */
+@media(max-width:900px){.hero-img{display:none}.hero h1{font-size:2.5rem}.steps,.feature-cards{grid-template-columns:1fr}.chat-container{flex-direction:column;height:90vh}.chat-sidebar{width:100%;height:120px;border-right:none;border-bottom:1px solid var(--gray-200)}}
+@media(max-width:600px){.hero h1{font-size:2rem}.section{padding:60px 16px}.faq-grid{grid-template-columns:1fr}.stats-bar{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
+<div id="scroll-progress"></div>
 <div id="app">
-<div class="progress-bar" :style="{width:scrollProgress+'%'}"></div>
-<nav v-if="page!=='landing'||isLoggedIn">
-<div class="logo" @click="page='landing'">Skill<span>Swap</span></div>
+
+<!-- Loading -->
+<div v-if="loading" class="loading-overlay">
+<div class="loading-spinner"></div>
+<div class="loading-text">Loading SkillSwap...</div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container">
+<div v-for="t in toasts" :key="t.id" class="toast" :class="{error:t.type==='error'}">
+<i :class="t.type==='error'?'fas fa-exclamation-circle':'fas fa-check-circle'"></i>
+<p>{{t.message}}</p>
+</div>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar" :class="{scrolled:scrolled}">
+<div class="nav-container">
+<div class="logo" @click="page='landing'"><i class="fas fa-exchange-alt"></i> SkillSwap</div>
 <div class="nav-links">
-<a @click="page='landing'">Home</a>
-<a @click="page='browse'">Browse</a>
-<a @click="page='profile'" v-if="currentUser">My Profile</a>
-<div class="notification-bell" @click="showNotifications=!showNotifications" v-if="currentUser">
-<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-<span class="notification-badge" v-if="unreadCount>0">{{unreadCount}}</span>
-<div class="notification-dropdown" v-if="showNotifications" @click.stop>
-<div v-if="notifications.length===0" style="text-align:center;color:#999;padding:1rem">No notifications</div>
-<div v-for="n in notifications" :key="n.id" class="notification-item" :class="{unread:!n.read}" @click="handleNotificationClick(n)">
-<div>{{n.text}}</div>
-<div class="notification-time">{{formatTime(n.created_at)}}</div>
+<a @click="page='landing'" :class="{active:page==='landing'}">Home</a>
+<a @click="page='browse'" :class="{active:page==='browse'}">Browse</a>
+<a @click="page='profile'" :class="{active:page==='profile'}" v-if="currentUser">My Profile</a>
+</div>
+<div class="nav-right">
+<div v-if="currentUser" class="credits-badge"><i class="fas fa-coins"></i> {{currentUser.credits||0}} Credits</div>
+<div v-if="currentUser" style="position:relative">
+<div class="notif-bell" @click="showNotifDropdown=!showNotifDropdown">
+<i class="fas fa-bell"></i>
+<span v-if="unreadCount>0" class="notif-badge">{{unreadCount}}</span>
+</div>
+<div v-if="showNotifDropdown" class="notif-dropdown">
+<div class="notif-header"><h4>Notifications</h4><span @click="markAllRead()">Mark all read</span></div>
+<div class="notif-list">
+<div v-if="notifications.length===0" class="notif-empty">No notifications yet</div>
+<div v-for="n in notifications.slice().reverse()" :key="n.id" class="notif-item" :class="{unread:!n.read}" @click="handleNotificationClick(n)">
+<i :class="n.icon||'fas fa-info-circle'"></i>
+<div class="notif-content"><p>{{n.text}}</p><span>{{formatTime(n.created_at)}}</span></div>
 </div>
 </div>
 </div>
-<span class="credit-display" v-if="currentUser">{{currentUser.credits||0}} Credits</span>
-<button class="btn btn-outline btn-sm" @click="logout" v-if="currentUser">Log Out</button>
-<button class="btn btn-primary btn-sm" @click="showLogin=true" v-if="!currentUser">Log In</button>
-<button class="btn btn-outline btn-sm" @click="showSignup=true" v-if="!currentUser">Sign Up</button>
+</div>
+<button v-if="!currentUser" class="btn btn-outline btn-small" @click="showLogin=true">Log In</button>
+<button v-if="!currentUser" class="btn btn-primary btn-small" @click="showSignup=true">Sign Up</button>
+<button v-if="currentUser" class="btn btn-ghost btn-small" @click="logout()">Log Out</button>
+</div>
 </div>
 </nav>
 
 <!-- LANDING PAGE -->
-<div v-if="page==='landing'" class="landing-page">
-<div class="hero">
-<div class="hero-bg"><img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&q=80" alt=""></div>
-<div class="hero-overlay"></div>
+<div v-if="page==='landing'">
+<section class="hero">
+<div class="hero-bg"></div>
 <div class="hero-content">
-<h1>Learn from <span>Experts</span>.<br>Teach what you <span>Know</span>.</h1>
-<p>Connect with skilled people in your community. Swap knowledge, earn credits, and grow together. No money needed — just skills and a willingness to learn.</p>
+<h1>Trade Skills, <span>Build Community</span></h1>
+<p>Connect with people who want to learn what you know — and teach you what they know. No money needed, just skills and curiosity.</p>
 <div class="hero-btns">
-<button class="btn btn-primary" style="padding:1rem 2.5rem;font-size:1.1rem" @click="showSignup=true">Get Started Free</button>
-<button class="btn btn-outline" style="padding:1rem 2.5rem;font-size:1.1rem" @click="page='browse'">Browse Members</button>
+<button v-if="!currentUser" class="btn btn-primary" style="padding:1rem 2.5rem;font-size:1.1rem" @click="showSignup=true"><i class="fas fa-rocket"></i> Get Started Free</button>
+<button v-else class="btn btn-primary" style="padding:1rem 2.5rem;font-size:1.1rem" @click="page='browse'"><i class="fas fa-search"></i> Browse Members</button>
+<button class="btn btn-outline" style="padding:1rem 2.5rem;font-size:1.1rem" @click="page='browse'">Explore Skills</button>
 </div>
 </div>
-</div>
+<div class="hero-img"><img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80" alt="People learning"></div>
+</section>
 
 <div class="section">
 <div class="stats-bar">
-<div class="stat-card scroll-reveal">
-<div class="stat-number">{{users.length}}</div>
-<div class="stat-label">Active Members</div>
-</div>
-<div class="stat-card scroll-reveal">
-<div class="stat-number">{{allSkills.length}}</div>
-<div class="stat-label">Skills Listed</div>
-</div>
-<div class="stat-card scroll-reveal">
-<div class="stat-number">{{messages.length}}</div>
-<div class="stat-label">Messages Sent</div>
-</div>
-<div class="stat-card scroll-reveal">
-<div class="stat-number">{{bookings.length}}</div>
-<div class="stat-label">Sessions Booked</div>
-</div>
+<div class="stat-card scroll-reveal"><i class="fas fa-users"></i><div class="stat-number">{{users.length}}</div><div class="stat-label">Active Members</div></div>
+<div class="stat-card scroll-reveal"><i class="fas fa-lightbulb"></i><div class="stat-number">{{allSkills.length}}</div><div class="stat-label">Skills Listed</div></div>
+<div class="stat-card scroll-reveal"><i class="fas fa-comments"></i><div class="stat-number">{{messages.length}}</div><div class="stat-label">Messages Sent</div></div>
+<div class="stat-card scroll-reveal"><i class="fas fa-calendar-check"></i><div class="stat-number">{{bookings.length}}</div><div class="stat-label">Sessions Booked</div></div>
 </div>
 </div>
 
 <div class="section" style="background:linear-gradient(135deg,#f0fdf4,#e0f2fe);border-radius:30px;margin:0 2rem 4rem;padding:4rem 2rem">
-<h2 class="section-title">How It Works</h2>
-<p class="section-subtitle">Three simple steps to start swapping skills</p>
-<div class="feature-grid">
-<div class="feature-card scroll-reveal">
-<div class="feature-icon">1</div>
-<h3>Create Your Profile</h3>
-<p>Sign up and list the skills you can teach and the ones you want to learn. Everyone starts with 25 free credits.</p>
-</div>
-<div class="feature-card scroll-reveal">
-<div class="feature-icon">2</div>
-<h3>Find & Connect</h3>
-<p>Browse members by skill, send messages, and book sessions. Learn from real people in your community.</p>
-</div>
-<div class="feature-card scroll-reveal">
-<div class="feature-icon">3</div>
-<h3>Teach & Earn</h3>
-<p>After each session, leave a review. Teachers earn credits based on session length and rating.</p>
-</div>
+<div class="section-title"><h2>How It Works</h2><p>Three simple steps to start swapping skills</p></div>
+<div class="steps">
+<div class="step-card scroll-reveal"><div class="step-number">1</div><h3>Create Your Profile</h3><p>Sign up and list the skills you can teach and the ones you want to learn. Everyone starts with 25 free credits.</p></div>
+<div class="step-card scroll-reveal"><div class="step-number">2</div><h3>Find & Connect</h3><p>Browse members by skill, send messages, and book sessions. Learn from real people in your community.</p></div>
+<div class="step-card scroll-reveal"><div class="step-number">3</div><h3>Teach & Earn</h3><p>After each session, leave a review. Teachers earn credits based on session length and rating.</p></div>
 </div>
 </div>
 
 <div class="section">
-<h2 class="section-title">Popular Skill Categories</h2>
-<p class="section-subtitle">Explore what our community has to offer</p>
-<div class="category-pills">
+<div class="section-title"><h2>Popular Skill Categories</h2><p>Explore what our community has to offer</p></div>
+<div class="categories-grid">
 <span class="category-pill" v-for="cat in categories" :key="cat" :class="{active:selectedCategory===cat}" @click="selectedCategory=cat">{{cat}}</span>
 </div>
-<div class="feature-grid">
-<div class="feature-card scroll-reveal">
-<div class="feature-icon">💻</div>
-<h3>Technical Skills</h3>
-<p>Programming, data science, web development, cybersecurity, and more. Learn from working professionals.</p>
-</div>
-<div class="feature-card scroll-reveal">
-<div class="feature-icon">🎨</div>
-<h3>Creative Arts</h3>
-<p>Photography, graphic design, music, writing, and visual arts. Unleash your creative potential.</p>
-</div>
-<div class="feature-card scroll-reveal">
-<div class="feature-icon">🌍</div>
-<h3>Languages</h3>
-<p>Spanish, French, Mandarin, Japanese, and more. Practice with native speakers and fluent learners.</p>
-</div>
+<div class="feature-cards">
+<div class="feature-card scroll-reveal"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80" alt="Technical"><div class="feature-card-content"><h3>Technical Skills</h3><p>Programming, data science, web development, and more. Learn from working professionals.</p></div></div>
+<div class="feature-card scroll-reveal"><img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&q=80" alt="Creative"><div class="feature-card-content"><h3>Creative Arts</h3><p>Photography, design, music, writing. Unleash your creative potential.</p></div></div>
+<div class="feature-card scroll-reveal"><img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&q=80" alt="Languages"><div class="feature-card-content"><h3>Languages</h3><p>Spanish, French, Mandarin, Japanese. Practice with native speakers.</p></div></div>
 </div>
 </div>
 
-<div class="section" style="background:#fff;border-radius:30px;margin:0 2rem 4rem;padding:4rem 2rem;box-shadow:0 4px 20px rgba(0,0,0,0.06)">
-<h2 class="section-title">Frequently Asked Questions</h2>
+<div class="section" style="background:white;border-radius:30px;margin:0 2rem 4rem;padding:4rem 2rem;box-shadow:0 4px 20px rgba(0,0,0,0.06)">
+<div class="section-title"><h2>Frequently Asked Questions</h2></div>
 <div class="faq-grid">
-<div class="faq-card scroll-reveal">
-<h4>Is SkillSwap free?</h4>
-<p>Yes! Everyone starts with 25 free credits. You earn more by teaching others and receiving good reviews. No money ever changes hands.</p>
-</div>
-<div class="faq-card scroll-reveal">
-<h4>Who can join?</h4>
-<p>Anyone with a skill to share or a desire to learn. Whether you are a professional, student, hobbyist, or retiree — there is a place for you here.</p>
-</div>
-<div class="faq-card scroll-reveal">
-<h4>How do sessions work?</h4>
-<p>Find someone with the skill you want, send them a message, and book a time. Sessions can be in-person or virtual — you decide together.</p>
-</div>
-<div class="faq-card scroll-reveal">
-<h4>Is it safe?</h4>
-<p>All members have public profiles with reviews. Start with short sessions, meet in public places, and trust your instincts. Our review system keeps everyone accountable.</p>
-</div>
-</div>
-</div>
-
-<div class="section">
-<h2 class="section-title">Success Stories</h2>
-<p class="section-subtitle">Real connections, real growth</p>
-<div class="feature-grid">
-<div class="feature-card scroll-reveal">
-<img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80" style="width:100%;height:180px;object-fit:cover;border-radius:12px;margin-bottom:1rem" alt="">
-<h3>From Beginner to Developer</h3>
-<p>Sarah learned Python from a community member and landed her first tech job within 6 months. Now she teaches others.</p>
-</div>
-<div class="feature-card scroll-reveal">
-<img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&q=80" style="width:100%;height:180px;object-fit:cover;border-radius:12px;margin-bottom:1rem" alt="">
-<h3>A Global Language Exchange</h3>
-<p>Members from 12 countries connected to practice languages. Friendships formed, careers advanced, horizons expanded.</p>
-</div>
-<div class="feature-card scroll-reveal">
-<img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&q=80" style="width:100%;height:180px;object-fit:cover;border-radius:12px;margin-bottom:1rem" alt="">
-<h3>Small Business Growth</h3>
-<p>Entrepreneurs swapped marketing, design, and accounting skills — helping each other grow without spending a dime.</p>
-</div>
+<div class="faq-card scroll-reveal"><h4><i class="fas fa-coins"></i> Is SkillSwap free?</h4><p>Yes! Everyone starts with 25 free credits. You earn more by teaching others and receiving good reviews. No money ever changes hands.</p></div>
+<div class="faq-card scroll-reveal"><h4><i class="fas fa-user-check"></i> Who can join?</h4><p>Anyone with a skill to share or a desire to learn. Whether you are a professional, student, hobbyist, or retiree.</p></div>
+<div class="faq-card scroll-reveal"><h4><i class="fas fa-video"></i> How do sessions work?</h4><p>Find someone with the skill you want, send them a message, and book a time. Sessions can be in-person or virtual.</p></div>
+<div class="faq-card scroll-reveal"><h4><i class="fas fa-shield-alt"></i> Is it safe?</h4><p>All members have public profiles with reviews. Start with short sessions, meet in public places, and trust your instincts.</p></div>
 </div>
 </div>
 
 <div class="section" style="text-align:center;padding:6rem 2rem">
 <h2 class="section-title" style="font-size:3rem">Ready to Start?</h2>
 <p class="section-subtitle" style="font-size:1.2rem">Join the community today. Your next skill is one message away.</p>
-<button class="btn btn-primary" style="padding:1.2rem 3rem;font-size:1.2rem" @click="showSignup=true">Join SkillSwap Free</button>
+<button v-if="!currentUser" class="btn btn-primary" style="padding:1.2rem 3rem;font-size:1.2rem" @click="showSignup=true">Join SkillSwap Free</button>
+<button v-else class="btn btn-primary" style="padding:1.2rem 3rem;font-size:1.2rem" @click="page='browse'">Browse Members</button>
 </div>
 </div>
 
 <!-- BROWSE PAGE -->
-<div v-if="page==='browse'" class="section" style="padding-top:8rem">
-<h2 class="section-title">Browse Members</h2>
-<p class="section-subtitle">Find someone to learn from or teach</p>
-<input type="text" class="search-box" v-model="searchQuery" placeholder="Search by name, skill, or keyword...">
-<div v-if="loading" class="loading-spinner"></div>
-<div v-else-if="filteredUsers.length===0" class="empty-state">
-<div class="empty-state-icon">🔍</div>
-<h3>No members found</h3>
-<p>Be the first to join! Sign up and start the community.</p>
-<button class="btn btn-primary" @click="showSignup=true">Sign Up Now</button>
+<div v-if="page==='browse'" class="section" style="padding-top:100px">
+<div class="section-title"><h2>Browse Members</h2><p>Find someone to learn from or teach</p></div>
+<div class="search-bar"><i class="fas fa-search"></i><input v-model="searchQuery" placeholder="Search by name, skill, or keyword..."></div>
+<div class="categories-grid" style="margin-bottom:2rem">
+<span class="category-pill" :class="{active:!selectedCategory}" @click="selectedCategory=''">All</span>
+<span class="category-pill" v-for="cat in categories.slice(1)" :key="cat" :class="{active:selectedCategory===cat}" @click="selectedCategory=cat">{{cat}}</span>
 </div>
-<div v-else class="member-grid">
+<div v-if="loading" class="empty-state"><div class="loading-spinner" style="margin:2rem auto"></div><p>Loading members...</p></div>
+<div v-else-if="filteredUsers.length===0" class="empty-state"><i class="fas fa-search"></i><h3>No members found</h3><p>Be the first to join! Sign up and start the community.</p><button v-if="!currentUser" class="btn btn-primary" @click="showSignup=true">Sign Up Now</button></div>
+<div v-else class="members-grid">
 <div class="member-card scroll-reveal" v-for="user in filteredUsers" :key="user.id" @click="viewProfile(user)">
-<div style="width:100%;height:200px;background:linear-gradient(135deg,#0d9488,#14b8a6);display:flex;align-items:center;justify-content:center">
-<div style="width:80px;height:80px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:#0d9488">{{user.name?user.name[0]:'?'}}</div>
-</div>
+<div class="member-card-img"><div class="avatar-large">{{user.name?user.name.charAt(0).toUpperCase():'?'}}</div></div>
 <div class="member-info">
-<div class="member-name">{{user.name}}</div>
-<div class="member-skills">
-<span class="skill-tag" v-for="skill in (user.skills||[]).slice(0,3)" :key="skill">{{skill}}</span>
-</div>
-<div class="member-bio">{{user.bio||'No bio yet'}}</div>
-<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem">
-<span style="color:#f39c12">{{'★'.repeat(Math.round(user.avgRating||0))}}</span>
-<span style="color:#999;font-size:0.8rem">{{(user.reviews||[]).length}} reviews</span>
-</div>
+<h4>{{user.name}}</h4>
+<div class="role">{{(user.skills||[])[0]||'Member'}}</div>
+<div class="member-skills"><span class="skill-tag" v-for="s in (user.skills||[]).slice(0,4)" :key="s">{{s}}</span></div>
+<div class="member-rating"><span class="stars">{{'★'.repeat(Math.round(user.avgRating||0))}}</span><span>{{(user.reviews||[]).length}} reviews</span></div>
 <div class="member-actions">
-<button class="btn btn-primary btn-sm" @click.stop="startChat(user)">Message</button>
-<button class="btn btn-outline btn-sm" @click.stop="viewProfile(user)">View Profile</button>
+<button class="btn btn-primary btn-small" @click.stop="startChat(user)"><i class="fas fa-comment"></i> Message</button>
+<button class="btn btn-outline btn-small" @click.stop="viewProfile(user)"><i class="fas fa-user"></i> View</button>
 </div>
 </div>
 </div>
@@ -339,136 +410,255 @@ footer p{color:rgba(255,255,255,0.6)}
 </div>
 
 <!-- PROFILE PAGE -->
-<div v-if="page==='profile'" class="section" style="padding-top:8rem">
-<div v-if="!currentUser">
-<div class="empty-state">
-<div class="empty-state-icon">👤</div>
-<h3>Not logged in</h3>
-<p>Log in or sign up to view your profile.</p>
-<button class="btn btn-primary" @click="showLogin=true">Log In</button>
-</div>
+<div v-if="page==='profile'" style="padding-top:100px">
+<div v-if="!currentUser" class="section">
+<div class="empty-state"><i class="fas fa-lock"></i><h3>Not logged in</h3><p>Log in or sign up to view your profile.</p><button class="btn btn-primary" @click="showLogin=true">Log In</button></div>
 </div>
 <div v-else>
 <div class="profile-header">
-<div style="width:100px;height:100px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:700;color:#0d9488;margin:0 auto 1rem">{{currentUser.name?currentUser.name[0]:'?'}}</div>
+<div class="profile-avatar-large">{{currentUser.name?currentUser.name.charAt(0).toUpperCase():'?'}}</div>
 <h2>{{currentUser.name}}</h2>
 <p>{{currentUser.email}}</p>
-<div style="margin-top:1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
-<span class="credit-display">{{currentUser.credits||0}} Credits</span>
-<span style="background:rgba(255,255,255,0.2);color:#fff;padding:0.5rem 1rem;border-radius:50px;font-size:0.9rem">{{(currentUser.skills||[]).length}} Skills</span>
+<div class="profile-stats">
+<span class="profile-stat"><i class="fas fa-coins" style="margin-right:6px"></i>{{currentUser.credits||0}} Credits</span>
+<span class="profile-stat"><i class="fas fa-star" style="margin-right:6px"></i>{{getAvgRating(currentUser.id).toFixed(1)}} Rating</span>
+<span class="profile-stat">{{(currentUser.skills||[]).length}} Skills</span>
 </div>
 </div>
-
+<div class="profile-body">
+<div class="profile-section"><h3><i class="fas fa-graduation-cap"></i> Skills I Can Teach</h3><div class="member-skills"><span class="skill-tag" v-for="s in currentUser.skills||[]" :key="s">{{s}}</span><span v-if="!(currentUser.skills||[]).length" style="color:var(--gray-400)">No skills added yet.</span></div></div>
+<div class="profile-section"><h3><i class="fas fa-search"></i> Skills I Want to Learn</h3><div class="member-skills"><span class="skill-tag" v-for="s in currentUser.wants||[]" :key="s">{{s}}</span><span v-if="!(currentUser.wants||[]).length" style="color:var(--gray-400)">No learning goals yet.</span></div></div>
+<div class="profile-section"><h3><i class="fas fa-info-circle"></i> Bio</h3><p>{{currentUser.bio||'No bio yet. Edit your profile to tell people about yourself.'}}</p></div>
 <div class="profile-section">
-<h3>My Skills</h3>
-<div class="member-skills">
-<span class="skill-tag" v-for="skill in currentUser.skills||[]" :key="skill">{{skill}}</span>
-<span v-if="!(currentUser.skills||[]).length" style="color:#999">No skills added yet. Edit your profile to add some.</span>
-</div>
-</div>
-
-<div class="profile-section">
-<h3>Skills I Want to Learn</h3>
-<div class="member-skills">
-<span class="skill-tag" v-for="skill in currentUser.wants||[]" :key="skill">{{skill}}</span>
-<span v-if="!(currentUser.wants||[]).length" style="color:#999">No learning goals yet. Edit your profile to add some.</span>
-</div>
-</div>
-
-<div class="profile-section">
-<h3>Bio</h3>
-<p style="color:#555;line-height:1.7">{{currentUser.bio||'No bio yet. Edit your profile to tell people about yourself.'}}</p>
-</div>
-
-<div class="profile-section">
-<h3>My Reviews</h3>
-<div v-if="!(myReviews||[]).length" style="color:#999">No reviews yet. Teach a session to get your first review!</div>
-<div v-for="review in myReviews" :key="review.id" class="review-card">
-<div class="review-header">
-<strong>{{review.from_name}}</strong>
-<span class="review-stars">{{'★'.repeat(review.rating)}}</span>
-</div>
+<h3><i class="fas fa-star"></i> My Reviews ({{getReviewCount(currentUser.id)}})</h3>
+<div v-if="!getUserReviews(currentUser.id).length" style="color:var(--gray-400)">No reviews yet. Teach a session to get your first review!</div>
+<div v-for="review in getUserReviews(currentUser.id)" :key="review.id" class="review-item">
+<div class="review-header"><span class="review-author">{{review.from_name}}</span><span class="review-stars">{{'★'.repeat(review.rating)}}{{'☆'.repeat(5-review.rating)}}</span></div>
 <div class="review-text">{{review.text}}</div>
-<div class="review-meta">{{review.skill}} · {{review.duration}} min · {{formatTime(review.created_at)}}</div>
+<div class="review-meta">{{review.skill}} &bull; {{review.duration}} min &bull; {{formatTime(review.created_at)}}</div>
 </div>
 </div>
-
 <div class="profile-section">
-<h3>Share Your Profile</h3>
-<p style="color:#666;margin-bottom:1rem">Share this code with friends so they can find you on SkillSwap.</p>
-<div class="share-box">
-<p style="font-weight:600;color:#0d9488;margin-bottom:0.5rem">Your Share Code:</p>
-<div class="share-code">{{generateShareCode()}}</div>
-<button class="btn btn-primary btn-sm" @click="copyShareCode">Copy Code</button>
+<h3><i class="fas fa-share-alt"></i> Share Your Profile</h3>
+<p style="color:var(--gray-500);margin-bottom:1rem">Share this code with friends so they can find you on SkillSwap.</p>
+<div class="share-box"><p>Your Share Code:</p><div class="share-code">{{generateShareCode()}}</div><button class="btn btn-primary btn-small" @click="copyShareCode"><i class="fas fa-copy"></i> Copy Code</button></div>
 </div>
+<div style="display:flex;gap:12px;margin-top:24px;flex-wrap:wrap">
+<button class="btn btn-primary" @click="editProfile"><i class="fas fa-edit"></i> Edit Profile</button>
+<button class="btn btn-outline" @click="showAddFriend=true"><i class="fas fa-user-plus"></i> Add Friend</button>
+<button class="btn btn-danger" @click="showDeleteAccount=true"><i class="fas fa-trash-alt"></i> Delete Account</button>
 </div>
-
-<div style="display:flex;gap:1rem;margin-top:2rem">
-<button class="btn btn-primary" @click="showEditProfile=true">Edit Profile</button>
-<button class="btn btn-outline" @click="logout">Log Out</button>
 </div>
 </div>
 </div>
 
 <!-- VIEW OTHER PROFILE -->
-<div v-if="page==='viewProfile'&&viewingUser" class="section" style="padding-top:8rem">
+<div v-if="page==='viewProfile'&&viewingUser" style="padding-top:100px">
+<div class="section">
+<button class="btn btn-ghost btn-small" @click="page='browse'" style="margin-bottom:1rem"><i class="fas fa-arrow-left"></i> Back to Browse</button>
 <div class="profile-header">
-<div style="width:100px;height:100px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:700;color:#0d9488;margin:0 auto 1rem">{{viewingUser.name?viewingUser.name[0]:'?'}}</div>
+<div class="profile-avatar-large">{{viewingUser.name?viewingUser.name.charAt(0).toUpperCase():'?'}}</div>
 <h2>{{viewingUser.name}}</h2>
-<p>{{viewingUser.email}}</p>
-<div style="margin-top:1rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
-<span style="background:rgba(255,255,255,0.2);color:#fff;padding:0.5rem 1rem;border-radius:50px;font-size:0.9rem">{{(viewingUser.skills||[]).length}} Skills</span>
-<span style="background:rgba(255,255,255,0.2);color:#fff;padding:0.5rem 1rem;border-radius:50px;font-size:0.9rem">{{(viewingUser.reviews||[]).length}} Reviews</span>
+<div class="profile-stats">
+<span class="profile-stat"><i class="fas fa-star" style="margin-right:6px"></i>{{getAvgRating(viewingUser.id).toFixed(1)}} Rating</span>
+<span class="profile-stat">{{getReviewCount(viewingUser.id)}} Reviews</span>
+<span class="profile-stat">{{(viewingUser.skills||[]).length}} Skills</span>
 </div>
 </div>
-
+<div class="profile-body">
+<div class="profile-section"><h3><i class="fas fa-graduation-cap"></i> Skills They Teach</h3><div class="member-skills"><span class="skill-tag" v-for="s in viewingUser.skills||[]" :key="s">{{s}}</span></div></div>
+<div class="profile-section"><h3><i class="fas fa-search"></i> Skills They Want</h3><div class="member-skills"><span class="skill-tag" v-for="s in viewingUser.wants||[]" :key="s">{{s}}</span></div></div>
+<div class="profile-section"><h3><i class="fas fa-info-circle"></i> Bio</h3><p>{{viewingUser.bio||'No bio yet.'}}</p></div>
 <div class="profile-section">
-<h3>Skills</h3>
-<div class="member-skills">
-<span class="skill-tag" v-for="skill in viewingUser.skills||[]" :key="skill">{{skill}}</span>
-</div>
-</div>
-
-<div class="profile-section">
-<h3>Looking to Learn</h3>
-<div class="member-skills">
-<span class="skill-tag" v-for="skill in viewingUser.wants||[]" :key="skill">{{skill}}</span>
-</div>
-</div>
-
-<div class="profile-section">
-<h3>Bio</h3>
-<p style="color:#555;line-height:1.7">{{viewingUser.bio||'No bio yet.'}}</p>
-</div>
-
-<div class="profile-section">
-<h3>Reviews</h3>
-<div v-if="!(viewingUser.reviews||[]).length" style="color:#999">No reviews yet.</div>
-<div v-for="review in viewingUser.reviews||[]" :key="review.id" class="review-card">
-<div class="review-header">
-<strong>{{review.from_name}}</strong>
-<span class="review-stars">{{'★'.repeat(review.rating)}}</span>
-</div>
+<h3><i class="fas fa-star"></i> Reviews ({{getReviewCount(viewingUser.id)}})</h3>
+<div v-if="!getUserReviews(viewingUser.id).length" style="color:var(--gray-400)">No reviews yet.</div>
+<div v-for="review in getUserReviews(viewingUser.id)" :key="review.id" class="review-item">
+<div class="review-header"><span class="review-author">{{review.from_name}}</span><span class="review-stars">{{'★'.repeat(review.rating)}}{{'☆'.repeat(5-review.rating)}}</span></div>
 <div class="review-text">{{review.text}}</div>
-<div class="review-meta">{{review.skill}} · {{review.duration}} min · {{formatTime(review.created_at)}}</div>
+<div class="review-meta">{{review.skill}} &bull; {{review.duration}} min &bull; {{formatTime(review.created_at)}}</div>
+</div>
+</div>
+<div style="display:flex;gap:12px;margin-top:24px;flex-wrap:wrap" v-if="currentUser&&currentUser.id!==viewingUser.id">
+<button class="btn btn-primary" @click="startChat(viewingUser)"><i class="fas fa-comment"></i> Message</button>
+<button class="btn btn-outline" @click="showBooking=true;bookingTo=viewingUser"><i class="fas fa-calendar"></i> Book Session</button>
+<button class="btn btn-outline" @click="showReviewModal=true;reviewTo=viewingUser"><i class="fas fa-star"></i> Leave Review</button>
+</div>
+</div>
 </div>
 </div>
 
-<div style="display:flex;gap:1rem;margin-top:2rem">
-<button class="btn btn-primary" @click="startChat(viewingUser)">Message</button>
-<button class="btn btn-outline" @click="showBooking=true;bookingTo=viewingUser">Book Session</button>
-<button class="btn btn-outline" @click="page='browse'">Back to Browse</button>
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" v-if="showLogin" @click.self="showLogin=false">
+<div class="modal">
+<button class="modal-close" @click="showLogin=false">&times;</button>
+<h2>Welcome Back</h2>
+<p class="subtitle">Log in to your SkillSwap account</p>
+<div class="form-group"><label>Email</label><input type="email" v-model="loginEmail" placeholder="you@example.com" @keyup.enter="handleLogin"></div>
+<div class="form-group"><label>Password</label><input type="password" v-model="loginPassword" placeholder="Your password" @keyup.enter="handleLogin"></div>
+<div v-if="loginError" class="error-msg">{{loginError}}</div>
+<div class="modal-actions"><button class="btn btn-outline" @click="showLogin=false">Cancel</button><button class="btn btn-primary" @click="handleLogin" :disabled="loginLoading">{{loginLoading?'Logging in...':'Log In'}}</button></div>
+<p class="switch-link">Don't have an account? <a @click="showLogin=false;showSignup=true">Sign Up</a></p>
 </div>
+</div>
+
+<!-- SIGNUP MODAL -->
+<div class="modal-overlay" v-if="showSignup" @click.self="showSignup=false">
+<div class="modal" style="max-width:550px">
+<button class="modal-close" @click="showSignup=false">&times;</button>
+<h2>Join SkillSwap</h2>
+<p class="subtitle">Create your free account and get 25 credits</p>
+<div class="form-row">
+<div class="form-group"><label>Full Name *</label><input type="text" v-model="signupName" placeholder="Your name"></div>
+<div class="form-group"><label>Age</label><input type="number" v-model="signupAge" placeholder="25"></div>
+</div>
+<div class="form-group"><label>Email *</label><input type="email" v-model="signupEmail" placeholder="you@example.com"></div>
+<div class="form-group"><label>Password * (min 4 chars)</label><input type="password" v-model="signupPassword" placeholder="Create a password"></div>
+<div class="form-group"><label>Phone</label><input type="tel" v-model="signupPhone" placeholder="(555) 123-4567"></div>
+<div class="form-group"><label>Skills You Can Teach</label><input type="text" v-model="newSkill" @keyup.enter="addSkill" placeholder="e.g. Python, Guitar... Press Enter to add"><div class="member-skills" style="margin-top:8px"><span class="skill-tag" v-for="(s,i) in signupSkills" :key="i">{{s}} <i class="fas fa-times" style="cursor:pointer;margin-left:4px" @click="signupSkills.splice(i,1)"></i></span></div></div>
+<div class="form-group"><label>Skills You Want to Learn</label><input type="text" v-model="newWant" @keyup.enter="addWant" placeholder="e.g. Spanish, Cooking... Press Enter to add"><div class="member-skills" style="margin-top:8px"><span class="skill-tag" v-for="(s,i) in signupWants" :key="i">{{s}} <i class="fas fa-times" style="cursor:pointer;margin-left:4px" @click="signupWants.splice(i,1)"></i></span></div></div>
+<div class="form-group"><label>Bio</label><textarea v-model="signupBio" placeholder="Tell us about yourself..."></textarea></div>
+<div v-if="signupError" class="error-msg">{{signupError}}</div>
+<div class="modal-actions"><button class="btn btn-outline" @click="showSignup=false">Cancel</button><button class="btn btn-primary" @click="handleSignup" :disabled="signupLoading">{{signupLoading?'Creating...':'Create Account'}}</button></div>
+<p class="switch-link">Already have an account? <a @click="showSignup=false;showLogin=true">Log In</a></p>
+</div>
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div class="modal-overlay" v-if="showEditProfile" @click.self="showEditProfile=false">
+<div class="modal" style="max-width:550px">
+<button class="modal-close" @click="showEditProfile=false">&times;</button>
+<h2>Edit Profile</h2>
+<div class="form-group"><label>Name</label><input type="text" v-model="editName"></div>
+<div class="form-group"><label>Phone</label><input type="tel" v-model="editPhone"></div>
+<div class="form-group"><label>Age</label><input type="number" v-model="editAge"></div>
+<div class="form-group"><label>Skills You Can Teach</label><input type="text" v-model="newEditSkill" @keyup.enter="addEditSkill" placeholder="Press Enter to add"><div class="member-skills" style="margin-top:8px"><span class="skill-tag" v-for="(s,i) in editSkills" :key="i">{{s}} <i class="fas fa-times" style="cursor:pointer;margin-left:4px" @click="editSkills.splice(i,1)"></i></span></div></div>
+<div class="form-group"><label>Skills You Want to Learn</label><input type="text" v-model="newEditWant" @keyup.enter="addEditWant" placeholder="Press Enter to add"><div class="member-skills" style="margin-top:8px"><span class="skill-tag" v-for="(s,i) in editWants" :key="i">{{s}} <i class="fas fa-times" style="cursor:pointer;margin-left:4px" @click="editWants.splice(i,1)"></i></span></div></div>
+<div class="form-group"><label>Bio</label><textarea v-model="editBio"></textarea></div>
+<div class="modal-actions"><button class="btn btn-outline" @click="showEditProfile=false">Cancel</button><button class="btn btn-primary" @click="saveProfile" :disabled="editLoading">{{editLoading?'Saving...':'Save Changes'}}</button></div>
+</div>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" v-if="showBooking" @click.self="showBooking=false">
+<div class="modal">
+<button class="modal-close" @click="showBooking=false">&times;</button>
+<h2>Book a Session</h2>
+<p class="subtitle">With {{bookingTo?bookingTo.name:''}}</p>
+<div class="form-group"><label>Skill to Learn</label><select v-model="bookingSkill"><option v-for="skill in (bookingTo?bookingTo.skills:[])" :key="skill" :value="skill">{{skill}}</option></select></div>
+<div class="form-row">
+<div class="form-group"><label>Date</label><input type="date" v-model="bookingDate"></div>
+<div class="form-group"><label>Time</label><input type="time" v-model="bookingTime"></div>
+</div>
+<div class="form-group"><label>Duration (minutes)</label><input type="number" v-model="bookingDuration" placeholder="60" min="15" max="240"></div>
+<div class="form-group"><label>Message</label><textarea v-model="bookingMessage" placeholder="Hi! I would like to learn..."></textarea></div>
+<div class="modal-actions"><button class="btn btn-outline" @click="showBooking=false">Cancel</button><button class="btn btn-primary" @click="confirmBooking" :disabled="bookingLoading">{{bookingLoading?'Sending...':'Send Request'}}</button></div>
+</div>
+</div>
+
+<!-- REVIEW MODAL -->
+<div class="modal-overlay" v-if="showReviewModal" @click.self="showReviewModal=false">
+<div class="modal">
+<button class="modal-close" @click="showReviewModal=false">&times;</button>
+<h2>Leave a Review</h2>
+<p class="subtitle">Reviewing {{reviewTo?reviewTo.name:''}}</p>
+<div class="credit-preview"><div class="amount">{{calculateCredits()}}</div><p>credits they'll earn</p></div>
+<div class="form-group"><label>Rating</label><div class="star-rating"><span v-for="n in 5" :key="n" class="star" :class="{active:reviewRating>=n}" @click="reviewRating=n"><i :class="n<=reviewRating?'fas fa-star':'far fa-star'"></i></span></div></div>
+<div class="form-group"><label>Session Duration (minutes)</label><input type="number" v-model="reviewDuration" placeholder="60" min="5" max="240"></div>
+<div class="form-group"><label>Skill Taught</label><input type="text" v-model="reviewSkill" placeholder="What did they teach you?"></div>
+<div class="form-group"><label>Your Review</label><textarea v-model="reviewText" placeholder="How was the session?"></textarea></div>
+<div class="modal-actions"><button class="btn btn-outline" @click="showReviewModal=false">Cancel</button><button class="btn btn-primary" @click="submitReview" :disabled="reviewLoading">{{reviewLoading?'Submitting...':'Submit Review'}}</button></div>
+</div>
+</div>
+
+<!-- DELETE ACCOUNT MODAL -->
+<div class="modal-overlay" v-if="showDeleteAccount" @click.self="showDeleteAccount=false">
+<div class="modal">
+<button class="modal-close" @click="showDeleteAccount=false">&times;</button>
+<h2><i class="fas fa-exclamation-triangle" style="color:var(--red);margin-right:8px"></i>Delete Account</h2>
+<p class="subtitle">This action cannot be undone. All your data will be permanently removed.</p>
+<div class="delete-warning"><p><i class="fas fa-exclamation-circle"></i>Warning: This will delete your profile, messages, reviews, and bookings forever.</p></div>
+<div class="form-group"><label>Type "DELETE" to confirm</label><input type="text" v-model="deleteConfirmText" placeholder="DELETE"></div>
+<div v-if="deleteError" class="error-msg">{{deleteError}}</div>
+<div class="modal-actions"><button class="btn btn-outline" @click="showDeleteAccount=false">Cancel</button><button class="btn btn-danger" @click="deleteAccount" :disabled="deleteLoading||deleteConfirmText!=='DELETE'">{{deleteLoading?'Deleting...':'Permanently Delete Account'}}</button></div>
+</div>
+</div>
+
+<!-- ADD FRIEND MODAL -->
+<div class="modal-overlay" v-if="showAddFriend" @click.self="showAddFriend=false">
+<div class="modal">
+<button class="modal-close" @click="showAddFriend=false">&times;</button>
+<h2>Add Friend</h2>
+<p class="subtitle">Paste your friend's share code to add them to your contacts.</p>
+<div class="form-group"><label>Friend's Share Code</label><textarea v-model="friendCode" rows="3" placeholder="Paste the code here..."></textarea></div>
+<div v-if="addFriendError" class="error-msg">{{addFriendError}}</div>
+<div v-if="addFriendSuccess" style="color:var(--green);margin-bottom:1rem">{{addFriendSuccess}}</div>
+<div class="modal-actions"><button class="btn btn-outline" @click="showAddFriend=false">Cancel</button><button class="btn btn-primary" @click="addFriendFromCode">Add Friend</button></div>
+</div>
+</div>
+
+<!-- CHAT OVERLAY -->
+<div class="chat-overlay" v-if="showChat" @click.self="showChat=false">
+<div class="chat-container">
+<div class="chat-sidebar">
+<div class="chat-sidebar-header"><h3><i class="fas fa-comments" style="margin-right:8px"></i>Conversations</h3></div>
+<div class="chat-conversations">
+<div v-for="contact in chatContacts" :key="contact.id" class="chat-conv-item" :class="{active:chatWith&&chatWith.id===contact.id}" @click="openChat(contact)">
+<div class="chat-conv-avatar">{{contact.name?contact.name.charAt(0).toUpperCase():'?'}}</div>
+<div class="chat-conv-info"><p>{{contact.name}}</p><span>{{lastMessagePreview(contact.id)}}</span></div>
+<div v-if="contact.unread" class="chat-conv-unread"></div>
+</div>
+<div v-if="!chatContacts.length" style="padding:20px;text-align:center;color:var(--gray-400);font-size:0.85rem">No conversations yet</div>
+</div>
+</div>
+<div class="chat-main" v-if="chatWith">
+<div class="chat-header">
+<div class="chat-header-info">
+<div class="chat-header-avatar">{{chatWith.name?chatWith.name.charAt(0).toUpperCase():'?'}}</div>
+<div><div class="chat-header-name">{{chatWith.name}}</div><div class="chat-header-status"><span style="width:8px;height:8px;background:#22c55e;border-radius:50%;display:inline-block;margin-right:4px"></span>Online</div></div>
+</div>
+<div style="display:flex;gap:8px">
+<button class="btn btn-outline btn-small" @click="showReviewModal=true;reviewTo=chatWith" v-if="currentUser&&currentUser.id!==chatWith.id"><i class="fas fa-star"></i> Review</button>
+<button class="btn btn-ghost btn-small" @click="showChat=false"><i class="fas fa-times"></i></button>
+</div>
+</div>
+<div class="chat-messages" ref="chatMessagesRef">
+<div v-for="msg in currentChatMessages" :key="msg.id" class="chat-msg" :class="msg.sender_id===currentUser.id?'sent':'received'">
+<div>{{msg.text}}</div>
+<div class="chat-msg-time">{{formatTime(msg.created_at)}}</div>
+</div>
+<div v-if="typing" class="typing-indicator"><span></span><span></span><span></span></div>
+</div>
+<div class="chat-input-area">
+<input type="text" class="chat-input" v-model="chatInput" @keyup.enter="sendMessage" placeholder="Type a message...">
+<button class="chat-send-btn" @click="sendMessage"><i class="fas fa-paper-plane"></i></button>
+</div>
+</div>
+<div class="chat-main" v-else style="align-items:center;justify-content:center;color:var(--gray-400);display:flex">
+<p>Select a conversation to start chatting</p>
+</div>
+</div>
+</div>
+
+<footer class="footer">
+<h3>SkillSwap</h3>
+<p>Learn. Teach. Grow. Together.</p>
+<div class="footer-links">
+<span class="footer-link" @click="page='landing'">Home</span>
+<span class="footer-link" @click="page='browse'">Browse</span>
+<span class="footer-link" @click="page='profile'" v-if="currentUser">My Profile</span>
+</div>
+<p style="font-size:0.85rem;opacity:0.5">&copy; 2026 SkillSwap. Built with Supabase.</p>
+</footer>
 </div>
 
 <script>
-const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
+const { createApp, ref, computed, onMounted, nextTick } = Vue;
 
-// Supabase config
+// Supabase config - FIXED: use 'sb' instead of 'supabase' to avoid shadowing
 const SUPABASE_URL = 'https://sgyugzriwxljaiwbsogg.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNneXVnenJpd3hsamFpd2Jzb2dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4MzIyNTAsImV4cCI6MjEwMDQwODI1MH0.2XfwboDhKhWTGEaJdnyFJKd5YJUuY-8D0HUxByD8bWk';
 
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 createApp({
   setup() {
@@ -493,8 +683,9 @@ createApp({
     const showReviewModal = ref(false);
     const showAddFriend = ref(false);
     const showChat = ref(false);
-    const showNotifications = ref(false);
-    const scrollProgress = ref(0);
+    const showNotifDropdown = ref(false);
+    const showDeleteAccount = ref(false);
+    const scrolled = ref(false);
     const viewingUser = ref(null);
 
     // Login
@@ -553,6 +744,11 @@ createApp({
     const addFriendError = ref('');
     const addFriendSuccess = ref('');
 
+    // Delete account
+    const deleteConfirmText = ref('');
+    const deleteError = ref('');
+    const deleteLoading = ref(false);
+
     const categories = ['All','Programming','Design','Music','Languages','Cooking','Fitness','Photography','Business','Writing','Math','Art'];
 
     // ========== COMPUTED ==========
@@ -576,21 +772,25 @@ createApp({
       return Array.from(set);
     });
 
-    const myReviews = computed(() => {
-      if (!currentUser.value) return [];
-      return reviews.value.filter(r => r.to_id === currentUser.value.id).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-    });
-
     const unreadCount = computed(() => notifications.value.filter(n => !n.read).length);
 
-    const chatUsers = computed(() => {
+    const chatContacts = computed(() => {
       if (!currentUser.value) return [];
-      const ids = new Set();
+      const map = new Map();
       messages.value.forEach(m => {
-        if (m.sender_id === currentUser.value.id) ids.add(m.receiver_id);
-        if (m.receiver_id === currentUser.value.id) ids.add(m.sender_id);
+        if (m.sender_id === currentUser.value.id) {
+          if (!map.has(m.receiver_id)) map.set(m.receiver_id, {lastText: m.text, lastTime: m.created_at, unread: 0});
+          else { const e = map.get(m.receiver_id); if (new Date(m.created_at) > new Date(e.lastTime)) { e.lastText = m.text; e.lastTime = m.created_at; }}
+        }
+        if (m.receiver_id === currentUser.value.id) {
+          if (!map.has(m.sender_id)) map.set(m.sender_id, {lastText: m.text, lastTime: m.created_at, unread: m.read ? 0 : 1});
+          else { const e = map.get(m.sender_id); if (new Date(m.created_at) > new Date(e.lastTime)) { e.lastText = m.text; e.lastTime = m.created_at; } if (!m.read) e.unread++; }
+        }
       });
-      return Array.from(ids).map(id => users.value.find(u => u.id === id)).filter(Boolean);
+      return Array.from(map.entries()).map(([id, data]) => {
+        const user = users.value.find(u => u.id === id);
+        return user ? { ...user, ...data } : null;
+      }).filter(Boolean).sort((a,b) => new Date(b.lastTime) - new Date(a.lastTime));
     });
 
     const currentChatMessages = computed(() => {
@@ -602,9 +802,9 @@ createApp({
     });
 
     // ========== HELPERS ==========
-    function showToast(text) {
+    function showToast(message, type='success') {
       const id = Date.now() + Math.random();
-      toasts.value.push({ id, text });
+      toasts.value.push({ id, message, type });
       setTimeout(() => { toasts.value = toasts.value.filter(t => t.id !== id); }, 4000);
     }
 
@@ -664,19 +864,43 @@ createApp({
         (m.sender_id === currentUser.value.id && m.receiver_id === userId) ||
         (m.sender_id === userId && m.receiver_id === currentUser.value.id)
       ).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-      return msgs.length ? msgs[0].text.substring(0, 30) + '...' : 'No messages yet';
+      return msgs.length ? msgs[0].text.substring(0, 30) + (msgs[0].text.length > 30 ? '...' : '') : 'No messages yet';
     }
 
-    // ========== SUPABASE ==========
+    function getAvgRating(userId) {
+      const rs = reviews.value.filter(r => r.to_id === userId);
+      if (!rs.length) return 0;
+      return rs.reduce((a,b) => a + b.rating, 0) / rs.length;
+    }
+
+    function getReviewCount(userId) {
+      return reviews.value.filter(r => r.to_id === userId).length;
+    }
+
+    function getUserReviews(userId) {
+      return reviews.value.filter(r => r.to_id === userId).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+    }
+
+    function getUserName(id) {
+      const u = users.value.find(x => x.id === id);
+      return u ? u.name : 'Unknown';
+    }
+
+    // ========== SUPABASE DATA ==========
     async function loadAllData() {
       try {
-        const [{data:u}, {data:m}, {data:r}, {data:b}, {data:n}] = await Promise.all([
-          supabase.from('users').select('*').order('created_at', {ascending:false}),
-          supabase.from('messages').select('*').order('created_at', {ascending:true}),
-          supabase.from('reviews').select('*').order('created_at', {ascending:false}),
-          supabase.from('bookings').select('*').order('created_at', {ascending:false}),
-          supabase.from('notifications').select('*').order('created_at', {ascending:false}),
+        const [{data:u, error:eu}, {data:m, error:em}, {data:r, error:er}, {data:b, error:eb}, {data:n, error:en}] = await Promise.all([
+          sb.from('users').select('*').order('created_at', {ascending:false}),
+          sb.from('messages').select('*').order('created_at', {ascending:true}),
+          sb.from('reviews').select('*').order('created_at', {ascending:false}),
+          sb.from('bookings').select('*').order('created_at', {ascending:false}),
+          sb.from('notifications').select('*').order('created_at', {ascending:false}),
         ]);
+        if (eu) console.error('users error:', eu);
+        if (em) console.error('messages error:', em);
+        if (er) console.error('reviews error:', er);
+        if (eb) console.error('bookings error:', eb);
+        if (en) console.error('notifications error:', en);
         users.value = u || [];
         messages.value = m || [];
         reviews.value = r || [];
@@ -690,25 +914,19 @@ createApp({
     }
 
     function setupRealtime() {
-      supabase.channel('messages').on('postgres_changes', {event:'INSERT', schema:'public', table:'messages'}, (payload) => {
+      sb.channel('messages').on('postgres_changes', {event:'INSERT', schema:'public', table:'messages'}, (payload) => {
         messages.value.push(payload.new);
         if (chatWith.value && (payload.new.sender_id === chatWith.value.id || payload.new.receiver_id === chatWith.value.id)) {
           nextTick(() => { const el = document.querySelector('.chat-messages'); if (el) el.scrollTop = el.scrollHeight; });
         }
-        if (currentUser.value && payload.new.receiver_id === currentUser.value.id) {
+        if (currentUser.value && payload.new.receiver_id === currentUser.value.id && payload.new.sender_id !== currentUser.value.id) {
           showToast(`New message from ${getUserName(payload.new.sender_id)}`);
         }
       }).subscribe();
-
-      supabase.channel('users').on('postgres_changes', {event:'*', schema:'public', table:'users'}, () => loadAllData()).subscribe();
-      supabase.channel('reviews').on('postgres_changes', {event:'*', schema:'public', table:'reviews'}, () => loadAllData()).subscribe();
-      supabase.channel('bookings').on('postgres_changes', {event:'*', schema:'public', table:'bookings'}, () => loadAllData()).subscribe();
-      supabase.channel('notifications').on('postgres_changes', {event:'*', schema:'public', table:'notifications'}, () => loadAllData()).subscribe();
-    }
-
-    function getUserName(id) {
-      const u = users.value.find(x => x.id === id);
-      return u ? u.name : 'Unknown';
+      sb.channel('users').on('postgres_changes', {event:'*', schema:'public', table:'users'}, () => loadAllData()).subscribe();
+      sb.channel('reviews').on('postgres_changes', {event:'*', schema:'public', table:'reviews'}, () => loadAllData()).subscribe();
+      sb.channel('bookings').on('postgres_changes', {event:'*', schema:'public', table:'bookings'}, () => loadAllData()).subscribe();
+      sb.channel('notifications').on('postgres_changes', {event:'*', schema:'public', table:'notifications'}, () => loadAllData()).subscribe();
     }
 
     // ========== AUTH ==========
@@ -732,7 +950,7 @@ createApp({
         bio: signupBio.value || null,
         credits: 25,
       };
-      const { data, error } = await supabase.from('users').insert([newUser]).select().single();
+      const { data, error } = await sb.from('users').insert([newUser]).select().single();
       signupLoading.value = false;
       if (error) {
         signupError.value = error.message || 'Signup failed. Email may already exist.'; return;
@@ -741,8 +959,7 @@ createApp({
       showSignup.value = false;
       showToast('Welcome to SkillSwap! You got 25 credits.');
       await loadAllData();
-      // Welcome notification
-      await supabase.from('notifications').insert([{user_id: data.id, text: 'Welcome to SkillSwap! Start browsing members to find someone to learn from.', icon: 'fas fa-rocket', read: false}]);
+      await sb.from('notifications').insert([{user_id: data.id, text: 'Welcome to SkillSwap! Start browsing members to find someone to learn from.', icon: 'fas fa-rocket', read: false}]);
     }
 
     async function handleLogin() {
@@ -751,7 +968,7 @@ createApp({
         loginError.value = 'Email and password required.'; return;
       }
       loginLoading.value = true;
-      const { data, error } = await supabase.from('users').select('*').eq('email', loginEmail.value.trim().toLowerCase()).single();
+      const { data, error } = await sb.from('users').select('*').eq('email', loginEmail.value.trim().toLowerCase()).single();
       loginLoading.value = false;
       if (error || !data) { loginError.value = 'Account not found.'; return; }
       if (data.password !== loginPassword.value) { loginError.value = 'Wrong password.'; return; }
@@ -767,6 +984,37 @@ createApp({
       chatWith.value = null;
       page.value = 'landing';
       showToast('Logged out successfully.');
+    }
+
+    // ========== DELETE ACCOUNT ==========
+    async function deleteAccount() {
+      deleteError.value = '';
+      if (deleteConfirmText.value !== 'DELETE') {
+        deleteError.value = 'Please type DELETE to confirm.'; return;
+      }
+      if (!currentUser.value) return;
+      deleteLoading.value = true;
+      const userId = currentUser.value.id;
+      try {
+        // Delete all related data first
+        await sb.from('messages').delete().or('sender_id.eq.' + userId + ',receiver_id.eq.' + userId);
+        await sb.from('reviews').delete().or('from_id.eq.' + userId + ',to_id.eq.' + userId);
+        await sb.from('bookings').delete().or('from_id.eq.' + userId + ',to_id.eq.' + userId);
+        await sb.from('notifications').delete().eq('user_id', userId);
+        // Delete the user
+        await sb.from('users').delete().eq('id', userId);
+        currentUser.value = null;
+        showDeleteAccount.value = false;
+        deleteConfirmText.value = '';
+        showToast('Your account has been permanently deleted.', 'success');
+        await loadAllData();
+        page.value = 'landing';
+      } catch (e) {
+        deleteError.value = 'Failed to delete account. Please try again.';
+        console.error('Delete error:', e);
+      } finally {
+        deleteLoading.value = false;
+      }
     }
 
     // ========== PROFILE ==========
@@ -796,9 +1044,9 @@ createApp({
         wants: editWants.value,
         bio: editBio.value || null,
       };
-      const { error } = await supabase.from('users').update(updates).eq('id', currentUser.value.id);
+      const { error } = await sb.from('users').update(updates).eq('id', currentUser.value.id);
       editLoading.value = false;
-      if (error) { showToast('Failed to save profile.'); return; }
+      if (error) { showToast('Failed to save profile.', 'error'); return; }
       currentUser.value = { ...currentUser.value, ...updates };
       showEditProfile.value = false;
       showToast('Profile updated!');
@@ -807,7 +1055,7 @@ createApp({
 
     // ========== CHAT ==========
     function startChat(user) {
-      if (!currentUser.value) { showLogin.value = true; showToast('Please log in to message.'); return; }
+      if (!currentUser.value) { showLogin.value = true; showToast('Please log in to message.', 'error'); return; }
       chatWith.value = user;
       showChat.value = true;
       nextTick(() => { const el = document.querySelector('.chat-messages'); if (el) el.scrollTop = el.scrollHeight; });
@@ -827,10 +1075,9 @@ createApp({
         read: false,
       };
       chatInput.value = '';
-      const { error } = await supabase.from('messages').insert([msg]);
-      if (error) { showToast('Failed to send message.'); return; }
-      // Create notification for receiver
-      await supabase.from('notifications').insert([{
+      const { error } = await sb.from('messages').insert([msg]);
+      if (error) { showToast('Failed to send message.', 'error'); return; }
+      await sb.from('notifications').insert([{
         user_id: chatWith.value.id,
         text: `New message from ${currentUser.value.name}`,
         icon: 'fas fa-comment',
@@ -851,13 +1098,12 @@ createApp({
         duration: parseInt(bookingDuration.value) || 60,
         message: bookingMessage.value,
       };
-      const { error } = await supabase.from('bookings').insert([booking]);
+      const { error } = await sb.from('bookings').insert([booking]);
       bookingLoading.value = false;
-      if (error) { showToast('Failed to send booking.'); return; }
+      if (error) { showToast('Failed to send booking.', 'error'); return; }
       showBooking.value = false;
       showToast('Booking request sent!');
-      // Notify the other person
-      await supabase.from('notifications').insert([{
+      await sb.from('notifications').insert([{
         user_id: bookingTo.value.id,
         text: `${currentUser.value.name} wants to book a session with you!`,
         icon: 'fas fa-calendar',
@@ -880,14 +1126,12 @@ createApp({
         text: reviewText.value,
         from_name: currentUser.value.name,
       };
-      const { error } = await supabase.from('reviews').insert([review]);
-      if (error) { reviewLoading.value = false; showToast('Failed to submit review.'); return; }
-      // Update credits
-      const { data: userData } = await supabase.from('users').select('credits').eq('id', reviewTo.value.id).single();
+      const { error } = await sb.from('reviews').insert([review]);
+      if (error) { reviewLoading.value = false; showToast('Failed to submit review.', 'error'); return; }
+      const { data: userData } = await sb.from('users').select('credits').eq('id', reviewTo.value.id).single();
       const newCredits = (userData?.credits || 0) + credits;
-      await supabase.from('users').update({credits: newCredits}).eq('id', reviewTo.value.id);
-      // Notify
-      await supabase.from('notifications').insert([{
+      await sb.from('users').update({credits: newCredits}).eq('id', reviewTo.value.id);
+      await sb.from('notifications').insert([{
         user_id: reviewTo.value.id,
         text: `${currentUser.value.name} left you a ${reviewRating.value}-star review! You earned ${credits} credits.`,
         icon: 'fas fa-star',
@@ -902,15 +1146,15 @@ createApp({
     // ========== NOTIFICATIONS ==========
     async function handleNotificationClick(notif) {
       if (!notif.read) {
-        await supabase.from('notifications').update({read: true}).eq('id', notif.id);
+        await sb.from('notifications').update({read: true}).eq('id', notif.id);
         await loadAllData();
       }
-      showNotifications.value = false;
+      showNotifDropdown.value = false;
     }
 
     async function markAllRead() {
       if (!currentUser.value) return;
-      await supabase.from('notifications').update({read: true}).eq('user_id', currentUser.value.id).eq('read', false);
+      await sb.from('notifications').update({read: true}).eq('user_id', currentUser.value.id).eq('read', false);
       await loadAllData();
     }
 
@@ -922,7 +1166,7 @@ createApp({
       try {
         const decoded = JSON.parse(atob(friendCode.value.trim()));
         if (!decoded.id) { addFriendError.value = 'Invalid code.'; return; }
-        const { data } = await supabase.from('users').select('*').eq('id', decoded.id).single();
+        const { data } = await sb.from('users').select('*').eq('id', decoded.id).single();
         if (!data) { addFriendError.value = 'User not found.'; return; }
         addFriendSuccess.value = `Added ${data.name} to your contacts!`;
         showAddFriend.value = false;
@@ -932,15 +1176,12 @@ createApp({
       }
     }
 
-    function removeToast(id) {
-      toasts.value = toasts.value.filter(t => t.id !== id);
-    }
-
     // ========== SCROLL ==========
     function updateScrollProgress() {
       const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       scrollProgress.value = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      scrolled.value = scrollTop > 50;
     }
 
     // ========== INIT ==========
@@ -948,8 +1189,6 @@ createApp({
       window.addEventListener('scroll', updateScrollProgress);
       await loadAllData();
       setupRealtime();
-
-      // Scroll reveal
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
       }, { threshold: 0.1 });
@@ -959,7 +1198,7 @@ createApp({
     return {
       loading, page, currentUser, users, messages, reviews, bookings, notifications, toasts,
       searchQuery, selectedCategory, showLogin, showSignup, showEditProfile, showBooking,
-      showReviewModal, showAddFriend, showChat, showNotifications, scrollProgress, viewingUser,
+      showReviewModal, showAddFriend, showChat, showNotifDropdown, showDeleteAccount, scrolled, viewingUser,
       loginEmail, loginPassword, loginError, loginLoading,
       signupName, signupEmail, signupPassword, signupPhone, signupAge, signupSkills, signupWants,
       signupBio, newSkill, newWant, signupError, signupLoading,
@@ -967,11 +1206,13 @@ createApp({
       bookingTo, bookingSkill, bookingDate, bookingTime, bookingDuration, bookingMessage, bookingLoading,
       reviewTo, reviewRating, reviewDuration, reviewSkill, reviewText, reviewLoading,
       chatWith, chatInput, typing, friendCode, addFriendError, addFriendSuccess,
-      categories, isLoggedIn, filteredUsers, allSkills, myReviews, unreadCount, chatUsers, currentChatMessages,
+      deleteConfirmText, deleteError, deleteLoading,
+      categories, isLoggedIn, filteredUsers, allSkills, unreadCount, chatContacts, currentChatMessages,
       showToast, formatTime, generateShareCode, copyShareCode, addSkill, addWant, addEditSkill, addEditWant,
-      calculateCredits, lastMessagePreview, handleSignup, handleLogin, logout, viewProfile, editProfile,
-      saveProfile, startChat, openChat, sendMessage, confirmBooking, submitReview, handleNotificationClick,
-      markAllRead, addFriendFromCode, removeToast,
+      calculateCredits, lastMessagePreview, getAvgRating, getReviewCount, getUserReviews, getUserName,
+      handleSignup, handleLogin, logout, deleteAccount, viewProfile, editProfile, saveProfile,
+      startChat, openChat, sendMessage, confirmBooking, submitReview, handleNotificationClick,
+      markAllRead, addFriendFromCode,
     };
   }
 }).mount('#app');
