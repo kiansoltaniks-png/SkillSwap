@@ -7,7 +7,7 @@
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
-:root{--primary:#0d9488;--primary-dark:#0f766e;--danger:#e74c3c;--danger-dark:#c0392b;--bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;--radius:12px;--shadow:0 4px 6px -1px rgba(0,0,0,0.1);}
+:root{--primary:#0d9488;--primary-dark:#0f766e;--primary-light:#ccfbf1;--danger:#e74c3c;--danger-dark:#c0392b;--bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;--radius:12px;--shadow:0 4px 6px -1px rgba(0,0,0,0.1);}
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif;}
 body{background:var(--bg);color:var(--text);line-height:1.5;}
 .container{max-width:1200px;margin:0 auto;padding:1rem;}
@@ -25,6 +25,7 @@ nav a:hover,nav button:hover{background:#f1f5f9;}
 .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
 .btn-outline:hover{background:#f8fafc;}
 .btn-sm{padding:0.4rem 0.8rem;font-size:0.85rem;}
+.btn-lg{padding:0.9rem 2rem;font-size:1.1rem;}
 .card{background:var(--card);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:1rem;}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem;}
 .member-card{background:var(--card);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);border:1px solid var(--border);transition:0.2s;cursor:pointer;}
@@ -33,7 +34,7 @@ nav a:hover,nav button:hover{background:#f1f5f9;}
 .member-name{font-weight:700;font-size:1.1rem;margin-bottom:0.25rem;}
 .member-meta{color:var(--muted);font-size:0.9rem;margin-bottom:0.75rem;}
 .skills{display:flex;flex-wrap:wrap;gap:0.4rem;}
-.skill-tag{background:#ccfbf1;color:var(--primary-dark);padding:0.25rem 0.6rem;border-radius:20px;font-size:0.8rem;font-weight:600;}
+.skill-tag{background:var(--primary-light);color:var(--primary-dark);padding:0.25rem 0.6rem;border-radius:20px;font-size:0.8rem;font-weight:600;}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:200;padding:1rem;}
 .modal{background:var(--card);border-radius:var(--radius);width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:2rem;position:relative;}
 .modal h2{margin-bottom:1.5rem;font-size:1.4rem;}
@@ -84,7 +85,53 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
 #loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:500;}
 #loading-screen h2{color:var(--primary);margin-bottom:1rem;}
 #loading-screen p{color:var(--muted);}
-@media(max-width:768px){.grid{grid-template-columns:1fr;}.profile-header{flex-direction:column;align-items:center;text-align:center;}.chat-sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);}}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#0d9488 0%,#0f766e 100%);color:#fff;padding:5rem 1rem;text-align:center;border-radius:0 0 var(--radius) var(--radius);margin-bottom:3rem;}
+.hero h1{font-size:3rem;font-weight:800;margin-bottom:1rem;}
+.hero p{font-size:1.25rem;opacity:0.9;margin-bottom:2rem;max-width:600px;margin-left:auto;margin-right:auto;}
+.hero .btn{background:#fff;color:var(--primary);font-weight:700;}
+.hero .btn:hover{background:#f0fdf4;}
+
+/* FEATURES */
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem;margin:3rem 0;}
+.feature-card{background:var(--card);border-radius:var(--radius);padding:2rem;text-align:center;border:1px solid var(--border);box-shadow:var(--shadow);}
+.feature-icon{font-size:2.5rem;margin-bottom:1rem;}
+.feature-card h3{font-size:1.2rem;margin-bottom:0.5rem;}
+.feature-card p{color:var(--muted);font-size:0.95rem;}
+
+/* HOW IT WORKS */
+.steps{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin:3rem 0;}
+.step{background:var(--card);border-radius:var(--radius);padding:1.5rem;width:220px;text-align:center;border:1px solid var(--border);box-shadow:var(--shadow);}
+.step-num{width:40px;height:40px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;margin:0 auto 1rem;}
+.step h4{margin-bottom:0.5rem;}
+.step p{color:var(--muted);font-size:0.9rem;}
+
+/* STATS */
+.stats{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;margin:2rem 0;}
+.stat{text-align:center;}
+.stat-num{font-size:2.5rem;font-weight:800;color:var(--primary);}
+.stat-label{color:var(--muted);font-size:0.9rem;}
+
+/* CTA */
+.cta-section{background:var(--primary-light);border-radius:var(--radius);padding:3rem;text-align:center;margin:3rem 0;}
+.cta-section h2{margin-bottom:1rem;}
+.cta-section p{color:var(--muted);margin-bottom:1.5rem;}
+
+/* DEMO TAG */
+.demo-tag{background:#fef3c7;color:#92400e;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.75rem;font-weight:600;margin-left:0.5rem;}
+
+/* LOGIN WALL */
+.login-wall{background:var(--card);border:2px dashed var(--border);border-radius:var(--radius);padding:2rem;text-align:center;margin:1rem 0;}
+.login-wall p{color:var(--muted);margin-bottom:1rem;}
+
+@media(max-width:768px){
+  .hero h1{font-size:2rem;}
+  .grid{grid-template-columns:1fr;}
+  .profile-header{flex-direction:column;align-items:center;text-align:center;}
+  .chat-sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);}
+  .steps{flex-direction:column;align-items:center;}
+}
 </style>
 </head>
 <body>
@@ -107,6 +154,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
       <button class="btn btn-outline btn-sm" @click="logout">Logout</button>
     </nav>
     <nav v-else>
+      <a href="#" @click.prevent="page='browse'">Browse Members</a>
       <button class="btn btn-primary" @click="showLogin=true">Log In</button>
       <button class="btn btn-outline" @click="showSignup=true">Sign Up</button>
     </nav>
@@ -208,9 +256,96 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
     </div>
   </div>
 
-  <!-- BROWSE PAGE -->
-  <div v-if="page==='browse' && currentUser && !showSetup && !fatalError">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+  <!-- ====== LANDING PAGE (when not logged in and page is home) ====== -->
+  <div v-if="!currentUser && page==='home' && !showSetup && !fatalError">
+    <div class="hero">
+      <h1>Trade Skills, Not Money</h1>
+      <p>Join a community where people teach each other what they know. Earn credits by teaching, spend credits by learning. No cash needed.</p>
+      <button class="btn btn-lg" @click="showSignup=true">Get Started Free</button>
+    </div>
+
+    <div style="text-align:center;margin-bottom:1rem;">
+      <h2 style="font-size:1.8rem;">How It Works</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h4>Sign Up</h4>
+        <p>Create your profile and list skills you can teach and want to learn.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h4>Connect</h4>
+        <p>Browse members, message people, and book skill-swap sessions.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h4>Trade</h4>
+        <p>Teach someone and earn credits. Use those credits to learn from others.</p>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-bottom:1rem;">
+      <h2 style="font-size:1.8rem;">Features</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎓</div>
+        <h3>Teach & Earn</h3>
+        <p>Share your expertise and earn credits for every session you teach.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📚</div>
+        <h3>Learn Anything</h3>
+        <p>Use your credits to book sessions with experts in any skill you want.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <h3>Real-Time Chat</h3>
+        <p>Message members instantly to coordinate sessions and ask questions.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⭐</div>
+        <h3>Reviews & Ratings</h3>
+        <p>Leave honest reviews after sessions to build trust in the community.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📅</div>
+        <h3>Easy Booking</h3>
+        <p>Schedule sessions with date, time, and duration in just a few clicks.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🪙</div>
+        <h3>Credit System</h3>
+        <p>No money changes hands. Credits are earned by teaching and spent on learning.</p>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num">{{users.length}}</div>
+        <div class="stat-label">Members</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">{{totalSkills}}</div>
+        <div class="stat-label">Skills Listed</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">{{bookings.length}}</div>
+        <div class="stat-label">Sessions Booked</div>
+      </div>
+    </div>
+
+    <div class="cta-section">
+      <h2>Ready to start trading skills?</h2>
+      <p>Join {{users.length}} members already swapping knowledge on SkillSwap.</p>
+      <button class="btn btn-primary btn-lg" @click="showSignup=true">Create Free Account</button>
+    </div>
+  </div>
+
+  <!-- ====== BROWSE PAGE (works for everyone) ====== -->
+  <div v-if="page==='browse' && !showSetup && !fatalError">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
       <h1>Browse Members</h1>
       <input type="text" v-model="searchQuery" placeholder="Search skills or names..." style="padding:0.5rem 1rem;border:1px solid var(--border);border-radius:8px;width:280px;">
     </div>
@@ -226,11 +361,12 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
     </div>
     <div v-if="filteredUsers.length===0" class="empty-state">
       <h3>No members found</h3>
-      <p>Try a different search or check back later.</p>
+      <p>Be the first to join! Sign up and create your profile.</p>
+      <button class="btn btn-primary" style="margin-top:1rem;" @click="showSignup=true">Sign Up</button>
     </div>
   </div>
 
-  <!-- PROFILE PAGE -->
+  <!-- ====== PROFILE PAGE ====== -->
   <div v-if="page==='profile' && currentUser && !showSetup && !fatalError">
     <div class="card">
       <div class="profile-header">
@@ -357,7 +493,12 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
       </div>
       <div class="section-title">Bio</div>
       <p style="color:var(--muted);white-space:pre-wrap;margin-bottom:1rem;">{{viewingUser.bio||'No bio.'}}</p>
-      <div style="display:flex;gap:0.5rem;">
+      <div v-if="!currentUser" class="login-wall">
+        <p>Log in or sign up to message or book a session with {{viewingUser.name}}.</p>
+        <button class="btn btn-primary" @click="viewingUser=null;showLogin=true">Log In</button>
+        <button class="btn btn-outline" style="margin-left:0.5rem;" @click="viewingUser=null;showSignup=true">Sign Up</button>
+      </div>
+      <div v-else style="display:flex;gap:0.5rem;">
         <button class="btn btn-primary" @click="startChat(viewingUser);viewingUser=null">Message</button>
         <button class="btn btn-outline" @click="openBooking(viewingUser);viewingUser=null">Book Session</button>
       </div>
@@ -525,7 +666,7 @@ const { createApp } = Vue;
 createApp({
   data() {
     return {
-      page: 'browse',
+      page: 'home',
       currentUser: null,
       users: [],
       messages: [],
@@ -698,6 +839,13 @@ GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;`
         (m.sender_id === this.currentUser.id && m.receiver_id === this.chatWith.id) ||
         (m.sender_id === this.chatWith.id && m.receiver_id === this.currentUser.id)
       ).sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+    },
+    totalSkills() {
+      const all = new Set();
+      this.users.forEach(u => {
+        (u.skills||[]).forEach(s => all.add(s));
+      });
+      return all.size;
     }
   },
 
@@ -709,12 +857,12 @@ GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;`
 
     if (this.fatalError) return;
     await this.checkSetup();
+    await this.loadUsers();
+    await this.loadBookings();
     const saved = localStorage.getItem('skillswap_user');
     if (saved) {
       try {
         this.currentUser = JSON.parse(saved);
-        await this.loadUsers();
-        await this.loadBookings();
         this.subscribeMessages();
       } catch(e) {
         localStorage.removeItem('skillswap_user');
@@ -758,9 +906,9 @@ GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;`
     },
 
     async loadBookings() {
-      if (!sb || !this.currentUser) return;
+      if (!sb) return;
       try {
-        const { data, error } = await sb.from('bookings').select('*').or('from_id.eq.'+this.currentUser.id+',to_id.eq.'+this.currentUser.id);
+        const { data, error } = await sb.from('bookings').select('*');
         if (error) throw error;
         this.bookings = data || [];
       } catch(e) {
@@ -790,9 +938,9 @@ GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;`
         this.currentUser = data;
         localStorage.setItem('skillswap_user', JSON.stringify(data));
         this.showLogin = false;
+        this.page = 'browse';
         this.showToast('Welcome back, ' + data.name + '!', 'success');
         await this.loadUsers();
-        await this.loadBookings();
         this.subscribeMessages();
       } catch(e) {
         this.loginError = 'Login failed: ' + e.message;
@@ -834,6 +982,7 @@ GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;`
         this.currentUser = data;
         localStorage.setItem('skillswap_user', JSON.stringify(data));
         this.showSignup = false;
+        this.page = 'browse';
         this.showToast('Account created! You got 25 credits.', 'success');
         await this.loadUsers();
         this.subscribeMessages();
@@ -848,8 +997,8 @@ GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;`
       this.chatWith = null;
       this.chatUsers = [];
       this.messages = [];
+      this.page = 'home';
       localStorage.removeItem('skillswap_user');
-      this.page = 'browse';
       this.showToast('Logged out', 'success');
     },
 
