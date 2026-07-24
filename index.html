@@ -3,16 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SkillSwap - Learn & Teach</title>
+<title>SkillSwap</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <style>
-:root{--teal:#0d9488;--teal-light:#14b8a6;--teal-dark:#0f766e;--teal-50:#f0fdfa;--teal-100:#ccfbf1;--cream:#faf9f6;--white:#ffffff;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;--red:#ef4444;--red-light:#fef2f2;--yellow:#f59e0b;--green:#10b981;}
+:root{--teal:#0d9488;--teal-light:#14b8a6;--teal-dark:#0f766e;--teal-50:#f0fdfa;--cream:#faf9f6;--white:#fff;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;--red:#ef4444;--red-light:#fef2f2;--yellow:#f59e0b;--green:#10b981}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--gray-800);line-height:1.6;overflow-x:hidden}
+
+/* Setup Banner */
+.setup-banner{background:linear-gradient(135deg,#fef3c7,#fde68a);padding:16px 24px;text-align:center;border-bottom:2px solid #f59e0b;position:fixed;top:0;left:0;right:0;z-index:1001}
+.setup-banner p{color:#92400e;font-size:0.9rem;margin:0}
+.setup-banner a{color:#92400e;font-weight:700;text-decoration:underline}
+.setup-banner code{background:#fff;padding:2px 6px;border-radius:4px;font-family:monospace;font-size:0.85rem}
 
 /* Scroll progress */
 #scroll-progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--teal-light),var(--teal-dark));z-index:9999;width:0%;transition:width 0.1s}
@@ -219,7 +225,7 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--gray-800
 .typing-indicator span:nth-child(3){animation-delay:0.4s}
 @keyframes typing{0%,60%,100%{opacity:0.3;transform:scale(1)}30%{opacity:1;transform:scale(1.2)}}
 
-/* Review Modal Stars */
+/* Review Stars */
 .star-rating{display:flex;gap:8px;font-size:1.8rem;margin-bottom:16px}
 .star-rating .star{color:var(--gray-300);cursor:pointer;transition:all 0.2s}
 .star-rating .star.active{color:var(--yellow)}
@@ -261,6 +267,12 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--gray-800
 .footer-link{color:var(--gray-400);text-decoration:none;font-size:0.85rem;transition:color 0.2s;cursor:pointer}
 .footer-link:hover{color:white}
 
+/* Error Banner */
+.error-banner{background:var(--red-light);border:1px solid #fecaca;border-radius:12px;padding:20px;margin:20px auto;max-width:800px}
+.error-banner h4{color:#991b1b;margin-bottom:8px}
+.error-banner p{color:#7f1d1d;font-size:0.9rem;margin-bottom:8px}
+.error-banner code{background:white;padding:2px 6px;border-radius:4px;font-family:monospace;font-size:0.85rem}
+
 /* Responsive */
 @media(max-width:900px){.hero-img{display:none}.hero h1{font-size:2.5rem}.steps,.feature-cards{grid-template-columns:1fr}.chat-container{flex-direction:column;height:90vh}.chat-sidebar{width:100%;height:120px;border-right:none;border-bottom:1px solid var(--gray-200)}}
 @media(max-width:600px){.hero h1{font-size:2rem}.section{padding:60px 16px}.faq-grid{grid-template-columns:1fr}.stats-bar{grid-template-columns:1fr 1fr}}
@@ -274,6 +286,99 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--gray-800
 <div v-if="loading" class="loading-overlay">
 <div class="loading-spinner"></div>
 <div class="loading-text">Loading SkillSwap...</div>
+</div>
+
+<!-- Setup Error Banner -->
+<div v-if="setupError" class="error-banner" style="margin-top:80px">
+<h4><i class="fas fa-exclamation-triangle"></i> Database Setup Required</h4>
+<p>Your Supabase database needs to be set up. Please run the SQL script below in your Supabase SQL Editor:</p>
+<ol style="margin-left:20px;color:#7f1d1d;font-size:0.9rem">
+<li>Go to <a href="https://supabase.com/dashboard" target="_blank" style="color:#991b1b;text-decoration:underline">supabase.com/dashboard</a></li>
+<li>Select your project</li>
+<li>Click "SQL Editor" in the left sidebar</li>
+<li>Paste the SQL below and click "Run"</li>
+</ol>
+<div style="background:#1e293b;color:#e2e8f0;padding:16px;border-radius:8px;margin-top:12px;font-family:monospace;font-size:0.8rem;overflow-x:auto;white-space:pre">
+-- Create users table
+CREATE TABLE IF NOT EXISTS public.users (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  password TEXT NOT NULL,
+  phone TEXT,
+  age INTEGER,
+  skills TEXT[] DEFAULT '{}',
+  wants TEXT[] DEFAULT '{}',
+  bio TEXT,
+  credits INTEGER DEFAULT 25,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create messages table
+CREATE TABLE IF NOT EXISTS public.messages (
+  id SERIAL PRIMARY KEY,
+  sender_id INTEGER NOT NULL,
+  receiver_id INTEGER NOT NULL,
+  text TEXT NOT NULL,
+  read BOOLEAN DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create reviews table
+CREATE TABLE IF NOT EXISTS public.reviews (
+  id SERIAL PRIMARY KEY,
+  from_id INTEGER NOT NULL,
+  to_id INTEGER NOT NULL,
+  rating INTEGER NOT NULL,
+  duration INTEGER NOT NULL,
+  skill TEXT NOT NULL,
+  text TEXT NOT NULL,
+  from_name TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create bookings table
+CREATE TABLE IF NOT EXISTS public.bookings (
+  id SERIAL PRIMARY KEY,
+  from_id INTEGER NOT NULL,
+  to_id INTEGER NOT NULL,
+  skill TEXT,
+  date TEXT,
+  time TEXT,
+  duration INTEGER,
+  message TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create notifications table
+CREATE TABLE IF NOT EXISTS public.notifications (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL,
+  text TEXT NOT NULL,
+  icon TEXT,
+  read BOOLEAN DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Enable RLS
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.bookings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+
+-- Create permissive policies for testing (allow all)
+CREATE POLICY "Allow all" ON public.users FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all" ON public.messages FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all" ON public.reviews FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all" ON public.bookings FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all" ON public.notifications FOR ALL USING (true) WITH CHECK (true);
+
+-- Grant access
+GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
+</div>
+<button class="btn btn-primary" style="margin-top:16px" @click="retryConnection"><i class="fas fa-sync"></i> I've Run the SQL - Retry Connection</button>
 </div>
 
 <!-- Toast -->
@@ -654,7 +759,7 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--gray-800
 <script>
 const { createApp, ref, computed, onMounted, nextTick } = Vue;
 
-// Supabase config - FIXED: use 'sb' instead of 'supabase' to avoid shadowing
+// Supabase config - use 'sb' to avoid shadowing the global 'supabase' object
 const SUPABASE_URL = 'https://sgyugzriwxljaiwbsogg.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNneXVnenJpd3hsamFpd2Jzb2dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4MzIyNTAsImV4cCI6MjEwMDQwODI1MH0.2XfwboDhKhWTGEaJdnyFJKd5YJUuY-8D0HUxByD8bWk';
 
@@ -672,6 +777,7 @@ createApp({
     const bookings = ref([]);
     const notifications = ref([]);
     const toasts = ref([]);
+    const setupError = ref(false);
 
     // UI state
     const searchQuery = ref('');
@@ -896,18 +1002,33 @@ createApp({
           sb.from('bookings').select('*').order('created_at', {ascending:false}),
           sb.from('notifications').select('*').order('created_at', {ascending:false}),
         ]);
+
+        // Check for table not found errors
+        const tableErrors = [eu, em, er, eb, en].filter(e => e && (e.message?.includes('schema cache') || e.message?.includes('does not exist') || e.code === '42P01'));
+        if (tableErrors.length > 0) {
+          console.error('Table not found errors:', tableErrors);
+          setupError.value = true;
+          loading.value = false;
+          return;
+        }
+
         if (eu) console.error('users error:', eu);
         if (em) console.error('messages error:', em);
         if (er) console.error('reviews error:', er);
         if (eb) console.error('bookings error:', eb);
         if (en) console.error('notifications error:', en);
+
         users.value = u || [];
         messages.value = m || [];
         reviews.value = r || [];
         bookings.value = b || [];
         notifications.value = n || [];
+        setupError.value = false;
       } catch (e) {
         console.error('loadAllData error:', e);
+        if (e.message?.includes('schema cache') || e.message?.includes('does not exist')) {
+          setupError.value = true;
+        }
       } finally {
         loading.value = false;
       }
@@ -927,6 +1048,16 @@ createApp({
       sb.channel('reviews').on('postgres_changes', {event:'*', schema:'public', table:'reviews'}, () => loadAllData()).subscribe();
       sb.channel('bookings').on('postgres_changes', {event:'*', schema:'public', table:'bookings'}, () => loadAllData()).subscribe();
       sb.channel('notifications').on('postgres_changes', {event:'*', schema:'public', table:'notifications'}, () => loadAllData()).subscribe();
+    }
+
+    async function retryConnection() {
+      loading.value = true;
+      setupError.value = false;
+      await loadAllData();
+      if (!setupError.value) {
+        showToast('Connected to database successfully!');
+        setupRealtime();
+      }
     }
 
     // ========== AUTH ==========
@@ -953,7 +1084,13 @@ createApp({
       const { data, error } = await sb.from('users').insert([newUser]).select().single();
       signupLoading.value = false;
       if (error) {
-        signupError.value = error.message || 'Signup failed. Email may already exist.'; return;
+        if (error.message?.includes('schema cache') || error.message?.includes('does not exist')) {
+          signupError.value = 'Database not set up. Please run the SQL setup script shown on the page.';
+          setupError.value = true;
+        } else {
+          signupError.value = error.message || 'Signup failed. Email may already exist.';
+        }
+        return;
       }
       currentUser.value = data;
       showSignup.value = false;
@@ -970,7 +1107,16 @@ createApp({
       loginLoading.value = true;
       const { data, error } = await sb.from('users').select('*').eq('email', loginEmail.value.trim().toLowerCase()).single();
       loginLoading.value = false;
-      if (error || !data) { loginError.value = 'Account not found.'; return; }
+      if (error) {
+        if (error.message?.includes('schema cache') || error.message?.includes('does not exist')) {
+          loginError.value = 'Database not set up. Please run the SQL setup script shown on the page.';
+          setupError.value = true;
+        } else {
+          loginError.value = 'Account not found.';
+        }
+        return;
+      }
+      if (!data) { loginError.value = 'Account not found.'; return; }
       if (data.password !== loginPassword.value) { loginError.value = 'Wrong password.'; return; }
       currentUser.value = data;
       showLogin.value = false;
@@ -996,17 +1142,15 @@ createApp({
       deleteLoading.value = true;
       const userId = currentUser.value.id;
       try {
-        // Delete all related data first
         await sb.from('messages').delete().or('sender_id.eq.' + userId + ',receiver_id.eq.' + userId);
         await sb.from('reviews').delete().or('from_id.eq.' + userId + ',to_id.eq.' + userId);
         await sb.from('bookings').delete().or('from_id.eq.' + userId + ',to_id.eq.' + userId);
         await sb.from('notifications').delete().eq('user_id', userId);
-        // Delete the user
         await sb.from('users').delete().eq('id', userId);
         currentUser.value = null;
         showDeleteAccount.value = false;
         deleteConfirmText.value = '';
-        showToast('Your account has been permanently deleted.', 'success');
+        showToast('Your account has been permanently deleted.');
         await loadAllData();
         page.value = 'landing';
       } catch (e) {
@@ -1188,7 +1332,9 @@ createApp({
     onMounted(async () => {
       window.addEventListener('scroll', updateScrollProgress);
       await loadAllData();
-      setupRealtime();
+      if (!setupError.value) {
+        setupRealtime();
+      }
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
       }, { threshold: 0.1 });
@@ -1196,7 +1342,7 @@ createApp({
     });
 
     return {
-      loading, page, currentUser, users, messages, reviews, bookings, notifications, toasts,
+      loading, page, currentUser, users, messages, reviews, bookings, notifications, toasts, setupError,
       searchQuery, selectedCategory, showLogin, showSignup, showEditProfile, showBooking,
       showReviewModal, showAddFriend, showChat, showNotifDropdown, showDeleteAccount, scrolled, viewingUser,
       loginEmail, loginPassword, loginError, loginLoading,
@@ -1212,7 +1358,7 @@ createApp({
       calculateCredits, lastMessagePreview, getAvgRating, getReviewCount, getUserReviews, getUserName,
       handleSignup, handleLogin, logout, deleteAccount, viewProfile, editProfile, saveProfile,
       startChat, openChat, sendMessage, confirmBooking, submitReview, handleNotificationClick,
-      markAllRead, addFriendFromCode,
+      markAllRead, addFriendFromCode, retryConnection,
     };
   }
 }).mount('#app');
