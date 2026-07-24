@@ -4,303 +4,590 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SkillSwap</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
-:root{--teal:#0d9488;--teal-light:#14b8a6;--teal-dark:#0f766e;--teal-50:#f0fdfa;--cream:#faf9f6;--white:#fff;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;--red:#ef4444;--red-light:#fef2f2;--yellow:#f59e0b;--green:#10b981}
-*{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--gray-800);line-height:1.6;overflow-x:hidden}
-
-/* Setup Banner */
-.setup-banner{background:linear-gradient(135deg,#fef3c7,#fde68a);padding:16px 24px;text-align:center;border-bottom:2px solid #f59e0b;position:fixed;top:0;left:0;right:0;z-index:1001}
-.setup-banner p{color:#92400e;font-size:0.9rem;margin:0}
-.setup-banner a{color:#92400e;font-weight:700;text-decoration:underline}
-.setup-banner code{background:#fff;padding:2px 6px;border-radius:4px;font-family:monospace;font-size:0.85rem}
-
-/* Scroll progress */
-#scroll-progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--teal-light),var(--teal-dark));z-index:9999;width:0%;transition:width 0.1s}
-
-/* Navbar */
-.navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--gray-200);transition:all 0.3s ease}
-.navbar.scrolled{box-shadow:0 4px 30px rgba(0,0,0,0.08)}
-.nav-container{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:72px}
-.logo{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--teal);cursor:pointer;display:flex;align-items:center;gap:8px}
-.logo i{font-size:1.3rem}
-.nav-links{display:flex;align-items:center;gap:32px}
-.nav-links a{color:var(--gray-600);text-decoration:none;font-weight:500;font-size:0.95rem;transition:color 0.2s;cursor:pointer}
-.nav-links a:hover{color:var(--teal)}
-.nav-links a.active{color:var(--teal);font-weight:600}
-.nav-right{display:flex;align-items:center;gap:16px}
-.credits-badge{background:linear-gradient(135deg,var(--teal),var(--teal-light));color:white;padding:6px 16px;border-radius:20px;font-weight:600;font-size:0.85rem;display:flex;align-items:center;gap:6px}
-.btn{padding:10px 24px;border-radius:8px;font-weight:600;font-size:0.9rem;cursor:pointer;transition:all 0.3s;border:none;display:inline-flex;align-items:center;gap:8px}
-.btn-primary{background:linear-gradient(135deg,var(--teal),var(--teal-light));color:white;box-shadow:0 4px 15px rgba(13,148,136,0.3)}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(13,148,136,0.4)}
-.btn-outline{background:transparent;color:var(--teal);border:2px solid var(--teal)}
-.btn-outline:hover{background:var(--teal);color:white}
-.btn-small{padding:6px 14px;font-size:0.8rem}
-.btn-ghost{background:transparent;color:var(--gray-500)}
-.btn-ghost:hover{color:var(--teal)}
-.btn-danger{background:var(--red);color:white}
-.btn-danger:hover{background:#dc2626}
-
-/* Notification Bell */
-.notif-bell{position:relative;cursor:pointer;padding:8px;color:var(--gray-600);font-size:1.2rem;transition:color 0.2s}
-.notif-bell:hover{color:var(--teal)}
-.notif-badge{position:absolute;top:2px;right:2px;background:var(--red);color:white;font-size:0.65rem;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-.notif-dropdown{position:absolute;top:50px;right:0;width:320px;background:white;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.15);border:1px solid var(--gray-200);overflow:hidden;z-index:1001}
-.notif-header{padding:16px;border-bottom:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:center}
-.notif-header h4{font-size:0.95rem;color:var(--gray-800)}
-.notif-header span{font-size:0.8rem;color:var(--teal);cursor:pointer}
-.notif-list{max-height:300px;overflow-y:auto}
-.notif-item{padding:12px 16px;border-bottom:1px solid var(--gray-50);cursor:pointer;transition:background 0.2s;display:flex;gap:12px;align-items:flex-start}
-.notif-item:hover{background:var(--gray-50)}
-.notif-item.unread{background:rgba(13,148,136,0.05);border-left:3px solid var(--teal)}
-.notif-item i{color:var(--teal);margin-top:2px}
-.notif-content p{font-size:0.85rem;color:var(--gray-700);margin-bottom:2px}
-.notif-content span{font-size:0.75rem;color:var(--gray-400)}
-.notif-empty{padding:24px;text-align:center;color:var(--gray-400);font-size:0.85rem}
-
-/* Hero */
-.hero{min-height:100vh;display:flex;align-items:center;padding:120px 24px 80px;position:relative;overflow:hidden}
-.hero-bg{position:absolute;inset:0;z-index:0;background:linear-gradient(135deg,var(--cream) 0%,#f0fdf4 50%,var(--white) 100%)}
-.hero-bg::before{content:'';position:absolute;top:-20%;right:-10%;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(13,148,136,0.08) 0%,transparent 70%);animation:float 8s ease-in-out infinite}
-.hero-bg::after{content:'';position:absolute;bottom:-10%;left:-5%;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(20,184,166,0.06) 0%,transparent 70%);animation:float 10s ease-in-out infinite reverse}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
-.hero-content{position:relative;z-index:1;max-width:600px}
-.hero h1{font-family:'Playfair Display',serif;font-size:3.8rem;font-weight:700;line-height:1.1;color:var(--gray-900);margin-bottom:24px}
-.hero h1 span{background:linear-gradient(135deg,var(--teal),var(--teal-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero p{font-size:1.15rem;color:var(--gray-500);margin-bottom:32px;max-width:540px}
-.hero-btns{display:flex;gap:16px;flex-wrap:wrap}
-.hero-img{position:absolute;right:4rem;top:50%;transform:translateY(-50%);width:520px;height:420px;border-radius:24px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,0.12);z-index:1}
-.hero-img img{width:100%;height:100%;object-fit:cover}
-
-/* Sections */
-.section{padding:80px 24px;max-width:1200px;margin:0 auto}
-.section-title{text-align:center;margin-bottom:48px}
-.section-title h2{font-size:2.4rem;color:var(--gray-900);margin-bottom:12px}
-.section-title p{color:var(--gray-500);font-size:1.05rem;max-width:600px;margin:0 auto}
-
-/* Stats */
-.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;margin-bottom:48px}
-.stat-card{background:white;padding:28px 20px;border-radius:16px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.06);border:1px solid var(--gray-100);transition:transform 0.3s}
-.stat-card:hover{transform:translateY(-4px)}
-.stat-card i{font-size:1.8rem;color:var(--teal);margin-bottom:12px}
-.stat-number{font-size:2.2rem;font-weight:700;color:var(--teal);font-family:'Playfair Display',serif}
-.stat-label{font-size:0.85rem;color:var(--gray-500);margin-top:4px}
-
-/* How It Works */
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:40px}
-.step-card{background:white;border-radius:16px;padding:40px 30px;text-align:center;border:1px solid var(--gray-100);transition:all 0.3s;position:relative;overflow:hidden}
-.step-card:hover{transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,0.08);border-color:var(--teal-200)}
-.step-number{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--teal),var(--teal-light));color:white;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700;margin:0 auto 20px;font-family:'Playfair Display',serif}
-.step-card h3{font-size:1.2rem;margin-bottom:10px;color:var(--gray-800)}
-.step-card p{color:var(--gray-500);font-size:0.95rem}
-
-/* Categories */
-.categories-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:40px}
-.category-pill{padding:10px 22px;border-radius:30px;background:white;border:1.5px solid rgba(13,148,136,0.15);color:var(--gray-600);font-size:0.85rem;font-weight:500;cursor:pointer;transition:all 0.3s}
-.category-pill:hover,.category-pill.active{background:linear-gradient(135deg,var(--teal),var(--teal-light));color:white;border-color:transparent}
-
-/* Feature Cards */
-.feature-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-.feature-card{background:white;border-radius:16px;overflow:hidden;border:1px solid var(--gray-100);transition:all 0.3s}
-.feature-card:hover{transform:translateY(-5px);box-shadow:0 20px 50px rgba(0,0,0,0.08)}
-.feature-card img{width:100%;height:200px;object-fit:cover}
-.feature-card-content{padding:24px}
-.feature-card-content h3{font-size:1.1rem;font-weight:600;margin-bottom:8px}
-.feature-card-content p{color:var(--gray-500);font-size:0.9rem}
-
-/* FAQ */
-.faq-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
-.faq-card{background:white;border-radius:16px;padding:30px;border:1px solid var(--gray-100);transition:all 0.3s}
-.faq-card:hover{border-color:var(--teal-200);box-shadow:0 10px 30px rgba(0,0,0,0.05)}
-.faq-card h4{font-size:1.1rem;margin-bottom:10px;color:var(--teal);display:flex;align-items:center;gap:8px}
-.faq-card p{color:var(--gray-500);font-size:0.9rem;line-height:1.6}
-
-/* Browse Members */
-.search-bar{max-width:600px;margin:0 auto 40px;position:relative}
-.search-bar input{width:100%;padding:14px 20px 14px 48px;border:2px solid var(--gray-200);border-radius:12px;font-size:1rem;transition:all 0.3s;background:white}
-.search-bar input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 4px rgba(13,148,136,0.1)}
-.search-bar i{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--gray-400)}
-
-.members-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px}
-.member-card{background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);border:1px solid var(--gray-100);transition:all 0.3s;cursor:pointer}
-.member-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.1)}
-.member-card-img{width:100%;height:200px;background:linear-gradient(135deg,var(--teal),var(--teal-light));display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.member-card-img .avatar-large{width:80px;height:80px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:var(--teal)}
-.member-info{padding:24px}
-.member-info h4{font-size:1.15rem;margin-bottom:4px;color:var(--gray-900)}
-.member-info .role{color:var(--teal);font-size:0.85rem;font-weight:500;margin-bottom:10px}
-.member-skills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
-.skill-tag{padding:4px 12px;border-radius:20px;background:var(--teal-50);color:var(--teal-dark);font-size:0.8rem;font-weight:500}
-.member-rating{display:flex;align-items:center;gap:6px;font-size:0.9rem;color:var(--gray-500);margin-bottom:16px}
-.member-rating .stars{color:var(--yellow)}
-.member-actions{display:flex;gap:8px}
-.member-actions .btn{flex:1;justify-content:center}
-
-/* Profile */
-.profile-header{background:linear-gradient(135deg,var(--teal),var(--teal-light));padding:60px 40px 40px;text-align:center;color:white;border-radius:0 0 24px 24px}
-.profile-avatar-large{width:100px;height:100px;border-radius:50%;background:white;color:var(--teal);display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:700;margin:0 auto 16px;border:4px solid rgba(255,255,255,0.3)}
-.profile-header h2{font-size:2rem;margin-bottom:8px}
-.profile-header p{opacity:0.9}
-.profile-stats{display:flex;gap:20px;justify-content:center;margin-top:16px;flex-wrap:wrap}
-.profile-stat{background:rgba(255,255,255,0.2);padding:8px 20px;border-radius:20px;font-size:0.9rem}
-.profile-body{padding:40px;max-width:800px;margin:0 auto}
-.profile-section{margin-bottom:32px}
-.profile-section h3{font-size:1.2rem;margin-bottom:16px;color:var(--gray-800);display:flex;align-items:center;gap:8px}
-.profile-section h3 i{color:var(--teal)}
-.profile-section p{color:var(--gray-600);line-height:1.7}
-.review-item{background:var(--gray-50);padding:20px;border-radius:12px;margin-bottom:12px}
-.review-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.review-author{font-weight:600;color:var(--gray-800)}
-.review-stars{color:var(--yellow);font-size:0.9rem}
-.review-text{color:var(--gray-600);font-size:0.9rem;line-height:1.5}
-.review-meta{font-size:0.8rem;color:var(--gray-400);margin-top:6px}
-
-/* Share Box */
-.share-box{background:var(--teal-50);border:2px dashed var(--teal);border-radius:12px;padding:20px;margin-top:16px}
-.share-box p{font-weight:600;color:var(--teal-dark);margin-bottom:8px}
-.share-code{background:white;padding:12px;border-radius:8px;border:1px solid var(--gray-200);font-family:monospace;font-size:0.85rem;word-break:break-all;margin-bottom:12px}
-
-/* Modals */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px)}
-.modal{background:white;border-radius:20px;padding:32px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
-.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--gray-400);width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all 0.2s}
-.modal-close:hover{background:var(--gray-100);color:var(--gray-700)}
-.modal h2{font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:8px;color:var(--gray-900)}
-.modal p.subtitle{color:var(--gray-500);margin-bottom:24px;font-size:0.95rem}
-.form-group{margin-bottom:20px}
-.form-group label{display:block;margin-bottom:6px;font-weight:500;color:var(--gray-700);font-size:0.9rem}
-.form-group input,.form-group textarea,.form-group select{width:100%;padding:12px 16px;border:2px solid var(--gray-200);border-radius:10px;font-size:0.95rem;transition:all 0.3s;font-family:'Inter',sans-serif}
-.form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,0.1)}
-.form-group textarea{min-height:100px;resize:vertical}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.error-msg{color:var(--red);font-size:0.85rem;margin-top:4px}
-.switch-link{text-align:center;margin-top:16px;font-size:0.9rem;color:var(--gray-500)}
-.switch-link a{color:var(--teal);cursor:pointer;font-weight:600}
-.modal-actions{display:flex;gap:12px;margin-top:24px}
-.modal-actions .btn{flex:1;justify-content:center}
-
-/* Delete Account Modal */
-.delete-warning{background:var(--red-light);border:1px solid #fecaca;border-radius:12px;padding:16px;margin-bottom:20px}
-.delete-warning p{color:#991b1b;font-size:0.9rem;margin:0}
-.delete-warning i{color:var(--red);margin-right:8px}
-
-/* Chat */
-.chat-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px)}
-.chat-container{background:white;border-radius:20px;width:100%;max-width:900px;height:80vh;display:flex;overflow:hidden;box-shadow:0 25px 80px rgba(0,0,0,0.3)}
-.chat-sidebar{width:280px;border-right:1px solid var(--gray-200);background:var(--gray-50);display:flex;flex-direction:column}
-.chat-sidebar-header{padding:20px;border-bottom:1px solid var(--gray-200)}
-.chat-sidebar-header h3{font-size:1rem;color:var(--gray-800)}
-.chat-conversations{flex:1;overflow-y:auto}
-.chat-conv-item{padding:14px 20px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:background 0.2s;border-bottom:1px solid var(--gray-100)}
-.chat-conv-item:hover,.chat-conv-item.active{background:white}
-.chat-conv-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-light));color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;flex-shrink:0}
-.chat-conv-info{flex:1;min-width:0}
-.chat-conv-info p{font-size:0.85rem;color:var(--gray-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chat-conv-info span{font-size:0.75rem;color:var(--gray-400)}
-.chat-conv-unread{width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0}
-.chat-main{flex:1;display:flex;flex-direction:column}
-.chat-header{padding:16px 24px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between}
-.chat-header-info{display:flex;align-items:center;gap:12px}
-.chat-header-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-light));color:white;display:flex;align-items:center;justify-content:center;font-weight:700}
-.chat-header-name{font-size:1rem;font-weight:600}
-.chat-header-status{font-size:0.8rem;color:#22c55e;display:flex;align-items:center;gap:4px}
-.chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
-.chat-msg{max-width:70%;padding:12px 16px;border-radius:16px;font-size:0.9rem;line-height:1.5}
-.chat-msg.sent{align-self:flex-end;background:linear-gradient(135deg,var(--teal),var(--teal-light));color:white;border-bottom-right-radius:4px}
-.chat-msg.received{align-self:flex-start;background:var(--gray-100);color:var(--gray-700);border-bottom-left-radius:4px}
-.chat-msg-time{font-size:0.7rem;opacity:0.7;margin-top:4px}
-.chat-input-area{padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;gap:12px}
-.chat-input{flex:1;padding:12px 18px;border:2px solid var(--gray-200);border-radius:50px;font-size:0.9rem;outline:none;transition:all 0.3s}
-.chat-input:focus{border-color:var(--teal)}
-.chat-send-btn{padding:12px 24px;border-radius:50px;background:var(--teal);color:white;border:none;cursor:pointer;font-weight:600;transition:all 0.2s}
-.chat-send-btn:hover{background:var(--teal-dark)}
-.typing-indicator{display:flex;gap:4px;padding:12px 16px;background:var(--gray-100);border-radius:16px;align-self:flex-start;border-bottom-left-radius:4px}
-.typing-indicator span{width:6px;height:6px;border-radius:50%;background:var(--gray-400);animation:typing 1.4s infinite}
-.typing-indicator span:nth-child(2){animation-delay:0.2s}
-.typing-indicator span:nth-child(3){animation-delay:0.4s}
-@keyframes typing{0%,60%,100%{opacity:0.3;transform:scale(1)}30%{opacity:1;transform:scale(1.2)}}
-
-/* Review Stars */
-.star-rating{display:flex;gap:8px;font-size:1.8rem;margin-bottom:16px}
-.star-rating .star{color:var(--gray-300);cursor:pointer;transition:all 0.2s}
-.star-rating .star.active{color:var(--yellow)}
-.star-rating .star:hover{transform:scale(1.15)}
-.credit-preview{background:var(--teal-50);border-radius:10px;padding:16px;text-align:center;margin-bottom:20px}
-.credit-preview .amount{font-size:2rem;font-weight:700;color:var(--teal)}
-.credit-preview p{color:var(--gray-500);font-size:0.85rem}
-
-/* Toast */
-.toast-container{position:fixed;top:90px;right:20px;z-index:3000;display:flex;flex-direction:column;gap:10px}
-.toast{background:white;padding:16px 20px;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.15);border-left:4px solid var(--teal);display:flex;align-items:center;gap:12px;animation:slideIn 0.3s ease;max-width:320px}
-.toast.error{border-left-color:var(--red)}
-.toast i{color:var(--teal);font-size:1.1rem}
-.toast.error i{color:var(--red)}
-.toast p{font-size:0.9rem;color:var(--gray-700)}
-@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
-
-/* Empty State */
-.empty-state{text-align:center;padding:60px 20px;color:var(--gray-400)}
-.empty-state i{font-size:3rem;margin-bottom:16px;color:var(--gray-300)}
-.empty-state h3{font-size:1.2rem;margin-bottom:8px;color:var(--gray-700)}
-.empty-state p{font-size:0.95rem}
-
-/* Loading */
-.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,0.95);z-index:5000;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.loading-spinner{width:50px;height:50px;border:4px solid var(--gray-200);border-top-color:var(--teal);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:20px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{color:var(--teal);font-weight:600}
-
-/* Scroll Animations */
-.scroll-reveal{opacity:0;transform:translateY(30px);transition:all 0.6s ease}
-.scroll-reveal.visible{opacity:1;transform:translateY(0)}
-
-/* Footer */
-.footer{background:var(--gray-900);color:var(--gray-400);padding:60px 24px 30px;text-align:center}
-.footer h3{font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:12px;color:white}
-.footer p{font-size:0.9rem;opacity:0.7;margin-bottom:8px}
-.footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:30px;flex-wrap:wrap}
-.footer-link{color:var(--gray-400);text-decoration:none;font-size:0.85rem;transition:color 0.2s;cursor:pointer}
-.footer-link:hover{color:white}
-
-/* Error Banner */
-.error-banner{background:var(--red-light);border:1px solid #fecaca;border-radius:12px;padding:20px;margin:20px auto;max-width:800px}
-.error-banner h4{color:#991b1b;margin-bottom:8px}
-.error-banner p{color:#7f1d1d;font-size:0.9rem;margin-bottom:8px}
-.error-banner code{background:white;padding:2px 6px;border-radius:4px;font-family:monospace;font-size:0.85rem}
-
-/* Responsive */
-@media(max-width:900px){.hero-img{display:none}.hero h1{font-size:2.5rem}.steps,.feature-cards{grid-template-columns:1fr}.chat-container{flex-direction:column;height:90vh}.chat-sidebar{width:100%;height:120px;border-right:none;border-bottom:1px solid var(--gray-200)}}
-@media(max-width:600px){.hero h1{font-size:2rem}.section{padding:60px 16px}.faq-grid{grid-template-columns:1fr}.stats-bar{grid-template-columns:1fr 1fr}}
+:root{--primary:#0d9488;--primary-dark:#0f766e;--danger:#e74c3c;--danger-dark:#c0392b;--bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;--radius:12px;--shadow:0 4px 6px -1px rgba(0,0,0,0.1);}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif;}
+body{background:var(--bg);color:var(--text);line-height:1.5;}
+.container{max-width:1200px;margin:0 auto;padding:1rem;}
+header{background:var(--card);border-bottom:1px solid var(--border);padding:1rem 0;position:sticky;top:0;z-index:100;}
+header .container{display:flex;align-items:center;justify-content:space-between;}
+.logo{font-size:1.5rem;font-weight:800;color:var(--primary);}
+nav{display:flex;gap:1rem;align-items:center;}
+nav a,nav button{color:var(--text);text-decoration:none;font-weight:500;background:none;border:none;cursor:pointer;font-size:1rem;padding:0.5rem 1rem;border-radius:8px;transition:0.2s;}
+nav a:hover,nav button:hover{background:#f1f5f9;}
+.btn{padding:0.6rem 1.2rem;border-radius:8px;border:none;font-weight:600;cursor:pointer;transition:0.2s;font-size:0.95rem;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover{background:var(--primary-dark);}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-danger:hover{background:var(--danger-dark);}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
+.btn-outline:hover{background:#f8fafc;}
+.btn-sm{padding:0.4rem 0.8rem;font-size:0.85rem;}
+.card{background:var(--card);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:1rem;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem;}
+.member-card{background:var(--card);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);border:1px solid var(--border);transition:0.2s;cursor:pointer;}
+.member-card:hover{transform:translateY(-4px);box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);}
+.member-avatar{width:64px;height:64px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;margin-bottom:1rem;}
+.member-name{font-weight:700;font-size:1.1rem;margin-bottom:0.25rem;}
+.member-meta{color:var(--muted);font-size:0.9rem;margin-bottom:0.75rem;}
+.skills{display:flex;flex-wrap:wrap;gap:0.4rem;}
+.skill-tag{background:#ccfbf1;color:var(--primary-dark);padding:0.25rem 0.6rem;border-radius:20px;font-size:0.8rem;font-weight:600;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:200;padding:1rem;}
+.modal{background:var(--card);border-radius:var(--radius);width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:2rem;position:relative;}
+.modal h2{margin-bottom:1.5rem;font-size:1.4rem;}
+.form-group{margin-bottom:1rem;}
+.form-group label{display:block;font-weight:600;margin-bottom:0.4rem;font-size:0.9rem;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:0.6rem;border:1px solid var(--border);border-radius:8px;font-size:1rem;}
+.form-group textarea{min-height:80px;resize:vertical;}
+.skills-input{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;}
+.skill-pill{background:var(--primary);color:#fff;padding:0.3rem 0.7rem;border-radius:20px;font-size:0.85rem;display:flex;align-items:center;gap:0.3rem;}
+.skill-pill button{background:none;border:none;color:#fff;font-size:1rem;cursor:pointer;line-height:1;}
+.star-rating{font-size:1.8rem;color:#cbd5e1;cursor:pointer;}
+.star-rating .filled{color:#fbbf24;}
+.chat-sidebar{width:280px;border-right:1px solid var(--border);overflow-y:auto;max-height:500px;}
+.chat-contact{padding:1rem;border-bottom:1px solid var(--border);cursor:pointer;transition:0.2s;}
+.chat-contact:hover,.chat-contact.active{background:#f8fafc;}
+.chat-contact-name{font-weight:600;}
+.chat-contact-preview{font-size:0.85rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chat-main{flex:1;display:flex;flex-direction:column;min-height:500px;}
+.chat-header{padding:1rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.chat-messages{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.5rem;}
+.message{max-width:70%;padding:0.75rem 1rem;border-radius:12px;font-size:0.95rem;}
+.message-sent{align-self:flex-end;background:var(--primary);color:#fff;border-bottom-right-radius:4px;}
+.message-received{align-self:flex-start;background:#f1f5f9;border-bottom-left-radius:4px;}
+.chat-input-area{display:flex;gap:0.5rem;padding:1rem;border-top:1px solid var(--border);}
+.chat-input{flex:1;padding:0.6rem;border:1px solid var(--border);border-radius:8px;}
+.chat-send-btn{background:var(--primary);color:#fff;border:none;border-radius:8px;padding:0 1.2rem;cursor:pointer;font-weight:600;}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.5rem;box-shadow:var(--shadow);z-index:300;display:flex;align-items:center;gap:0.75rem;animation:slideIn 0.3s ease;}
+@keyframes slideIn{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.toast-close{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);}
+.empty-state{text-align:center;padding:3rem;color:var(--muted);}
+.empty-state h3{margin-bottom:0.5rem;color:var(--text);}
+.badge{display:inline-flex;align-items:center;gap:0.3rem;background:#fef3c7;color:#92400e;padding:0.3rem 0.7rem;border-radius:20px;font-size:0.8rem;font-weight:600;}
+.review-card{background:#f8fafc;border-radius:8px;padding:1rem;margin-bottom:0.75rem;}
+.review-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;}
+.review-stars{color:#fbbf24;}
+.setup-banner{background:#fef3c7;border:1px solid #fbbf24;border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem;}
+.setup-banner h3{color:#92400e;margin-bottom:0.5rem;}
+.setup-banner pre{background:#1e293b;color:#e2e8f0;padding:1rem;border-radius:8px;overflow-x:auto;font-size:0.85rem;margin:1rem 0;}
+.setup-banner button{margin-top:0.5rem;}
+.profile-header{display:flex;gap:1.5rem;align-items:flex-start;margin-bottom:1.5rem;}
+.profile-avatar{width:96px;height:96px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:700;}
+.profile-info{flex:1;}
+.profile-name{font-size:1.5rem;font-weight:800;margin-bottom:0.25rem;}
+.profile-meta{color:var(--muted);margin-bottom:0.75rem;}
+.section-title{font-size:1.1rem;font-weight:700;margin:1.5rem 0 0.75rem;}
+.credits-badge{background:#f0fdf4;color:#166534;padding:0.4rem 1rem;border-radius:20px;font-weight:700;display:inline-flex;align-items:center;gap:0.4rem;}
+.tabs{display:flex;gap:0.5rem;border-bottom:2px solid var(--border);margin-bottom:1rem;}
+.tab{padding:0.75rem 1.25rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;}
+.tab.active{border-bottom-color:var(--primary);color:var(--primary);}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border-top:1px solid var(--border);margin-top:2rem;}
+@media(max-width:768px){.grid{grid-template-columns:1fr;}.profile-header{flex-direction:column;align-items:center;text-align:center;}.chat-sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);}}
 </style>
 </head>
 <body>
-<div id="scroll-progress"></div>
 <div id="app">
 
-<!-- Loading -->
-<div v-if="loading" class="loading-overlay">
-<div class="loading-spinner"></div>
-<div class="loading-text">Loading SkillSwap...</div>
+<header v-if="!showSetup">
+  <div class="container">
+    <div class="logo">SkillSwap</div>
+    <nav v-if="currentUser">
+      <a href="#" @click.prevent="page='browse'">Browse</a>
+      <a href="#" @click.prevent="page='chat';loadChatUsers()">Chat</a>
+      <a href="#" @click.prevent="page='bookings'">Bookings</a>
+      <a href="#" @click.prevent="page='profile'">Profile</a>
+      <button class="btn btn-outline btn-sm" @click="logout">Logout</button>
+    </nav>
+    <nav v-else>
+      <button class="btn btn-primary" @click="showLogin=true">Log In</button>
+      <button class="btn btn-outline" @click="showSignup=true">Sign Up</button>
+    </nav>
+  </div>
+</header>
+
+<div class="container" style="padding-top:2rem;">
+
+  <!-- SETUP BANNER -->
+  <div v-if="showSetup" class="setup-banner">
+    <h3>Database Setup Required</h3>
+    <p>Your Supabase database tables don't exist yet. Run this SQL in your Supabase SQL Editor:</p>
+    <pre id="setup-sql">{{setupSQL}}</pre>
+    <button class="btn btn-outline btn-sm" @click="copySQL">Copy SQL</button>
+    <button class="btn btn-primary" style="margin-left:0.5rem;" @click="checkSetup" :disabled="setupChecking">
+      {{setupChecking?'Checking...':'I've Run the SQL - Retry Connection'}}
+    </button>
+    <p v-if="setupError" style="color:var(--danger);margin-top:0.75rem;">{{setupError}}</p>
+  </div>
+
+  <!-- LOGIN MODAL -->
+  <div v-if="showLogin && !showSetup" class="modal-overlay" @click.self="showLogin=false">
+    <div class="modal">
+      <h2>Log In</h2>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" v-model="loginEmail" placeholder="your@email.com" @keyup.enter="handleLogin">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" v-model="loginPassword" placeholder="Your password" @keyup.enter="handleLogin">
+      </div>
+      <div v-if="loginError" style="color:var(--danger);margin-bottom:1rem;">{{loginError}}</div>
+      <button class="btn btn-primary" style="width:100%" @click="handleLogin" :disabled="loginLoading">
+        {{loginLoading?'Logging in...':'Log In'}}
+      </button>
+      <p style="text-align:center;margin-top:1rem;color:var(--muted)">Don't have an account? 
+        <a href="#" @click.prevent="showLogin=false;showSignup=true" style="color:var(--primary)">Sign Up</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- SIGNUP MODAL -->
+  <div v-if="showSignup && !showSetup" class="modal-overlay" @click.self="showSignup=false">
+    <div class="modal">
+      <h2>Create Account</h2>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" v-model="signupName" placeholder="Your full name">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" v-model="signupEmail" placeholder="your@email.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" v-model="signupPassword" placeholder="Create a password">
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" v-model="signupPhone" placeholder="(555) 123-4567">
+      </div>
+      <div class="form-group">
+        <label>Age</label>
+        <input type="number" v-model="signupAge" placeholder="25">
+      </div>
+      <div class="form-group">
+        <label>Skills You Can Teach</label>
+        <input type="text" v-model="newSkill" @keyup.enter="addSkill" placeholder="e.g. Python, Guitar... Press Enter">
+        <div class="skills-input">
+          <span class="skill-pill" v-for="(s,i) in signupSkills" :key="i">{{s}}<button @click="signupSkills.splice(i,1)">×</button></span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Skills You Want to Learn</label>
+        <input type="text" v-model="newWant" @keyup.enter="addWant" placeholder="e.g. Spanish, Cooking... Press Enter">
+        <div class="skills-input">
+          <span class="skill-pill" v-for="(s,i) in signupWants" :key="i">{{s}}<button @click="signupWants.splice(i,1)">×</button></span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Bio</label>
+        <textarea v-model="signupBio" placeholder="Tell us about yourself..."></textarea>
+      </div>
+      <div v-if="signupError" style="color:var(--danger);margin-bottom:1rem;">{{signupError}}</div>
+      <button class="btn btn-primary" style="width:100%" @click="handleSignup" :disabled="signupLoading">
+        {{signupLoading?'Creating Account...':'Create Account'}}
+      </button>
+      <p style="text-align:center;margin-top:1rem;color:var(--muted)">Already have an account? 
+        <a href="#" @click.prevent="showSignup=false;showLogin=true" style="color:var(--primary)">Log In</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- BROWSE PAGE -->
+  <div v-if="page==='browse' && currentUser && !showSetup">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+      <h1>Browse Members</h1>
+      <input type="text" v-model="searchQuery" placeholder="Search skills or names..." style="padding:0.5rem 1rem;border:1px solid var(--border);border-radius:8px;width:280px;">
+    </div>
+    <div class="grid">
+      <div class="member-card" v-for="u in filteredUsers" :key="u.id" @click="openProfile(u)">
+        <div class="member-avatar">{{u.name?u.name.charAt(0).toUpperCase():'?'}}</div>
+        <div class="member-name">{{u.name}}</div>
+        <div class="member-meta">{{u.age?u.age+' years old':''}} {{u.location?'· '+u.location:''}}</div>
+        <div class="skills">
+          <span class="skill-tag" v-for="s in (u.skills||[]).slice(0,4)" :key="s">{{s}}</span>
+        </div>
+      </div>
+    </div>
+    <div v-if="filteredUsers.length===0" class="empty-state">
+      <h3>No members found</h3>
+      <p>Try a different search or check back later.</p>
+    </div>
+  </div>
+
+  <!-- PROFILE PAGE -->
+  <div v-if="page==='profile' && currentUser && !showSetup">
+    <div class="card">
+      <div class="profile-header">
+        <div class="profile-avatar">{{currentUser.name?currentUser.name.charAt(0).toUpperCase():'?'}}</div>
+        <div class="profile-info">
+          <div class="profile-name">{{currentUser.name}}</div>
+          <div class="profile-meta">{{currentUser.email}} {{currentUser.age?'· '+currentUser.age+' years old':''}}</div>
+          <div class="credits-badge">{{currentUser.credits||0}} Credits</div>
+        </div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <button class="btn btn-outline btn-sm" @click="openEditProfile">Edit Profile</button>
+          <button class="btn btn-danger btn-sm" @click="showDeleteAccount=true">Delete Account</button>
+        </div>
+      </div>
+      <div class="section-title">Skills I Can Teach</div>
+      <div class="skills" style="margin-bottom:1rem;">
+        <span class="skill-tag" v-for="s in currentUser.skills||[]" :key="s">{{s}}</span>
+        <span v-if="!(currentUser.skills||[]).length" style="color:var(--muted)">No skills added yet.</span>
+      </div>
+      <div class="section-title">Skills I Want to Learn</div>
+      <div class="skills" style="margin-bottom:1rem;">
+        <span class="skill-tag" v-for="s in currentUser.wants||[]" :key="s">{{s}}</span>
+        <span v-if="!(currentUser.wants||[]).length" style="color:var(--muted)">No wants added yet.</span>
+      </div>
+      <div class="section-title">Bio</div>
+      <p style="color:var(--muted);white-space:pre-wrap;">{{currentUser.bio||'No bio yet.'}}</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:1rem;">Danger Zone</h3>
+      <p style="color:var(--muted);margin-bottom:1rem;">Clear all data from the database. This cannot be undone.</p>
+      <button class="btn btn-danger" @click="showClearAll=true">Clear All Site Data</button>
+    </div>
+  </div>
+
+  <!-- EDIT PROFILE MODAL -->
+  <div v-if="showEditProfile" class="modal-overlay" @click.self="showEditProfile=false">
+    <div class="modal">
+      <h2>Edit Profile</h2>
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" v-model="editName">
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" v-model="editPhone">
+      </div>
+      <div class="form-group">
+        <label>Age</label>
+        <input type="number" v-model="editAge">
+      </div>
+      <div class="form-group">
+        <label>Skills</label>
+        <input type="text" v-model="newEditSkill" @keyup.enter="addEditSkill" placeholder="Press Enter to add">
+        <div class="skills-input">
+          <span class="skill-pill" v-for="(s,i) in editSkills" :key="i">{{s}}<button @click="editSkills.splice(i,1)">×</button></span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Wants</label>
+        <input type="text" v-model="newEditWant" @keyup.enter="addEditWant" placeholder="Press Enter to add">
+        <div class="skills-input">
+          <span class="skill-pill" v-for="(s,i) in editWants" :key="i">{{s}}<button @click="editWants.splice(i,1)">×</button></span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Bio</label>
+        <textarea v-model="editBio"></textarea>
+      </div>
+      <button class="btn btn-primary" style="width:100%" @click="saveProfile" :disabled="editLoading">
+        {{editLoading?'Saving...':'Save Changes'}}
+      </button>
+    </div>
+  </div>
+
+  <!-- DELETE ACCOUNT MODAL -->
+  <div v-if="showDeleteAccount" class="modal-overlay" @click.self="showDeleteAccount=false">
+    <div class="modal">
+      <h2>Delete Account</h2>
+      <p style="color:var(--danger);margin-bottom:1rem;font-weight:600;">This will permanently delete your account and all your data.</p>
+      <p style="color:var(--muted);margin-bottom:1rem;">Type <strong>DELETE</strong> below to confirm:</p>
+      <div class="form-group">
+        <input type="text" v-model="deleteConfirmText" placeholder="Type DELETE">
+      </div>
+      <div v-if="deleteError" style="color:var(--danger);margin-bottom:1rem;">{{deleteError}}</div>
+      <button class="btn btn-danger" style="width:100%" @click="deleteAccount" :disabled="deleteLoading">
+        {{deleteLoading?'Deleting...':'Permanently Delete Account'}}
+      </button>
+    </div>
+  </div>
+
+  <!-- CLEAR ALL DATA MODAL -->
+  <div v-if="showClearAll" class="modal-overlay" @click.self="showClearAll=false">
+    <div class="modal">
+      <h2>Clear All Site Data</h2>
+      <p style="color:var(--danger);margin-bottom:1rem;font-weight:600;">This will delete ALL users, messages, reviews, bookings, and notifications.</p>
+      <p style="color:var(--muted);margin-bottom:1rem;">Type <strong>CLEAR ALL</strong> below to confirm:</p>
+      <div class="form-group">
+        <input type="text" v-model="clearConfirmText" placeholder="Type CLEAR ALL">
+      </div>
+      <div v-if="clearError" style="color:var(--danger);margin-bottom:1rem;">{{clearError}}</div>
+      <button class="btn btn-danger" style="width:100%" @click="clearAllData" :disabled="clearLoading">
+        {{clearLoading?'Clearing...':'Clear Everything'}}
+      </button>
+    </div>
+  </div>
+
+  <!-- VIEW OTHER PROFILE -->
+  <div v-if="viewingUser && !showSetup" class="modal-overlay" @click.self="viewingUser=null">
+    <div class="modal">
+      <div class="profile-header" style="margin-bottom:0;">
+        <div class="profile-avatar">{{viewingUser.name?viewingUser.name.charAt(0).toUpperCase():'?'}}</div>
+        <div class="profile-info">
+          <div class="profile-name">{{viewingUser.name}}</div>
+          <div class="profile-meta">{{viewingUser.age?viewingUser.age+' years old':''}}</div>
+        </div>
+      </div>
+      <div class="section-title">Skills</div>
+      <div class="skills" style="margin-bottom:1rem;">
+        <span class="skill-tag" v-for="s in viewingUser.skills||[]" :key="s">{{s}}</span>
+      </div>
+      <div class="section-title">Wants to Learn</div>
+      <div class="skills" style="margin-bottom:1rem;">
+        <span class="skill-tag" v-for="s in viewingUser.wants||[]" :key="s">{{s}}</span>
+      </div>
+      <div class="section-title">Bio</div>
+      <p style="color:var(--muted);white-space:pre-wrap;margin-bottom:1rem;">{{viewingUser.bio||'No bio.'}}</p>
+      <div style="display:flex;gap:0.5rem;">
+        <button class="btn btn-primary" @click="startChat(viewingUser);viewingUser=null">Message</button>
+        <button class="btn btn-outline" @click="openBooking(viewingUser);viewingUser=null">Book Session</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT PAGE -->
+  <div v-if="page==='chat' && currentUser && !showSetup" style="display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--card);">
+    <div class="chat-sidebar">
+      <div class="chat-contact" v-for="u in chatUsers" :key="u.id" :class="{active:chatWith&&chatWith.id===u.id}" @click="openChat(u)">
+        <div class="chat-contact-name">{{u.name}}</div>
+        <div class="chat-contact-preview">{{lastMessagePreview(u.id)}}</div>
+      </div>
+      <div v-if="chatUsers.length===0" style="padding:1rem;color:var(--muted);font-size:0.9rem;">No conversations yet.</div>
+    </div>
+    <div class="chat-main" v-if="chatWith">
+      <div class="chat-header">
+        <div>
+          <h4 style="margin:0;">{{chatWith.name}}</h4>
+          <p style="margin:0;color:var(--muted);font-size:0.85rem;">{{(chatWith.skills||[]).slice(0,2).join(', ')}}</p>
+        </div>
+        <div style="display:flex;gap:0.5rem;">
+          <button class="btn btn-outline btn-sm" @click="showReviewModal=true;reviewTo=chatWith">Leave Review</button>
+          <button class="btn btn-outline btn-sm" @click="chatWith=null">Close</button>
+        </div>
+      </div>
+      <div class="chat-messages" ref="chatMessages">
+        <div v-for="msg in currentChatMessages" :key="msg.id" class="message" :class="msg.sender_id===currentUser.id?'message-sent':'message-received'">
+          {{msg.text}}
+        </div>
+        <div v-if="typing" style="align-self:flex-start;color:var(--muted);font-size:0.8rem;padding:0.5rem;">{{chatWith.name}} is typing...</div>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" class="chat-input" v-model="chatInput" @keyup.enter="sendMessage" placeholder="Type a message...">
+        <button class="chat-send-btn" @click="sendMessage">Send</button>
+      </div>
+    </div>
+    <div v-else class="chat-main" style="justify-content:center;align-items:center;color:var(--muted);">
+      <p>Select a conversation to start chatting</p>
+    </div>
+  </div>
+
+  <!-- BOOKING MODAL -->
+  <div v-if="showBookingModal" class="modal-overlay" @click.self="showBookingModal=false">
+    <div class="modal">
+      <h2>Book a Session</h2>
+      <p style="color:var(--muted);margin-bottom:1rem;">Booking with <strong>{{bookingTo.name}}</strong></p>
+      <div class="form-group">
+        <label>Skill</label>
+        <select v-model="bookingSkill">
+          <option value="">Select a skill...</option>
+          <option v-for="s in bookingTo.skills||[]" :key="s" :value="s">{{s}}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" v-model="bookingDate">
+      </div>
+      <div class="form-group">
+        <label>Time</label>
+        <input type="time" v-model="bookingTime">
+      </div>
+      <div class="form-group">
+        <label>Duration (minutes)</label>
+        <input type="number" v-model="bookingDuration" placeholder="60" min="15" max="240">
+      </div>
+      <div class="form-group">
+        <label>Message</label>
+        <textarea v-model="bookingMessage" placeholder="Hi! I would like to learn..."></textarea>
+      </div>
+      <button class="btn btn-primary" style="width:100%" @click="confirmBooking" :disabled="bookingLoading">
+        {{bookingLoading?'Sending...':'Send Booking Request'}}
+      </button>
+    </div>
+  </div>
+
+  <!-- REVIEW MODAL -->
+  <div v-if="showReviewModal" class="modal-overlay" @click.self="showReviewModal=false">
+    <div class="modal">
+      <h2>Leave a Review</h2>
+      <p style="color:var(--muted);margin-bottom:1rem;">Reviewing <strong>{{reviewTo.name}}</strong></p>
+      <div class="form-group">
+        <label>Rating</label>
+        <div class="star-rating">
+          <span v-for="n in 5" :key="n" :class="{filled:reviewRating>=n}" @click="reviewRating=n">★</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Session Duration (minutes)</label>
+        <input type="number" v-model="reviewDuration" placeholder="30" min="5" max="240">
+      </div>
+      <div class="form-group">
+        <label>Skill Taught</label>
+        <input type="text" v-model="reviewSkill" placeholder="What did they teach you?">
+      </div>
+      <div class="form-group">
+        <label>Review</label>
+        <textarea v-model="reviewText" placeholder="How was your session?"></textarea>
+      </div>
+      <div style="background:#f0fdf4;padding:1rem;border-radius:8px;margin-bottom:1rem;">
+        <p style="color:var(--primary-dark);font-weight:600;">Credits they'll earn: {{calculateCredits()}}</p>
+        <p style="color:var(--muted);font-size:0.85rem;">Formula: ({{reviewDuration||0}} / 10) × {{reviewRating||0}} = {{calculateCredits()}} credits</p>
+      </div>
+      <button class="btn btn-primary" style="width:100%" @click="submitReview" :disabled="reviewLoading">
+        {{reviewLoading?'Submitting...':'Submit Review'}}
+      </button>
+    </div>
+  </div>
+
+  <!-- BOOKINGS PAGE -->
+  <div v-if="page==='bookings' && currentUser && !showSetup">
+    <h1 style="margin-bottom:1.5rem;">My Bookings</h1>
+    <div v-if="bookings.length===0" class="empty-state">
+      <h3>No bookings yet</h3>
+      <p>Browse members and book a session to get started.</p>
+    </div>
+    <div class="grid" style="grid-template-columns:1fr;">
+      <div class="card" v-for="b in bookings" :key="b.id">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div style="font-weight:700;font-size:1.1rem;">{{b.skill||'Session'}}</div>
+            <div style="color:var(--muted);font-size:0.9rem;">With {{b.to_name||'Member'}} · {{b.date}} at {{b.time}}</div>
+            <div style="color:var(--muted);font-size:0.85rem;margin-top:0.25rem;">{{b.duration}} minutes</div>
+            <p style="margin-top:0.5rem;color:var(--text);font-size:0.95rem;">{{b.message}}</p>
+          </div>
+          <span class="badge">{{b.status||'Pending'}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOASTS -->
+  <div v-for="t in toasts" :key="t.id" class="toast" :style="{borderLeft:'4px solid '+(t.type==='error'?'#e74c3c':'#0d9488')}">
+    <span>{{t.message}}</span>
+    <button class="toast-close" @click="removeToast(t.id)">×</button>
+  </div>
+
 </div>
 
-<!-- Setup Error Banner -->
-<div v-if="setupError" class="error-banner" style="margin-top:80px">
-<h4><i class="fas fa-exclamation-triangle"></i> Database Setup Required</h4>
-<p>Your Supabase database needs to be set up. Please run the SQL script below in your Supabase SQL Editor:</p>
-<ol style="margin-left:20px;color:#7f1d1d;font-size:0.9rem">
-<li>Go to <a href="https://supabase.com/dashboard" target="_blank" style="color:#991b1b;text-decoration:underline">supabase.com/dashboard</a></li>
-<li>Select your project</li>
-<li>Click "SQL Editor" in the left sidebar</li>
-<li>Paste the SQL below and click "Run"</li>
-</ol>
-<div style="background:#1e293b;color:#e2e8f0;padding:16px;border-radius:8px;margin-top:12px;font-family:monospace;font-size:0.8rem;overflow-x:auto;white-space:pre">
--- Create users table
-CREATE TABLE IF NOT EXISTS public.users (
+<footer v-if="!showSetup">
+  <p>SkillSwap — Trade skills, not money.</p>
+  <p style="margin-top:0.5rem;font-size:0.85rem;">Built with Supabase & Vue.js</p>
+</footer>
+
+</div>
+
+<script>
+const { createApp } = Vue;
+
+// IMPORTANT: Replace these with your actual Supabase credentials
+const SUPABASE_URL = 'https://your-project.supabase.co';
+const SUPABASE_KEY = 'your-anon-key';
+
+// Create client using the global supabase object from CDN
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+createApp({
+  data() {
+    return {
+      page: 'browse',
+      currentUser: null,
+      users: [],
+      messages: [],
+      bookings: [],
+      reviews: [],
+      notifications: [],
+      searchQuery: '',
+
+      showLogin: false,
+      loginEmail: '',
+      loginPassword: '',
+      loginError: '',
+      loginLoading: false,
+
+      showSignup: false,
+      signupName: '',
+      signupEmail: '',
+      signupPassword: '',
+      signupPhone: '',
+      signupAge: '',
+      signupSkills: [],
+      signupWants: [],
+      signupBio: '',
+      newSkill: '',
+      newWant: '',
+      signupError: '',
+      signupLoading: false,
+
+      showEditProfile: false,
+      editName: '',
+      editPhone: '',
+      editAge: '',
+      editSkills: [],
+      editWants: [],
+      editBio: '',
+      newEditSkill: '',
+      newEditWant: '',
+      editLoading: false,
+
+      showDeleteAccount: false,
+      deleteConfirmText: '',
+      deleteError: '',
+      deleteLoading: false,
+
+      showClearAll: false,
+      clearConfirmText: '',
+      clearError: '',
+      clearLoading: false,
+
+      viewingUser: null,
+
+      showBookingModal: false,
+      bookingTo: null,
+      bookingSkill: '',
+      bookingDate: '',
+      bookingTime: '',
+      bookingDuration: 60,
+      bookingMessage: '',
+      bookingLoading: false,
+
+      showReviewModal: false,
+      reviewTo: null,
+      reviewRating: 0,
+      reviewDuration: 30,
+      reviewSkill: '',
+      reviewText: '',
+      reviewLoading: false,
+
+      chatUsers: [],
+      chatWith: null,
+      chatInput: '',
+      typing: false,
+
+      toasts: [],
+      toastId: 0,
+
+      showSetup: false,
+      setupChecking: false,
+      setupError: '',
+      setupSQL: `CREATE TABLE IF NOT EXISTS public.users (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
@@ -314,7 +601,6 @@ CREATE TABLE IF NOT EXISTS public.users (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create messages table
 CREATE TABLE IF NOT EXISTS public.messages (
   id SERIAL PRIMARY KEY,
   sender_id INTEGER NOT NULL,
@@ -324,7 +610,6 @@ CREATE TABLE IF NOT EXISTS public.messages (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create reviews table
 CREATE TABLE IF NOT EXISTS public.reviews (
   id SERIAL PRIMARY KEY,
   from_id INTEGER NOT NULL,
@@ -337,7 +622,6 @@ CREATE TABLE IF NOT EXISTS public.reviews (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create bookings table
 CREATE TABLE IF NOT EXISTS public.bookings (
   id SERIAL PRIMARY KEY,
   from_id INTEGER NOT NULL,
@@ -347,10 +631,10 @@ CREATE TABLE IF NOT EXISTS public.bookings (
   time TEXT,
   duration INTEGER,
   message TEXT,
+  status TEXT DEFAULT 'Pending',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create notifications table
 CREATE TABLE IF NOT EXISTS public.notifications (
   id SERIAL PRIMARY KEY,
   user_id INTEGER NOT NULL,
@@ -360,1008 +644,473 @@ CREATE TABLE IF NOT EXISTS public.notifications (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Enable RLS
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.bookings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 
--- Create permissive policies for testing (allow all)
 CREATE POLICY "Allow all" ON public.users FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all" ON public.messages FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all" ON public.reviews FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all" ON public.bookings FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all" ON public.notifications FOR ALL USING (true) WITH CHECK (true);
 
--- Grant access
 GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated;
-GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
-</div>
-<button class="btn btn-primary" style="margin-top:16px" @click="retryConnection"><i class="fas fa-sync"></i> I've Run the SQL - Retry Connection</button>
-</div>
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;`
+    };
+  },
 
-<!-- Toast -->
-<div class="toast-container">
-<div v-for="t in toasts" :key="t.id" class="toast" :class="{error:t.type==='error'}">
-<i :class="t.type==='error'?'fas fa-exclamation-circle':'fas fa-check-circle'"></i>
-<p>{{t.message}}</p>
-</div>
-</div>
-
-<!-- Navbar -->
-<nav class="navbar" :class="{scrolled:scrolled}">
-<div class="nav-container">
-<div class="logo" @click="page='landing'"><i class="fas fa-exchange-alt"></i> SkillSwap</div>
-<div class="nav-links">
-<a @click="page='landing'" :class="{active:page==='landing'}">Home</a>
-<a @click="page='browse'" :class="{active:page==='browse'}">Browse</a>
-<a @click="page='profile'" :class="{active:page==='profile'}" v-if="currentUser">My Profile</a>
-</div>
-<div class="nav-right">
-<div v-if="currentUser" class="credits-badge"><i class="fas fa-coins"></i> {{currentUser.credits||0}} Credits</div>
-<div v-if="currentUser" style="position:relative">
-<div class="notif-bell" @click="showNotifDropdown=!showNotifDropdown">
-<i class="fas fa-bell"></i>
-<span v-if="unreadCount>0" class="notif-badge">{{unreadCount}}</span>
-</div>
-<div v-if="showNotifDropdown" class="notif-dropdown">
-<div class="notif-header"><h4>Notifications</h4><span @click="markAllRead()">Mark all read</span></div>
-<div class="notif-list">
-<div v-if="notifications.length===0" class="notif-empty">No notifications yet</div>
-<div v-for="n in notifications.slice().reverse()" :key="n.id" class="notif-item" :class="{unread:!n.read}" @click="handleNotificationClick(n)">
-<i :class="n.icon||'fas fa-info-circle'"></i>
-<div class="notif-content"><p>{{n.text}}</p><span>{{formatTime(n.created_at)}}</span></div>
-</div>
-</div>
-</div>
-</div>
-<button v-if="!currentUser" class="btn btn-outline btn-small" @click="showLogin=true">Log In</button>
-<button v-if="!currentUser" class="btn btn-primary btn-small" @click="showSignup=true">Sign Up</button>
-<button v-if="currentUser" class="btn btn-ghost btn-small" @click="logout()">Log Out</button>
-</div>
-</div>
-</nav>
-
-<!-- LANDING PAGE -->
-<div v-if="page==='landing'">
-<section class="hero">
-<div class="hero-bg"></div>
-<div class="hero-content">
-<h1>Trade Skills, <span>Build Community</span></h1>
-<p>Connect with people who want to learn what you know — and teach you what they know. No money needed, just skills and curiosity.</p>
-<div class="hero-btns">
-<button v-if="!currentUser" class="btn btn-primary" style="padding:1rem 2.5rem;font-size:1.1rem" @click="showSignup=true"><i class="fas fa-rocket"></i> Get Started Free</button>
-<button v-else class="btn btn-primary" style="padding:1rem 2.5rem;font-size:1.1rem" @click="page='browse'"><i class="fas fa-search"></i> Browse Members</button>
-<button class="btn btn-outline" style="padding:1rem 2.5rem;font-size:1.1rem" @click="page='browse'">Explore Skills</button>
-</div>
-</div>
-<div class="hero-img"><img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80" alt="People learning"></div>
-</section>
-
-<div class="section">
-<div class="stats-bar">
-<div class="stat-card scroll-reveal"><i class="fas fa-users"></i><div class="stat-number">{{users.length}}</div><div class="stat-label">Active Members</div></div>
-<div class="stat-card scroll-reveal"><i class="fas fa-lightbulb"></i><div class="stat-number">{{allSkills.length}}</div><div class="stat-label">Skills Listed</div></div>
-<div class="stat-card scroll-reveal"><i class="fas fa-comments"></i><div class="stat-number">{{messages.length}}</div><div class="stat-label">Messages Sent</div></div>
-<div class="stat-card scroll-reveal"><i class="fas fa-calendar-check"></i><div class="stat-number">{{bookings.length}}</div><div class="stat-label">Sessions Booked</div></div>
-</div>
-</div>
-
-<div class="section" style="background:linear-gradient(135deg,#f0fdf4,#e0f2fe);border-radius:30px;margin:0 2rem 4rem;padding:4rem 2rem">
-<div class="section-title"><h2>How It Works</h2><p>Three simple steps to start swapping skills</p></div>
-<div class="steps">
-<div class="step-card scroll-reveal"><div class="step-number">1</div><h3>Create Your Profile</h3><p>Sign up and list the skills you can teach and the ones you want to learn. Everyone starts with 25 free credits.</p></div>
-<div class="step-card scroll-reveal"><div class="step-number">2</div><h3>Find & Connect</h3><p>Browse members by skill, send messages, and book sessions. Learn from real people in your community.</p></div>
-<div class="step-card scroll-reveal"><div class="step-number">3</div><h3>Teach & Earn</h3><p>After each session, leave a review. Teachers earn credits based on session length and rating.</p></div>
-</div>
-</div>
-
-<div class="section">
-<div class="section-title"><h2>Popular Skill Categories</h2><p>Explore what our community has to offer</p></div>
-<div class="categories-grid">
-<span class="category-pill" v-for="cat in categories" :key="cat" :class="{active:selectedCategory===cat}" @click="selectedCategory=cat">{{cat}}</span>
-</div>
-<div class="feature-cards">
-<div class="feature-card scroll-reveal"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80" alt="Technical"><div class="feature-card-content"><h3>Technical Skills</h3><p>Programming, data science, web development, and more. Learn from working professionals.</p></div></div>
-<div class="feature-card scroll-reveal"><img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&q=80" alt="Creative"><div class="feature-card-content"><h3>Creative Arts</h3><p>Photography, design, music, writing. Unleash your creative potential.</p></div></div>
-<div class="feature-card scroll-reveal"><img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&q=80" alt="Languages"><div class="feature-card-content"><h3>Languages</h3><p>Spanish, French, Mandarin, Japanese. Practice with native speakers.</p></div></div>
-</div>
-</div>
-
-<div class="section" style="background:white;border-radius:30px;margin:0 2rem 4rem;padding:4rem 2rem;box-shadow:0 4px 20px rgba(0,0,0,0.06)">
-<div class="section-title"><h2>Frequently Asked Questions</h2></div>
-<div class="faq-grid">
-<div class="faq-card scroll-reveal"><h4><i class="fas fa-coins"></i> Is SkillSwap free?</h4><p>Yes! Everyone starts with 25 free credits. You earn more by teaching others and receiving good reviews. No money ever changes hands.</p></div>
-<div class="faq-card scroll-reveal"><h4><i class="fas fa-user-check"></i> Who can join?</h4><p>Anyone with a skill to share or a desire to learn. Whether you are a professional, student, hobbyist, or retiree.</p></div>
-<div class="faq-card scroll-reveal"><h4><i class="fas fa-video"></i> How do sessions work?</h4><p>Find someone with the skill you want, send them a message, and book a time. Sessions can be in-person or virtual.</p></div>
-<div class="faq-card scroll-reveal"><h4><i class="fas fa-shield-alt"></i> Is it safe?</h4><p>All members have public profiles with reviews. Start with short sessions, meet in public places, and trust your instincts.</p></div>
-</div>
-</div>
-
-<div class="section" style="text-align:center;padding:6rem 2rem">
-<h2 class="section-title" style="font-size:3rem">Ready to Start?</h2>
-<p class="section-subtitle" style="font-size:1.2rem">Join the community today. Your next skill is one message away.</p>
-<button v-if="!currentUser" class="btn btn-primary" style="padding:1.2rem 3rem;font-size:1.2rem" @click="showSignup=true">Join SkillSwap Free</button>
-<button v-else class="btn btn-primary" style="padding:1.2rem 3rem;font-size:1.2rem" @click="page='browse'">Browse Members</button>
-</div>
-</div>
-
-<!-- BROWSE PAGE -->
-<div v-if="page==='browse'" class="section" style="padding-top:100px">
-<div class="section-title"><h2>Browse Members</h2><p>Find someone to learn from or teach</p></div>
-<div class="search-bar"><i class="fas fa-search"></i><input v-model="searchQuery" placeholder="Search by name, skill, or keyword..."></div>
-<div class="categories-grid" style="margin-bottom:2rem">
-<span class="category-pill" :class="{active:!selectedCategory}" @click="selectedCategory=''">All</span>
-<span class="category-pill" v-for="cat in categories.slice(1)" :key="cat" :class="{active:selectedCategory===cat}" @click="selectedCategory=cat">{{cat}}</span>
-</div>
-<div v-if="loading" class="empty-state"><div class="loading-spinner" style="margin:2rem auto"></div><p>Loading members...</p></div>
-<div v-else-if="filteredUsers.length===0" class="empty-state"><i class="fas fa-search"></i><h3>No members found</h3><p>Be the first to join! Sign up and start the community.</p><button v-if="!currentUser" class="btn btn-primary" @click="showSignup=true">Sign Up Now</button></div>
-<div v-else class="members-grid">
-<div class="member-card scroll-reveal" v-for="user in filteredUsers" :key="user.id" @click="viewProfile(user)">
-<div class="member-card-img"><div class="avatar-large">{{user.name?user.name.charAt(0).toUpperCase():'?'}}</div></div>
-<div class="member-info">
-<h4>{{user.name}}</h4>
-<div class="role">{{(user.skills||[])[0]||'Member'}}</div>
-<div class="member-skills"><span class="skill-tag" v-for="s in (user.skills||[]).slice(0,4)" :key="s">{{s}}</span></div>
-<div class="member-rating"><span class="stars">{{'★'.repeat(Math.round(user.avgRating||0))}}</span><span>{{(user.reviews||[]).length}} reviews</span></div>
-<div class="member-actions">
-<button class="btn btn-primary btn-small" @click.stop="startChat(user)"><i class="fas fa-comment"></i> Message</button>
-<button class="btn btn-outline btn-small" @click.stop="viewProfile(user)"><i class="fas fa-user"></i> View</button>
-</div>
-</div>
-</div>
-</div>
-</div>
-
-<!-- PROFILE PAGE -->
-<div v-if="page==='profile'" style="padding-top:100px">
-<div v-if="!currentUser" class="section">
-<div class="empty-state"><i class="fas fa-lock"></i><h3>Not logged in</h3><p>Log in or sign up to view your profile.</p><button class="btn btn-primary" @click="showLogin=true">Log In</button></div>
-</div>
-<div v-else>
-<div class="profile-header">
-<div class="profile-avatar-large">{{currentUser.name?currentUser.name.charAt(0).toUpperCase():'?'}}</div>
-<h2>{{currentUser.name}}</h2>
-<p>{{currentUser.email}}</p>
-<div class="profile-stats">
-<span class="profile-stat"><i class="fas fa-coins" style="margin-right:6px"></i>{{currentUser.credits||0}} Credits</span>
-<span class="profile-stat"><i class="fas fa-star" style="margin-right:6px"></i>{{getAvgRating(currentUser.id).toFixed(1)}} Rating</span>
-<span class="profile-stat">{{(currentUser.skills||[]).length}} Skills</span>
-</div>
-</div>
-<div class="profile-body">
-<div class="profile-section"><h3><i class="fas fa-graduation-cap"></i> Skills I Can Teach</h3><div class="member-skills"><span class="skill-tag" v-for="s in currentUser.skills||[]" :key="s">{{s}}</span><span v-if="!(currentUser.skills||[]).length" style="color:var(--gray-400)">No skills added yet.</span></div></div>
-<div class="profile-section"><h3><i class="fas fa-search"></i> Skills I Want to Learn</h3><div class="member-skills"><span class="skill-tag" v-for="s in currentUser.wants||[]" :key="s">{{s}}</span><span v-if="!(currentUser.wants||[]).length" style="color:var(--gray-400)">No learning goals yet.</span></div></div>
-<div class="profile-section"><h3><i class="fas fa-info-circle"></i> Bio</h3><p>{{currentUser.bio||'No bio yet. Edit your profile to tell people about yourself.'}}</p></div>
-<div class="profile-section">
-<h3><i class="fas fa-star"></i> My Reviews ({{getReviewCount(currentUser.id)}})</h3>
-<div v-if="!getUserReviews(currentUser.id).length" style="color:var(--gray-400)">No reviews yet. Teach a session to get your first review!</div>
-<div v-for="review in getUserReviews(currentUser.id)" :key="review.id" class="review-item">
-<div class="review-header"><span class="review-author">{{review.from_name}}</span><span class="review-stars">{{'★'.repeat(review.rating)}}{{'☆'.repeat(5-review.rating)}}</span></div>
-<div class="review-text">{{review.text}}</div>
-<div class="review-meta">{{review.skill}} &bull; {{review.duration}} min &bull; {{formatTime(review.created_at)}}</div>
-</div>
-</div>
-<div class="profile-section">
-<h3><i class="fas fa-share-alt"></i> Share Your Profile</h3>
-<p style="color:var(--gray-500);margin-bottom:1rem">Share this code with friends so they can find you on SkillSwap.</p>
-<div class="share-box"><p>Your Share Code:</p><div class="share-code">{{generateShareCode()}}</div><button class="btn btn-primary btn-small" @click="copyShareCode"><i class="fas fa-copy"></i> Copy Code</button></div>
-</div>
-<div style="display:flex;gap:12px;margin-top:24px;flex-wrap:wrap">
-<button class="btn btn-primary" @click="editProfile"><i class="fas fa-edit"></i> Edit Profile</button>
-<button class="btn btn-outline" @click="showAddFriend=true"><i class="fas fa-user-plus"></i> Add Friend</button>
-<button class="btn btn-danger" @click="showDeleteAccount=true"><i class="fas fa-trash-alt"></i> Delete Account</button>
-</div>
-</div>
-</div>
-</div>
-
-<!-- VIEW OTHER PROFILE -->
-<div v-if="page==='viewProfile'&&viewingUser" style="padding-top:100px">
-<div class="section">
-<button class="btn btn-ghost btn-small" @click="page='browse'" style="margin-bottom:1rem"><i class="fas fa-arrow-left"></i> Back to Browse</button>
-<div class="profile-header">
-<div class="profile-avatar-large">{{viewingUser.name?viewingUser.name.charAt(0).toUpperCase():'?'}}</div>
-<h2>{{viewingUser.name}}</h2>
-<div class="profile-stats">
-<span class="profile-stat"><i class="fas fa-star" style="margin-right:6px"></i>{{getAvgRating(viewingUser.id).toFixed(1)}} Rating</span>
-<span class="profile-stat">{{getReviewCount(viewingUser.id)}} Reviews</span>
-<span class="profile-stat">{{(viewingUser.skills||[]).length}} Skills</span>
-</div>
-</div>
-<div class="profile-body">
-<div class="profile-section"><h3><i class="fas fa-graduation-cap"></i> Skills They Teach</h3><div class="member-skills"><span class="skill-tag" v-for="s in viewingUser.skills||[]" :key="s">{{s}}</span></div></div>
-<div class="profile-section"><h3><i class="fas fa-search"></i> Skills They Want</h3><div class="member-skills"><span class="skill-tag" v-for="s in viewingUser.wants||[]" :key="s">{{s}}</span></div></div>
-<div class="profile-section"><h3><i class="fas fa-info-circle"></i> Bio</h3><p>{{viewingUser.bio||'No bio yet.'}}</p></div>
-<div class="profile-section">
-<h3><i class="fas fa-star"></i> Reviews ({{getReviewCount(viewingUser.id)}})</h3>
-<div v-if="!getUserReviews(viewingUser.id).length" style="color:var(--gray-400)">No reviews yet.</div>
-<div v-for="review in getUserReviews(viewingUser.id)" :key="review.id" class="review-item">
-<div class="review-header"><span class="review-author">{{review.from_name}}</span><span class="review-stars">{{'★'.repeat(review.rating)}}{{'☆'.repeat(5-review.rating)}}</span></div>
-<div class="review-text">{{review.text}}</div>
-<div class="review-meta">{{review.skill}} &bull; {{review.duration}} min &bull; {{formatTime(review.created_at)}}</div>
-</div>
-</div>
-<div style="display:flex;gap:12px;margin-top:24px;flex-wrap:wrap" v-if="currentUser&&currentUser.id!==viewingUser.id">
-<button class="btn btn-primary" @click="startChat(viewingUser)"><i class="fas fa-comment"></i> Message</button>
-<button class="btn btn-outline" @click="showBooking=true;bookingTo=viewingUser"><i class="fas fa-calendar"></i> Book Session</button>
-<button class="btn btn-outline" @click="showReviewModal=true;reviewTo=viewingUser"><i class="fas fa-star"></i> Leave Review</button>
-</div>
-</div>
-</div>
-</div>
-
-<!-- LOGIN MODAL -->
-<div class="modal-overlay" v-if="showLogin" @click.self="showLogin=false">
-<div class="modal">
-<button class="modal-close" @click="showLogin=false">&times;</button>
-<h2>Welcome Back</h2>
-<p class="subtitle">Log in to your SkillSwap account</p>
-<div class="form-group"><label>Email</label><input type="email" v-model="loginEmail" placeholder="you@example.com" @keyup.enter="handleLogin"></div>
-<div class="form-group"><label>Password</label><input type="password" v-model="loginPassword" placeholder="Your password" @keyup.enter="handleLogin"></div>
-<div v-if="loginError" class="error-msg">{{loginError}}</div>
-<div class="modal-actions"><button class="btn btn-outline" @click="showLogin=false">Cancel</button><button class="btn btn-primary" @click="handleLogin" :disabled="loginLoading">{{loginLoading?'Logging in...':'Log In'}}</button></div>
-<p class="switch-link">Don't have an account? <a @click="showLogin=false;showSignup=true">Sign Up</a></p>
-</div>
-</div>
-
-<!-- SIGNUP MODAL -->
-<div class="modal-overlay" v-if="showSignup" @click.self="showSignup=false">
-<div class="modal" style="max-width:550px">
-<button class="modal-close" @click="showSignup=false">&times;</button>
-<h2>Join SkillSwap</h2>
-<p class="subtitle">Create your free account and get 25 credits</p>
-<div class="form-row">
-<div class="form-group"><label>Full Name *</label><input type="text" v-model="signupName" placeholder="Your name"></div>
-<div class="form-group"><label>Age</label><input type="number" v-model="signupAge" placeholder="25"></div>
-</div>
-<div class="form-group"><label>Email *</label><input type="email" v-model="signupEmail" placeholder="you@example.com"></div>
-<div class="form-group"><label>Password * (min 4 chars)</label><input type="password" v-model="signupPassword" placeholder="Create a password"></div>
-<div class="form-group"><label>Phone</label><input type="tel" v-model="signupPhone" placeholder="(555) 123-4567"></div>
-<div class="form-group"><label>Skills You Can Teach</label><input type="text" v-model="newSkill" @keyup.enter="addSkill" placeholder="e.g. Python, Guitar... Press Enter to add"><div class="member-skills" style="margin-top:8px"><span class="skill-tag" v-for="(s,i) in signupSkills" :key="i">{{s}} <i class="fas fa-times" style="cursor:pointer;margin-left:4px" @click="signupSkills.splice(i,1)"></i></span></div></div>
-<div class="form-group"><label>Skills You Want to Learn</label><input type="text" v-model="newWant" @keyup.enter="addWant" placeholder="e.g. Spanish, Cooking... Press Enter to add"><div class="member-skills" style="margin-top:8px"><span class="skill-tag" v-for="(s,i) in signupWants" :key="i">{{s}} <i class="fas fa-times" style="cursor:pointer;margin-left:4px" @click="signupWants.splice(i,1)"></i></span></div></div>
-<div class="form-group"><label>Bio</label><textarea v-model="signupBio" placeholder="Tell us about yourself..."></textarea></div>
-<div v-if="signupError" class="error-msg">{{signupError}}</div>
-<div class="modal-actions"><button class="btn btn-outline" @click="showSignup=false">Cancel</button><button class="btn btn-primary" @click="handleSignup" :disabled="signupLoading">{{signupLoading?'Creating...':'Create Account'}}</button></div>
-<p class="switch-link">Already have an account? <a @click="showSignup=false;showLogin=true">Log In</a></p>
-</div>
-</div>
-
-<!-- EDIT PROFILE MODAL -->
-<div class="modal-overlay" v-if="showEditProfile" @click.self="showEditProfile=false">
-<div class="modal" style="max-width:550px">
-<button class="modal-close" @click="showEditProfile=false">&times;</button>
-<h2>Edit Profile</h2>
-<div class="form-group"><label>Name</label><input type="text" v-model="editName"></div>
-<div class="form-group"><label>Phone</label><input type="tel" v-model="editPhone"></div>
-<div class="form-group"><label>Age</label><input type="number" v-model="editAge"></div>
-<div class="form-group"><label>Skills You Can Teach</label><input type="text" v-model="newEditSkill" @keyup.enter="addEditSkill" placeholder="Press Enter to add"><div class="member-skills" style="margin-top:8px"><span class="skill-tag" v-for="(s,i) in editSkills" :key="i">{{s}} <i class="fas fa-times" style="cursor:pointer;margin-left:4px" @click="editSkills.splice(i,1)"></i></span></div></div>
-<div class="form-group"><label>Skills You Want to Learn</label><input type="text" v-model="newEditWant" @keyup.enter="addEditWant" placeholder="Press Enter to add"><div class="member-skills" style="margin-top:8px"><span class="skill-tag" v-for="(s,i) in editWants" :key="i">{{s}} <i class="fas fa-times" style="cursor:pointer;margin-left:4px" @click="editWants.splice(i,1)"></i></span></div></div>
-<div class="form-group"><label>Bio</label><textarea v-model="editBio"></textarea></div>
-<div class="modal-actions"><button class="btn btn-outline" @click="showEditProfile=false">Cancel</button><button class="btn btn-primary" @click="saveProfile" :disabled="editLoading">{{editLoading?'Saving...':'Save Changes'}}</button></div>
-</div>
-</div>
-
-<!-- BOOKING MODAL -->
-<div class="modal-overlay" v-if="showBooking" @click.self="showBooking=false">
-<div class="modal">
-<button class="modal-close" @click="showBooking=false">&times;</button>
-<h2>Book a Session</h2>
-<p class="subtitle">With {{bookingTo?bookingTo.name:''}}</p>
-<div class="form-group"><label>Skill to Learn</label><select v-model="bookingSkill"><option v-for="skill in (bookingTo?bookingTo.skills:[])" :key="skill" :value="skill">{{skill}}</option></select></div>
-<div class="form-row">
-<div class="form-group"><label>Date</label><input type="date" v-model="bookingDate"></div>
-<div class="form-group"><label>Time</label><input type="time" v-model="bookingTime"></div>
-</div>
-<div class="form-group"><label>Duration (minutes)</label><input type="number" v-model="bookingDuration" placeholder="60" min="15" max="240"></div>
-<div class="form-group"><label>Message</label><textarea v-model="bookingMessage" placeholder="Hi! I would like to learn..."></textarea></div>
-<div class="modal-actions"><button class="btn btn-outline" @click="showBooking=false">Cancel</button><button class="btn btn-primary" @click="confirmBooking" :disabled="bookingLoading">{{bookingLoading?'Sending...':'Send Request'}}</button></div>
-</div>
-</div>
-
-<!-- REVIEW MODAL -->
-<div class="modal-overlay" v-if="showReviewModal" @click.self="showReviewModal=false">
-<div class="modal">
-<button class="modal-close" @click="showReviewModal=false">&times;</button>
-<h2>Leave a Review</h2>
-<p class="subtitle">Reviewing {{reviewTo?reviewTo.name:''}}</p>
-<div class="credit-preview"><div class="amount">{{calculateCredits()}}</div><p>credits they'll earn</p></div>
-<div class="form-group"><label>Rating</label><div class="star-rating"><span v-for="n in 5" :key="n" class="star" :class="{active:reviewRating>=n}" @click="reviewRating=n"><i :class="n<=reviewRating?'fas fa-star':'far fa-star'"></i></span></div></div>
-<div class="form-group"><label>Session Duration (minutes)</label><input type="number" v-model="reviewDuration" placeholder="60" min="5" max="240"></div>
-<div class="form-group"><label>Skill Taught</label><input type="text" v-model="reviewSkill" placeholder="What did they teach you?"></div>
-<div class="form-group"><label>Your Review</label><textarea v-model="reviewText" placeholder="How was the session?"></textarea></div>
-<div class="modal-actions"><button class="btn btn-outline" @click="showReviewModal=false">Cancel</button><button class="btn btn-primary" @click="submitReview" :disabled="reviewLoading">{{reviewLoading?'Submitting...':'Submit Review'}}</button></div>
-</div>
-</div>
-
-<!-- DELETE ACCOUNT MODAL -->
-<div class="modal-overlay" v-if="showDeleteAccount" @click.self="showDeleteAccount=false">
-<div class="modal">
-<button class="modal-close" @click="showDeleteAccount=false">&times;</button>
-<h2><i class="fas fa-exclamation-triangle" style="color:var(--red);margin-right:8px"></i>Delete Account</h2>
-<p class="subtitle">This action cannot be undone. All your data will be permanently removed.</p>
-<div class="delete-warning"><p><i class="fas fa-exclamation-circle"></i>Warning: This will delete your profile, messages, reviews, and bookings forever.</p></div>
-<div class="form-group"><label>Type "DELETE" to confirm</label><input type="text" v-model="deleteConfirmText" placeholder="DELETE"></div>
-<div v-if="deleteError" class="error-msg">{{deleteError}}</div>
-<div class="modal-actions"><button class="btn btn-outline" @click="showDeleteAccount=false">Cancel</button><button class="btn btn-danger" @click="deleteAccount" :disabled="deleteLoading||deleteConfirmText!=='DELETE'">{{deleteLoading?'Deleting...':'Permanently Delete Account'}}</button></div>
-</div>
-</div>
-
-<!-- ADD FRIEND MODAL -->
-<div class="modal-overlay" v-if="showAddFriend" @click.self="showAddFriend=false">
-<div class="modal">
-<button class="modal-close" @click="showAddFriend=false">&times;</button>
-<h2>Add Friend</h2>
-<p class="subtitle">Paste your friend's share code to add them to your contacts.</p>
-<div class="form-group"><label>Friend's Share Code</label><textarea v-model="friendCode" rows="3" placeholder="Paste the code here..."></textarea></div>
-<div v-if="addFriendError" class="error-msg">{{addFriendError}}</div>
-<div v-if="addFriendSuccess" style="color:var(--green);margin-bottom:1rem">{{addFriendSuccess}}</div>
-<div class="modal-actions"><button class="btn btn-outline" @click="showAddFriend=false">Cancel</button><button class="btn btn-primary" @click="addFriendFromCode">Add Friend</button></div>
-</div>
-</div>
-
-<!-- CHAT OVERLAY -->
-<div class="chat-overlay" v-if="showChat" @click.self="showChat=false">
-<div class="chat-container">
-<div class="chat-sidebar">
-<div class="chat-sidebar-header"><h3><i class="fas fa-comments" style="margin-right:8px"></i>Conversations</h3></div>
-<div class="chat-conversations">
-<div v-for="contact in chatContacts" :key="contact.id" class="chat-conv-item" :class="{active:chatWith&&chatWith.id===contact.id}" @click="openChat(contact)">
-<div class="chat-conv-avatar">{{contact.name?contact.name.charAt(0).toUpperCase():'?'}}</div>
-<div class="chat-conv-info"><p>{{contact.name}}</p><span>{{lastMessagePreview(contact.id)}}</span></div>
-<div v-if="contact.unread" class="chat-conv-unread"></div>
-</div>
-<div v-if="!chatContacts.length" style="padding:20px;text-align:center;color:var(--gray-400);font-size:0.85rem">No conversations yet</div>
-</div>
-</div>
-<div class="chat-main" v-if="chatWith">
-<div class="chat-header">
-<div class="chat-header-info">
-<div class="chat-header-avatar">{{chatWith.name?chatWith.name.charAt(0).toUpperCase():'?'}}</div>
-<div><div class="chat-header-name">{{chatWith.name}}</div><div class="chat-header-status"><span style="width:8px;height:8px;background:#22c55e;border-radius:50%;display:inline-block;margin-right:4px"></span>Online</div></div>
-</div>
-<div style="display:flex;gap:8px">
-<button class="btn btn-outline btn-small" @click="showReviewModal=true;reviewTo=chatWith" v-if="currentUser&&currentUser.id!==chatWith.id"><i class="fas fa-star"></i> Review</button>
-<button class="btn btn-ghost btn-small" @click="showChat=false"><i class="fas fa-times"></i></button>
-</div>
-</div>
-<div class="chat-messages" ref="chatMessagesRef">
-<div v-for="msg in currentChatMessages" :key="msg.id" class="chat-msg" :class="msg.sender_id===currentUser.id?'sent':'received'">
-<div>{{msg.text}}</div>
-<div class="chat-msg-time">{{formatTime(msg.created_at)}}</div>
-</div>
-<div v-if="typing" class="typing-indicator"><span></span><span></span><span></span></div>
-</div>
-<div class="chat-input-area">
-<input type="text" class="chat-input" v-model="chatInput" @keyup.enter="sendMessage" placeholder="Type a message...">
-<button class="chat-send-btn" @click="sendMessage"><i class="fas fa-paper-plane"></i></button>
-</div>
-</div>
-<div class="chat-main" v-else style="align-items:center;justify-content:center;color:var(--gray-400);display:flex">
-<p>Select a conversation to start chatting</p>
-</div>
-</div>
-</div>
-
-<footer class="footer">
-<h3>SkillSwap</h3>
-<p>Learn. Teach. Grow. Together.</p>
-<div class="footer-links">
-<span class="footer-link" @click="page='landing'">Home</span>
-<span class="footer-link" @click="page='browse'">Browse</span>
-<span class="footer-link" @click="page='profile'" v-if="currentUser">My Profile</span>
-</div>
-<p style="font-size:0.85rem;opacity:0.5">&copy; 2026 SkillSwap. Built with Supabase.</p>
-</footer>
-</div>
-
-<script>
-const { createApp, ref, computed, onMounted, nextTick } = Vue;
-
-// Supabase config - use 'sb' to avoid shadowing the global 'supabase' object
-const SUPABASE_URL = 'https://sgyugzriwxljaiwbsogg.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNneXVnenJpd3hsamFpd2Jzb2dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4MzIyNTAsImV4cCI6MjEwMDQwODI1MH0.2XfwboDhKhWTGEaJdnyFJKd5YJUuY-8D0HUxByD8bWk';
-
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-createApp({
-  setup() {
-    // Core state
-    const loading = ref(true);
-    const page = ref('landing');
-    const currentUser = ref(null);
-    const users = ref([]);
-    const messages = ref([]);
-    const reviews = ref([]);
-    const bookings = ref([]);
-    const notifications = ref([]);
-    const toasts = ref([]);
-    const setupError = ref(false);
-
-    // UI state
-    const searchQuery = ref('');
-    const selectedCategory = ref('');
-    const showLogin = ref(false);
-    const showSignup = ref(false);
-    const showEditProfile = ref(false);
-    const showBooking = ref(false);
-    const showReviewModal = ref(false);
-    const showAddFriend = ref(false);
-    const showChat = ref(false);
-    const showNotifDropdown = ref(false);
-    const showDeleteAccount = ref(false);
-    const scrolled = ref(false);
-    const viewingUser = ref(null);
-
-    // Login
-    const loginEmail = ref('');
-    const loginPassword = ref('');
-    const loginError = ref('');
-    const loginLoading = ref(false);
-
-    // Signup
-    const signupName = ref('');
-    const signupEmail = ref('');
-    const signupPassword = ref('');
-    const signupPhone = ref('');
-    const signupAge = ref('');
-    const signupSkills = ref([]);
-    const signupWants = ref([]);
-    const signupBio = ref('');
-    const newSkill = ref('');
-    const newWant = ref('');
-    const signupError = ref('');
-    const signupLoading = ref(false);
-
-    // Edit
-    const editName = ref('');
-    const editPhone = ref('');
-    const editAge = ref('');
-    const editSkills = ref([]);
-    const editWants = ref([]);
-    const editBio = ref('');
-    const newEditSkill = ref('');
-    const newEditWant = ref('');
-    const editLoading = ref(false);
-
-    // Booking
-    const bookingTo = ref(null);
-    const bookingSkill = ref('');
-    const bookingDate = ref('');
-    const bookingTime = ref('');
-    const bookingDuration = ref(60);
-    const bookingMessage = ref('');
-    const bookingLoading = ref(false);
-
-    // Review
-    const reviewTo = ref(null);
-    const reviewRating = ref(5);
-    const reviewDuration = ref(60);
-    const reviewSkill = ref('');
-    const reviewText = ref('');
-    const reviewLoading = ref(false);
-
-    // Chat
-    const chatWith = ref(null);
-    const chatInput = ref('');
-    const typing = ref(false);
-    const friendCode = ref('');
-    const addFriendError = ref('');
-    const addFriendSuccess = ref('');
-
-    // Delete account
-    const deleteConfirmText = ref('');
-    const deleteError = ref('');
-    const deleteLoading = ref(false);
-
-    const categories = ['All','Programming','Design','Music','Languages','Cooking','Fitness','Photography','Business','Writing','Math','Art'];
-
-    // ========== COMPUTED ==========
-    const isLoggedIn = computed(() => !!currentUser.value);
-
-    const filteredUsers = computed(() => {
-      let list = [...users.value];
-      if (searchQuery.value) {
-        const q = searchQuery.value.toLowerCase();
-        list = list.filter(u => (u.name||'').toLowerCase().includes(q) || (u.skills||[]).some(s => s.toLowerCase().includes(q)) || (u.bio||'').toLowerCase().includes(q));
-      }
-      if (selectedCategory.value && selectedCategory.value !== 'All') {
-        list = list.filter(u => (u.skills||[]).some(s => s.toLowerCase().includes(selectedCategory.value.toLowerCase())));
-      }
-      return list;
-    });
-
-    const allSkills = computed(() => {
-      const set = new Set();
-      users.value.forEach(u => (u.skills||[]).forEach(s => set.add(s)));
-      return Array.from(set);
-    });
-
-    const unreadCount = computed(() => notifications.value.filter(n => !n.read).length);
-
-    const chatContacts = computed(() => {
-      if (!currentUser.value) return [];
-      const map = new Map();
-      messages.value.forEach(m => {
-        if (m.sender_id === currentUser.value.id) {
-          if (!map.has(m.receiver_id)) map.set(m.receiver_id, {lastText: m.text, lastTime: m.created_at, unread: 0});
-          else { const e = map.get(m.receiver_id); if (new Date(m.created_at) > new Date(e.lastTime)) { e.lastText = m.text; e.lastTime = m.created_at; }}
-        }
-        if (m.receiver_id === currentUser.value.id) {
-          if (!map.has(m.sender_id)) map.set(m.sender_id, {lastText: m.text, lastTime: m.created_at, unread: m.read ? 0 : 1});
-          else { const e = map.get(m.sender_id); if (new Date(m.created_at) > new Date(e.lastTime)) { e.lastText = m.text; e.lastTime = m.created_at; } if (!m.read) e.unread++; }
-        }
+  computed: {
+    filteredUsers() {
+      if (!this.searchQuery) return this.users.filter(u => u.id !== this.currentUser?.id);
+      const q = this.searchQuery.toLowerCase();
+      return this.users.filter(u => {
+        if (u.id === this.currentUser?.id) return false;
+        return (u.name||'').toLowerCase().includes(q) ||
+               (u.skills||[]).some(s => s.toLowerCase().includes(q)) ||
+               (u.wants||[]).some(s => s.toLowerCase().includes(q));
       });
-      return Array.from(map.entries()).map(([id, data]) => {
-        const user = users.value.find(u => u.id === id);
-        return user ? { ...user, ...data } : null;
-      }).filter(Boolean).sort((a,b) => new Date(b.lastTime) - new Date(a.lastTime));
-    });
-
-    const currentChatMessages = computed(() => {
-      if (!chatWith.value || !currentUser.value) return [];
-      return messages.value.filter(m =>
-        (m.sender_id === currentUser.value.id && m.receiver_id === chatWith.value.id) ||
-        (m.sender_id === chatWith.value.id && m.receiver_id === currentUser.value.id)
+    },
+    currentChatMessages() {
+      if (!this.chatWith || !this.currentUser) return [];
+      return this.messages.filter(m => 
+        (m.sender_id === this.currentUser.id && m.receiver_id === this.chatWith.id) ||
+        (m.sender_id === this.chatWith.id && m.receiver_id === this.currentUser.id)
       ).sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
-    });
-
-    // ========== HELPERS ==========
-    function showToast(message, type='success') {
-      const id = Date.now() + Math.random();
-      toasts.value.push({ id, message, type });
-      setTimeout(() => { toasts.value = toasts.value.filter(t => t.id !== id); }, 4000);
     }
+  },
 
-    function formatTime(dateStr) {
-      if (!dateStr) return '';
-      const d = new Date(dateStr);
-      return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-    }
+  async mounted() {
+    // Check if tables exist
+    await this.checkSetup();
 
-    function generateShareCode() {
-      if (!currentUser.value) return '';
-      return btoa(JSON.stringify({id: currentUser.value.id, name: currentUser.value.name, email: currentUser.value.email}));
-    }
-
-    function copyShareCode() {
-      navigator.clipboard.writeText(generateShareCode());
-      showToast('Share code copied to clipboard!');
-    }
-
-    function addSkill() {
-      if (newSkill.value.trim() && !signupSkills.value.includes(newSkill.value.trim())) {
-        signupSkills.value.push(newSkill.value.trim());
-        newSkill.value = '';
-      }
-    }
-
-    function addWant() {
-      if (newWant.value.trim() && !signupWants.value.includes(newWant.value.trim())) {
-        signupWants.value.push(newWant.value.trim());
-        newWant.value = '';
-      }
-    }
-
-    function addEditSkill() {
-      if (newEditSkill.value.trim() && !editSkills.value.includes(newEditSkill.value.trim())) {
-        editSkills.value.push(newEditSkill.value.trim());
-        newEditSkill.value = '';
-      }
-    }
-
-    function addEditWant() {
-      if (newEditWant.value.trim() && !editWants.value.includes(newEditWant.value.trim())) {
-        editWants.value.push(newEditWant.value.trim());
-        newEditWant.value = '';
-      }
-    }
-
-    function calculateCredits() {
-      const d = parseInt(reviewDuration.value) || 0;
-      const r = parseInt(reviewRating.value) || 0;
-      return Math.round((d / 10) * r);
-    }
-
-    function lastMessagePreview(userId) {
-      if (!currentUser.value) return '';
-      const msgs = messages.value.filter(m =>
-        (m.sender_id === currentUser.value.id && m.receiver_id === userId) ||
-        (m.sender_id === userId && m.receiver_id === currentUser.value.id)
-      ).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-      return msgs.length ? msgs[0].text.substring(0, 30) + (msgs[0].text.length > 30 ? '...' : '') : 'No messages yet';
-    }
-
-    function getAvgRating(userId) {
-      const rs = reviews.value.filter(r => r.to_id === userId);
-      if (!rs.length) return 0;
-      return rs.reduce((a,b) => a + b.rating, 0) / rs.length;
-    }
-
-    function getReviewCount(userId) {
-      return reviews.value.filter(r => r.to_id === userId).length;
-    }
-
-    function getUserReviews(userId) {
-      return reviews.value.filter(r => r.to_id === userId).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-    }
-
-    function getUserName(id) {
-      const u = users.value.find(x => x.id === id);
-      return u ? u.name : 'Unknown';
-    }
-
-    // ========== SUPABASE DATA ==========
-    async function loadAllData() {
+    // Load saved session
+    const saved = localStorage.getItem('skillswap_user');
+    if (saved) {
       try {
-        const [{data:u, error:eu}, {data:m, error:em}, {data:r, error:er}, {data:b, error:eb}, {data:n, error:en}] = await Promise.all([
-          sb.from('users').select('*').order('created_at', {ascending:false}),
-          sb.from('messages').select('*').order('created_at', {ascending:true}),
-          sb.from('reviews').select('*').order('created_at', {ascending:false}),
-          sb.from('bookings').select('*').order('created_at', {ascending:false}),
-          sb.from('notifications').select('*').order('created_at', {ascending:false}),
-        ]);
+        this.currentUser = JSON.parse(saved);
+        await this.loadUsers();
+        await this.loadBookings();
+        this.subscribeMessages();
+      } catch(e) {
+        localStorage.removeItem('skillswap_user');
+      }
+    }
+  },
 
-        // Check for table not found errors
-        const tableErrors = [eu, em, er, eb, en].filter(e => e && (e.message?.includes('schema cache') || e.message?.includes('does not exist') || e.code === '42P01'));
-        if (tableErrors.length > 0) {
-          console.error('Table not found errors:', tableErrors);
-          setupError.value = true;
-          loading.value = false;
+  methods: {
+    async checkSetup() {
+      this.setupChecking = true;
+      this.setupError = '';
+      try {
+        const { error } = await sb.from('users').select('id').limit(1);
+        if (error && (error.message.includes('does not exist') || error.message.includes('schema cache') || error.code === '42P01')) {
+          this.showSetup = true;
+        } else {
+          this.showSetup = false;
+        }
+      } catch(e) {
+        this.showSetup = true;
+      }
+      this.setupChecking = false;
+    },
+
+    copySQL() {
+      navigator.clipboard.writeText(this.setupSQL).then(() => {
+        this.showToast('SQL copied to clipboard!', 'success');
+      });
+    },
+
+    async loadUsers() {
+      try {
+        const { data, error } = await sb.from('users').select('*');
+        if (error) throw error;
+        this.users = data || [];
+      } catch(e) {
+        console.error('loadUsers error:', e);
+      }
+    },
+
+    async loadBookings() {
+      if (!this.currentUser) return;
+      try {
+        const { data, error } = await sb.from('bookings').select('*').or('from_id.eq.'+this.currentUser.id+',to_id.eq.'+this.currentUser.id);
+        if (error) throw error;
+        this.bookings = data || [];
+      } catch(e) {
+        console.error('loadBookings error:', e);
+      }
+    },
+
+    async handleLogin() {
+      this.loginError = '';
+      if (!this.loginEmail || !this.loginPassword) {
+        this.loginError = 'Please fill in all fields';
+        return;
+      }
+      this.loginLoading = true;
+      try {
+        const { data, error } = await sb.from('users')
+          .select('*')
+          .eq('email', this.loginEmail)
+          .eq('password', this.loginPassword)
+          .single();
+        if (error || !data) {
+          this.loginError = 'Invalid email or password';
+          this.loginLoading = false;
           return;
         }
-
-        if (eu) console.error('users error:', eu);
-        if (em) console.error('messages error:', em);
-        if (er) console.error('reviews error:', er);
-        if (eb) console.error('bookings error:', eb);
-        if (en) console.error('notifications error:', en);
-
-        users.value = u || [];
-        messages.value = m || [];
-        reviews.value = r || [];
-        bookings.value = b || [];
-        notifications.value = n || [];
-        setupError.value = false;
-      } catch (e) {
-        console.error('loadAllData error:', e);
-        if (e.message?.includes('schema cache') || e.message?.includes('does not exist')) {
-          setupError.value = true;
-        }
-      } finally {
-        loading.value = false;
+        this.currentUser = data;
+        localStorage.setItem('skillswap_user', JSON.stringify(data));
+        this.showLogin = false;
+        this.showToast('Welcome back, ' + data.name + '!', 'success');
+        await this.loadUsers();
+        await this.loadBookings();
+        this.subscribeMessages();
+      } catch(e) {
+        this.loginError = 'Login failed: ' + e.message;
       }
-    }
+      this.loginLoading = false;
+    },
 
-    function setupRealtime() {
-      sb.channel('messages').on('postgres_changes', {event:'INSERT', schema:'public', table:'messages'}, (payload) => {
-        messages.value.push(payload.new);
-        if (chatWith.value && (payload.new.sender_id === chatWith.value.id || payload.new.receiver_id === chatWith.value.id)) {
-          nextTick(() => { const el = document.querySelector('.chat-messages'); if (el) el.scrollTop = el.scrollHeight; });
-        }
-        if (currentUser.value && payload.new.receiver_id === currentUser.value.id && payload.new.sender_id !== currentUser.value.id) {
-          showToast(`New message from ${getUserName(payload.new.sender_id)}`);
-        }
-      }).subscribe();
-      sb.channel('users').on('postgres_changes', {event:'*', schema:'public', table:'users'}, () => loadAllData()).subscribe();
-      sb.channel('reviews').on('postgres_changes', {event:'*', schema:'public', table:'reviews'}, () => loadAllData()).subscribe();
-      sb.channel('bookings').on('postgres_changes', {event:'*', schema:'public', table:'bookings'}, () => loadAllData()).subscribe();
-      sb.channel('notifications').on('postgres_changes', {event:'*', schema:'public', table:'notifications'}, () => loadAllData()).subscribe();
-    }
-
-    async function retryConnection() {
-      loading.value = true;
-      setupError.value = false;
-      await loadAllData();
-      if (!setupError.value) {
-        showToast('Connected to database successfully!');
-        setupRealtime();
-      }
-    }
-
-    // ========== AUTH ==========
-    async function handleSignup() {
-      signupError.value = '';
-      if (!signupName.value.trim() || !signupEmail.value.trim() || !signupPassword.value.trim()) {
-        signupError.value = 'Name, email, and password are required.'; return;
-      }
-      if (signupPassword.value.length < 4) {
-        signupError.value = 'Password must be at least 4 characters.'; return;
-      }
-      signupLoading.value = true;
-      const newUser = {
-        name: signupName.value.trim(),
-        email: signupEmail.value.trim().toLowerCase(),
-        password: signupPassword.value,
-        phone: signupPhone.value || null,
-        age: signupAge.value ? parseInt(signupAge.value) : null,
-        skills: signupSkills.value,
-        wants: signupWants.value,
-        bio: signupBio.value || null,
-        credits: 25,
-      };
-      const { data, error } = await sb.from('users').insert([newUser]).select().single();
-      signupLoading.value = false;
-      if (error) {
-        if (error.message?.includes('schema cache') || error.message?.includes('does not exist')) {
-          signupError.value = 'Database not set up. Please run the SQL setup script shown on the page.';
-          setupError.value = true;
-        } else {
-          signupError.value = error.message || 'Signup failed. Email may already exist.';
-        }
+    async handleSignup() {
+      this.signupError = '';
+      if (!this.signupName || !this.signupEmail || !this.signupPassword) {
+        this.signupError = 'Name, email, and password are required';
         return;
       }
-      currentUser.value = data;
-      showSignup.value = false;
-      showToast('Welcome to SkillSwap! You got 25 credits.');
-      await loadAllData();
-      await sb.from('notifications').insert([{user_id: data.id, text: 'Welcome to SkillSwap! Start browsing members to find someone to learn from.', icon: 'fas fa-rocket', read: false}]);
-    }
-
-    async function handleLogin() {
-      loginError.value = '';
-      if (!loginEmail.value.trim() || !loginPassword.value) {
-        loginError.value = 'Email and password required.'; return;
-      }
-      loginLoading.value = true;
-      const { data, error } = await sb.from('users').select('*').eq('email', loginEmail.value.trim().toLowerCase()).single();
-      loginLoading.value = false;
-      if (error) {
-        if (error.message?.includes('schema cache') || error.message?.includes('does not exist')) {
-          loginError.value = 'Database not set up. Please run the SQL setup script shown on the page.';
-          setupError.value = true;
-        } else {
-          loginError.value = 'Account not found.';
+      this.signupLoading = true;
+      try {
+        const { data: existing } = await sb.from('users').select('id').eq('email', this.signupEmail).single();
+        if (existing) {
+          this.signupError = 'Email already registered';
+          this.signupLoading = false;
+          return;
         }
+      } catch(e) {}
+
+      try {
+        const newUser = {
+          name: this.signupName,
+          email: this.signupEmail,
+          password: this.signupPassword,
+          phone: this.signupPhone,
+          age: this.signupAge ? parseInt(this.signupAge) : null,
+          skills: this.signupSkills,
+          wants: this.signupWants,
+          bio: this.signupBio,
+          credits: 25
+        };
+        const { data, error } = await sb.from('users').insert(newUser).select().single();
+        if (error) throw error;
+        this.currentUser = data;
+        localStorage.setItem('skillswap_user', JSON.stringify(data));
+        this.showSignup = false;
+        this.showToast('Account created! You got 25 credits.', 'success');
+        await this.loadUsers();
+        this.subscribeMessages();
+      } catch(e) {
+        this.signupError = 'Signup failed: ' + e.message;
+      }
+      this.signupLoading = false;
+    },
+
+    logout() {
+      this.currentUser = null;
+      this.chatWith = null;
+      this.chatUsers = [];
+      this.messages = [];
+      localStorage.removeItem('skillswap_user');
+      this.page = 'browse';
+      this.showToast('Logged out', 'success');
+    },
+
+    addSkill() {
+      if (this.newSkill.trim() && !this.signupSkills.includes(this.newSkill.trim())) {
+        this.signupSkills.push(this.newSkill.trim());
+        this.newSkill = '';
+      }
+    },
+    addWant() {
+      if (this.newWant.trim() && !this.signupWants.includes(this.newWant.trim())) {
+        this.signupWants.push(this.newWant.trim());
+        this.newWant = '';
+      }
+    },
+
+    openEditProfile() {
+      this.editName = this.currentUser.name || '';
+      this.editPhone = this.currentUser.phone || '';
+      this.editAge = this.currentUser.age || '';
+      this.editSkills = [...(this.currentUser.skills || [])];
+      this.editWants = [...(this.currentUser.wants || [])];
+      this.editBio = this.currentUser.bio || '';
+      this.showEditProfile = true;
+    },
+    addEditSkill() {
+      if (this.newEditSkill.trim() && !this.editSkills.includes(this.newEditSkill.trim())) {
+        this.editSkills.push(this.newEditSkill.trim());
+        this.newEditSkill = '';
+      }
+    },
+    addEditWant() {
+      if (this.newEditWant.trim() && !this.editWants.includes(this.newEditWant.trim())) {
+        this.editWants.push(this.newEditWant.trim());
+        this.newEditWant = '';
+      }
+    },
+    async saveProfile() {
+      this.editLoading = true;
+      try {
+        const updates = {
+          name: this.editName,
+          phone: this.editPhone,
+          age: this.editAge ? parseInt(this.editAge) : null,
+          skills: this.editSkills,
+          wants: this.editWants,
+          bio: this.editBio
+        };
+        const { data, error } = await sb.from('users').update(updates).eq('id', this.currentUser.id).select().single();
+        if (error) throw error;
+        this.currentUser = data;
+        localStorage.setItem('skillswap_user', JSON.stringify(data));
+        this.showEditProfile = false;
+        await this.loadUsers();
+        this.showToast('Profile updated!', 'success');
+      } catch(e) {
+        this.showToast('Failed to update profile: ' + e.message, 'error');
+      }
+      this.editLoading = false;
+    },
+
+    async deleteAccount() {
+      this.deleteError = '';
+      if (this.deleteConfirmText !== 'DELETE') {
+        this.deleteError = 'Please type DELETE to confirm';
         return;
       }
-      if (!data) { loginError.value = 'Account not found.'; return; }
-      if (data.password !== loginPassword.value) { loginError.value = 'Wrong password.'; return; }
-      currentUser.value = data;
-      showLogin.value = false;
-      showToast(`Welcome back, ${data.name}!`);
-      await loadAllData();
-    }
-
-    function logout() {
-      currentUser.value = null;
-      showChat.value = false;
-      chatWith.value = null;
-      page.value = 'landing';
-      showToast('Logged out successfully.');
-    }
-
-    // ========== DELETE ACCOUNT ==========
-    async function deleteAccount() {
-      deleteError.value = '';
-      if (deleteConfirmText.value !== 'DELETE') {
-        deleteError.value = 'Please type DELETE to confirm.'; return;
-      }
-      if (!currentUser.value) return;
-      deleteLoading.value = true;
-      const userId = currentUser.value.id;
+      this.deleteLoading = true;
       try {
-        await sb.from('messages').delete().or('sender_id.eq.' + userId + ',receiver_id.eq.' + userId);
-        await sb.from('reviews').delete().or('from_id.eq.' + userId + ',to_id.eq.' + userId);
-        await sb.from('bookings').delete().or('from_id.eq.' + userId + ',to_id.eq.' + userId);
-        await sb.from('notifications').delete().eq('user_id', userId);
-        await sb.from('users').delete().eq('id', userId);
-        currentUser.value = null;
-        showDeleteAccount.value = false;
-        deleteConfirmText.value = '';
-        showToast('Your account has been permanently deleted.');
-        await loadAllData();
-        page.value = 'landing';
-      } catch (e) {
-        deleteError.value = 'Failed to delete account. Please try again.';
-        console.error('Delete error:', e);
-      } finally {
-        deleteLoading.value = false;
+        const uid = this.currentUser.id;
+        await sb.from('messages').delete().or('sender_id.eq.'+uid+',receiver_id.eq.'+uid);
+        await sb.from('reviews').delete().or('from_id.eq.'+uid+',to_id.eq.'+uid);
+        await sb.from('bookings').delete().or('from_id.eq.'+uid+',to_id.eq.'+uid);
+        await sb.from('notifications').delete().eq('user_id', uid);
+        await sb.from('users').delete().eq('id', uid);
+        this.showDeleteAccount = false;
+        this.logout();
+        this.showToast('Account deleted permanently', 'success');
+        await this.loadUsers();
+      } catch(e) {
+        this.deleteError = 'Delete failed: ' + e.message;
       }
-    }
+      this.deleteLoading = false;
+    },
 
-    // ========== PROFILE ==========
-    function viewProfile(user) {
-      viewingUser.value = user;
-      page.value = 'viewProfile';
-    }
-
-    function editProfile() {
-      if (!currentUser.value) return;
-      editName.value = currentUser.value.name || '';
-      editPhone.value = currentUser.value.phone || '';
-      editAge.value = currentUser.value.age || '';
-      editSkills.value = [...(currentUser.value.skills || [])];
-      editWants.value = [...(currentUser.value.wants || [])];
-      editBio.value = currentUser.value.bio || '';
-      showEditProfile.value = true;
-    }
-
-    async function saveProfile() {
-      editLoading.value = true;
-      const updates = {
-        name: editName.value,
-        phone: editPhone.value || null,
-        age: editAge.value ? parseInt(editAge.value) : null,
-        skills: editSkills.value,
-        wants: editWants.value,
-        bio: editBio.value || null,
-      };
-      const { error } = await sb.from('users').update(updates).eq('id', currentUser.value.id);
-      editLoading.value = false;
-      if (error) { showToast('Failed to save profile.', 'error'); return; }
-      currentUser.value = { ...currentUser.value, ...updates };
-      showEditProfile.value = false;
-      showToast('Profile updated!');
-      await loadAllData();
-    }
-
-    // ========== CHAT ==========
-    function startChat(user) {
-      if (!currentUser.value) { showLogin.value = true; showToast('Please log in to message.', 'error'); return; }
-      chatWith.value = user;
-      showChat.value = true;
-      nextTick(() => { const el = document.querySelector('.chat-messages'); if (el) el.scrollTop = el.scrollHeight; });
-    }
-
-    function openChat(user) {
-      chatWith.value = user;
-      nextTick(() => { const el = document.querySelector('.chat-messages'); if (el) el.scrollTop = el.scrollHeight; });
-    }
-
-    async function sendMessage() {
-      if (!chatInput.value.trim() || !chatWith.value || !currentUser.value) return;
-      const msg = {
-        sender_id: currentUser.value.id,
-        receiver_id: chatWith.value.id,
-        text: chatInput.value.trim(),
-        read: false,
-      };
-      chatInput.value = '';
-      const { error } = await sb.from('messages').insert([msg]);
-      if (error) { showToast('Failed to send message.', 'error'); return; }
-      await sb.from('notifications').insert([{
-        user_id: chatWith.value.id,
-        text: `New message from ${currentUser.value.name}`,
-        icon: 'fas fa-comment',
-        read: false,
-      }]);
-    }
-
-    // ========== BOOKING ==========
-    async function confirmBooking() {
-      if (!bookingTo.value || !currentUser.value) return;
-      bookingLoading.value = true;
-      const booking = {
-        from_id: currentUser.value.id,
-        to_id: bookingTo.value.id,
-        skill: bookingSkill.value,
-        date: bookingDate.value,
-        time: bookingTime.value,
-        duration: parseInt(bookingDuration.value) || 60,
-        message: bookingMessage.value,
-      };
-      const { error } = await sb.from('bookings').insert([booking]);
-      bookingLoading.value = false;
-      if (error) { showToast('Failed to send booking.', 'error'); return; }
-      showBooking.value = false;
-      showToast('Booking request sent!');
-      await sb.from('notifications').insert([{
-        user_id: bookingTo.value.id,
-        text: `${currentUser.value.name} wants to book a session with you!`,
-        icon: 'fas fa-calendar',
-        read: false,
-      }]);
-      await loadAllData();
-    }
-
-    // ========== REVIEW ==========
-    async function submitReview() {
-      if (!reviewTo.value || !currentUser.value) return;
-      reviewLoading.value = true;
-      const credits = calculateCredits();
-      const review = {
-        from_id: currentUser.value.id,
-        to_id: reviewTo.value.id,
-        rating: parseInt(reviewRating.value),
-        duration: parseInt(reviewDuration.value) || 0,
-        skill: reviewSkill.value,
-        text: reviewText.value,
-        from_name: currentUser.value.name,
-      };
-      const { error } = await sb.from('reviews').insert([review]);
-      if (error) { reviewLoading.value = false; showToast('Failed to submit review.', 'error'); return; }
-      const { data: userData } = await sb.from('users').select('credits').eq('id', reviewTo.value.id).single();
-      const newCredits = (userData?.credits || 0) + credits;
-      await sb.from('users').update({credits: newCredits}).eq('id', reviewTo.value.id);
-      await sb.from('notifications').insert([{
-        user_id: reviewTo.value.id,
-        text: `${currentUser.value.name} left you a ${reviewRating.value}-star review! You earned ${credits} credits.`,
-        icon: 'fas fa-star',
-        read: false,
-      }]);
-      reviewLoading.value = false;
-      showReviewModal.value = false;
-      showToast(`Review submitted! They earned ${credits} credits.`);
-      await loadAllData();
-    }
-
-    // ========== NOTIFICATIONS ==========
-    async function handleNotificationClick(notif) {
-      if (!notif.read) {
-        await sb.from('notifications').update({read: true}).eq('id', notif.id);
-        await loadAllData();
+    async clearAllData() {
+      this.clearError = '';
+      if (this.clearConfirmText !== 'CLEAR ALL') {
+        this.clearError = 'Please type CLEAR ALL to confirm';
+        return;
       }
-      showNotifDropdown.value = false;
-    }
-
-    async function markAllRead() {
-      if (!currentUser.value) return;
-      await sb.from('notifications').update({read: true}).eq('user_id', currentUser.value.id).eq('read', false);
-      await loadAllData();
-    }
-
-    // ========== ADD FRIEND ==========
-    async function addFriendFromCode() {
-      addFriendError.value = '';
-      addFriendSuccess.value = '';
-      if (!friendCode.value.trim()) { addFriendError.value = 'Please enter a share code.'; return; }
+      this.clearLoading = true;
       try {
-        const decoded = JSON.parse(atob(friendCode.value.trim()));
-        if (!decoded.id) { addFriendError.value = 'Invalid code.'; return; }
-        const { data } = await sb.from('users').select('*').eq('id', decoded.id).single();
-        if (!data) { addFriendError.value = 'User not found.'; return; }
-        addFriendSuccess.value = `Added ${data.name} to your contacts!`;
-        showAddFriend.value = false;
-        showToast(`Added ${data.name}!`);
-      } catch (e) {
-        addFriendError.value = 'Invalid code format.';
+        await sb.from('messages').delete().neq('id', 0);
+        await sb.from('reviews').delete().neq('id', 0);
+        await sb.from('bookings').delete().neq('id', 0);
+        await sb.from('notifications').delete().neq('id', 0);
+        await sb.from('users').delete().neq('id', 0);
+        this.showClearAll = false;
+        this.logout();
+        this.showToast('All data cleared', 'success');
+        await this.loadUsers();
+      } catch(e) {
+        this.clearError = 'Clear failed: ' + e.message;
       }
-    }
+      this.clearLoading = false;
+    },
 
-    // ========== SCROLL ==========
-    function updateScrollProgress() {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      scrollProgress.value = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-      scrolled.value = scrollTop > 50;
-    }
+    openProfile(u) {
+      this.viewingUser = u;
+    },
 
-    // ========== INIT ==========
-    onMounted(async () => {
-      window.addEventListener('scroll', updateScrollProgress);
-      await loadAllData();
-      if (!setupError.value) {
-        setupRealtime();
+    openBooking(u) {
+      this.bookingTo = u;
+      this.bookingSkill = '';
+      this.bookingDate = '';
+      this.bookingTime = '';
+      this.bookingDuration = 60;
+      this.bookingMessage = '';
+      this.showBookingModal = true;
+    },
+
+    async confirmBooking() {
+      if (!this.bookingSkill || !this.bookingDate || !this.bookingTime) {
+        this.showToast('Please fill in all required fields', 'error');
+        return;
       }
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
-      }, { threshold: 0.1 });
-      document.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el));
-    });
+      this.bookingLoading = true;
+      try {
+        const booking = {
+          from_id: this.currentUser.id,
+          to_id: this.bookingTo.id,
+          skill: this.bookingSkill,
+          date: this.bookingDate,
+          time: this.bookingTime,
+          duration: parseInt(this.bookingDuration) || 60,
+          message: this.bookingMessage,
+          status: 'Pending'
+        };
+        const { error } = await sb.from('bookings').insert(booking);
+        if (error) throw error;
+        await sb.from('notifications').insert({
+          user_id: this.bookingTo.id,
+          text: this.currentUser.name + ' booked a ' + this.bookingSkill + ' session',
+          icon: 'calendar'
+        });
+        this.showBookingModal = false;
+        this.showToast('Booking request sent!', 'success');
+        await this.loadBookings();
+      } catch(e) {
+        this.showToast('Booking failed: ' + e.message, 'error');
+      }
+      this.bookingLoading = false;
+    },
 
-    return {
-      loading, page, currentUser, users, messages, reviews, bookings, notifications, toasts, setupError,
-      searchQuery, selectedCategory, showLogin, showSignup, showEditProfile, showBooking,
-      showReviewModal, showAddFriend, showChat, showNotifDropdown, showDeleteAccount, scrolled, viewingUser,
-      loginEmail, loginPassword, loginError, loginLoading,
-      signupName, signupEmail, signupPassword, signupPhone, signupAge, signupSkills, signupWants,
-      signupBio, newSkill, newWant, signupError, signupLoading,
-      editName, editPhone, editAge, editSkills, editWants, editBio, newEditSkill, newEditWant, editLoading,
-      bookingTo, bookingSkill, bookingDate, bookingTime, bookingDuration, bookingMessage, bookingLoading,
-      reviewTo, reviewRating, reviewDuration, reviewSkill, reviewText, reviewLoading,
-      chatWith, chatInput, typing, friendCode, addFriendError, addFriendSuccess,
-      deleteConfirmText, deleteError, deleteLoading,
-      categories, isLoggedIn, filteredUsers, allSkills, unreadCount, chatContacts, currentChatMessages,
-      showToast, formatTime, generateShareCode, copyShareCode, addSkill, addWant, addEditSkill, addEditWant,
-      calculateCredits, lastMessagePreview, getAvgRating, getReviewCount, getUserReviews, getUserName,
-      handleSignup, handleLogin, logout, deleteAccount, viewProfile, editProfile, saveProfile,
-      startChat, openChat, sendMessage, confirmBooking, submitReview, handleNotificationClick,
-      markAllRead, addFriendFromCode, retryConnection,
-    };
+    calculateCredits() {
+      const dur = parseInt(this.reviewDuration) || 0;
+      const rat = parseInt(this.reviewRating) || 0;
+      return Math.round((dur / 10) * rat);
+    },
+
+    async submitReview() {
+      if (!this.reviewRating || !this.reviewSkill || !this.reviewText) {
+        this.showToast('Please fill in all fields', 'error');
+        return;
+      }
+      this.reviewLoading = true;
+      try {
+        const credits = this.calculateCredits();
+        const review = {
+          from_id: this.currentUser.id,
+          to_id: this.reviewTo.id,
+          rating: this.reviewRating,
+          duration: parseInt(this.reviewDuration) || 30,
+          skill: this.reviewSkill,
+          text: this.reviewText,
+          from_name: this.currentUser.name
+        };
+        const { error } = await sb.from('reviews').insert(review);
+        if (error) throw error;
+
+        const { data: toUser } = await sb.from('users').select('credits').eq('id', this.reviewTo.id).single();
+        await sb.from('users').update({ credits: (toUser?.credits || 0) + credits }).eq('id', this.reviewTo.id);
+
+        await sb.from('notifications').insert({
+          user_id: this.reviewTo.id,
+          text: this.currentUser.name + ' left you a ' + this.reviewRating + '-star review',
+          icon: 'star'
+        });
+
+        this.showReviewModal = false;
+        this.showToast('Review submitted! They earned ' + credits + ' credits.', 'success');
+      } catch(e) {
+        this.showToast('Review failed: ' + e.message, 'error');
+      }
+      this.reviewLoading = false;
+    },
+
+    async loadChatUsers() {
+      if (!this.currentUser) return;
+      try {
+        const { data: msgs } = await sb.from('messages')
+          .select('sender_id,receiver_id')
+          .or('sender_id.eq.'+this.currentUser.id+',receiver_id.eq.'+this.currentUser.id);
+        const ids = new Set();
+        (msgs||[]).forEach(m => {
+          const other = m.sender_id === this.currentUser.id ? m.receiver_id : m.sender_id;
+          ids.add(other);
+        });
+        this.chatUsers = this.users.filter(u => ids.has(u.id));
+      } catch(e) {}
+    },
+
+    async openChat(u) {
+      this.chatWith = u;
+      await this.loadMessages();
+      this.scrollToBottom();
+    },
+
+    async loadMessages() {
+      try {
+        const { data, error } = await sb.from('messages').select('*');
+        if (error) throw error;
+        this.messages = data || [];
+      } catch(e) {}
+    },
+
+    lastMessagePreview(uid) {
+      const msgs = this.messages.filter(m => 
+        (m.sender_id === this.currentUser.id && m.receiver_id === uid) ||
+        (m.sender_id === uid && m.receiver_id === this.currentUser.id)
+      ).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+      return msgs.length ? msgs[0].text : 'No messages yet';
+    },
+
+    async sendMessage() {
+      if (!this.chatInput.trim() || !this.chatWith) return;
+      const text = this.chatInput.trim();
+      this.chatInput = '';
+      try {
+        const { error } = await sb.from('messages').insert({
+          sender_id: this.currentUser.id,
+          receiver_id: this.chatWith.id,
+          text: text
+        });
+        if (error) throw error;
+        await this.loadMessages();
+        this.scrollToBottom();
+        if (!this.chatUsers.find(u => u.id === this.chatWith.id)) {
+          this.chatUsers.push(this.chatWith);
+        }
+      } catch(e) {
+        this.showToast('Message failed: ' + e.message, 'error');
+      }
+    },
+
+    startChat(u) {
+      this.page = 'chat';
+      this.openChat(u);
+    },
+
+    scrollToBottom() {
+      this.$nextTick(() => {
+        const el = this.$refs.chatMessages;
+        if (el) el.scrollTop = el.scrollHeight;
+      });
+    },
+
+    subscribeMessages() {
+      sb.channel('messages')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, async () => {
+          await this.loadMessages();
+          if (this.chatWith) this.scrollToBottom();
+        })
+        .subscribe();
+    },
+
+    showToast(msg, type='success') {
+      const id = ++this.toastId;
+      this.toasts.push({ id, message: msg, type });
+      setTimeout(() => this.removeToast(id), 4000);
+    },
+    removeToast(id) {
+      this.toasts = this.toasts.filter(t => t.id !== id);
+    }
   }
 }).mount('#app');
 </script>
+
 </body>
 </html>
