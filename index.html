@@ -66,9 +66,6 @@ nav a:hover,nav button:hover{background:#f1f5f9;}
 .empty-state{text-align:center;padding:3rem;color:var(--muted);}
 .empty-state h3{margin-bottom:0.5rem;color:var(--text);}
 .badge{display:inline-flex;align-items:center;gap:0.3rem;background:#fef3c7;color:#92400e;padding:0.3rem 0.7rem;border-radius:20px;font-size:0.8rem;font-weight:600;}
-.review-card{background:#f8fafc;border-radius:8px;padding:1rem;margin-bottom:0.75rem;}
-.review-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;}
-.review-stars{color:#fbbf24;}
 .setup-banner{background:#fef3c7;border:1px solid #fbbf24;border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem;}
 .setup-banner h3{color:#92400e;margin-bottom:0.5rem;}
 .setup-banner pre{background:#1e293b;color:#e2e8f0;padding:1rem;border-radius:8px;overflow-x:auto;font-size:0.85rem;margin:1rem 0;}
@@ -80,36 +77,24 @@ nav a:hover,nav button:hover{background:#f1f5f9;}
 .profile-meta{color:var(--muted);margin-bottom:0.75rem;}
 .section-title{font-size:1.1rem;font-weight:700;margin:1.5rem 0 0.75rem;}
 .credits-badge{background:#f0fdf4;color:#166534;padding:0.4rem 1rem;border-radius:20px;font-weight:700;display:inline-flex;align-items:center;gap:0.4rem;}
-.tabs{display:flex;gap:0.5rem;border-bottom:2px solid var(--border);margin-bottom:1rem;}
-.tab{padding:0.75rem 1.25rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;}
-.tab.active{border-bottom-color:var(--primary);color:var(--primary);}
-.tab-content{display:none;}
-.tab-content.active{display:block;}
 .error-banner{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:1.5rem;border-radius:var(--radius);margin-bottom:1.5rem;}
 .error-banner h3{margin-bottom:0.5rem;}
 .error-banner pre{background:#fff;padding:0.75rem;border-radius:6px;margin-top:0.5rem;font-size:0.85rem;overflow-x:auto;}
 footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border-top:1px solid var(--border);margin-top:2rem;}
+#loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:500;}
+#loading-screen h2{color:var(--primary);margin-bottom:1rem;}
+#loading-screen p{color:var(--muted);}
 @media(max-width:768px){.grid{grid-template-columns:1fr;}.profile-header{flex-direction:column;align-items:center;text-align:center;}.chat-sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);}}
 </style>
 </head>
 <body>
 
-<!-- This shows if JS is disabled or crashes -->
-<noscript>
-  <div style="padding:2rem;text-align:center;font-family:sans-serif;">
-    <h2>JavaScript is required</h2>
-    <p>Please enable JavaScript to use SkillSwap.</p>
-  </div>
-</noscript>
-
-<div id="app">
-
-<!-- FATAL ERROR DISPLAY (outside Vue, shows if Vue crashes) -->
-<div id="fatal-error" style="display:none;padding:2rem;text-align:center;">
-  <h2 style="color:#e74c3c;">Something went wrong</h2>
-  <p id="fatal-msg" style="color:#666;margin-top:1rem;"></p>
-  <p style="margin-top:1rem;color:#999;font-size:0.9rem;">Open your browser console (F12 → Console) for details.</p>
+<div id="loading-screen">
+  <h2>SkillSwap</h2>
+  <p>Loading...</p>
 </div>
+
+<div id="app" style="display:none;">
 
 <header v-if="!showSetup && !fatalError">
   <div class="container">
@@ -130,31 +115,21 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
 
 <div class="container" style="padding-top:2rem;">
 
-  <!-- FATAL ERROR INSIDE VUE -->
+  <!-- FATAL ERROR -->
   <div v-if="fatalError" class="error-banner">
-    <h3>⚠️ Startup Error</h3>
+    <h3>Startup Error</h3>
     <p>{{fatalError}}</p>
     <pre>{{fatalDetail}}</pre>
-    <p style="margin-top:0.5rem;font-size:0.9rem;">Check your Supabase URL and Key. Open browser console (F12) for more info.</p>
-  </div>
-
-  <!-- CONFIG REQUIRED -->
-  <div v-if="configNeeded && !fatalError" class="error-banner" style="background:#fef3c7;border-color:#fbbf24;color:#92400e;">
-    <h3>🔧 Configuration Required</h3>
-    <p>You need to set your Supabase credentials in the code.</p>
-    <p style="margin-top:0.5rem;"><strong>Step 1:</strong> Go to your Supabase Dashboard → Project Settings → API</p>
-    <p><strong>Step 2:</strong> Copy your <code>URL</code> and <code>anon public</code> API key</p>
-    <p><strong>Step 3:</strong> Replace the placeholders at the top of this file's &lt;script&gt; section</p>
   </div>
 
   <!-- SETUP BANNER -->
   <div v-if="showSetup && !fatalError" class="setup-banner">
     <h3>Database Setup Required</h3>
-    <p>Your Supabase database tables don't exist yet. Run this SQL in your Supabase SQL Editor:</p>
-    <pre id="setup-sql">{{setupSQL}}</pre>
+    <p>Your Supabase tables do not exist yet. Run this SQL in your Supabase SQL Editor:</p>
+    <pre>{{setupSQL}}</pre>
     <button class="btn btn-outline btn-sm" @click="copySQL">Copy SQL</button>
     <button class="btn btn-primary" style="margin-left:0.5rem;" @click="checkSetup" :disabled="setupChecking">
-      {{setupChecking?'Checking...':'I've Run the SQL - Retry Connection'}}
+      {{setupChecking ? 'Checking...' : 'I have Run the SQL - Retry Connection'}}
     </button>
     <p v-if="setupError" style="color:var(--danger);margin-top:0.75rem;">{{setupError}}</p>
   </div>
@@ -175,7 +150,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
       <button class="btn btn-primary" style="width:100%" @click="handleLogin" :disabled="loginLoading">
         {{loginLoading?'Logging in...':'Log In'}}
       </button>
-      <p style="text-align:center;margin-top:1rem;color:var(--muted)">Don't have an account? 
+      <p style="text-align:center;margin-top:1rem;color:var(--muted)">Do not have an account? 
         <a href="#" @click.prevent="showLogin=false;showSignup=true" style="color:var(--primary)">Sign Up</a>
       </p>
     </div>
@@ -243,7 +218,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
       <div class="member-card" v-for="u in filteredUsers" :key="u.id" @click="openProfile(u)">
         <div class="member-avatar">{{u.name?u.name.charAt(0).toUpperCase():'?'}}</div>
         <div class="member-name">{{u.name}}</div>
-        <div class="member-meta">{{u.age?u.age+' years old':''}} {{u.location?'· '+u.location:''}}</div>
+        <div class="member-meta">{{u.age?u.age+' years old':''}}</div>
         <div class="skills">
           <span class="skill-tag" v-for="s in (u.skills||[]).slice(0,4)" :key="s">{{s}}</span>
         </div>
@@ -283,7 +258,6 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
       <div class="section-title">Bio</div>
       <p style="color:var(--muted);white-space:pre-wrap;">{{currentUser.bio||'No bio yet.'}}</p>
     </div>
-
     <div class="card">
       <h3 style="margin-bottom:1rem;">Danger Zone</h3>
       <p style="color:var(--muted);margin-bottom:1rem;">Clear all data from the database. This cannot be undone.</p>
@@ -484,8 +458,8 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
         <textarea v-model="reviewText" placeholder="How was your session?"></textarea>
       </div>
       <div style="background:#f0fdf4;padding:1rem;border-radius:8px;margin-bottom:1rem;">
-        <p style="color:var(--primary-dark);font-weight:600;">Credits they'll earn: {{calculateCredits()}}</p>
-        <p style="color:var(--muted);font-size:0.85rem;">Formula: ({{reviewDuration||0}} / 10) × {{reviewRating||0}} = {{calculateCredits()}} credits</p>
+        <p style="color:var(--primary-dark);font-weight:600;">Credits they will earn: {{calculateCredits()}}</p>
+        <p style="color:var(--muted);font-size:0.85rem;">Formula: ({{reviewDuration||0}} / 10) x {{reviewRating||0}} = {{calculateCredits()}} credits</p>
       </div>
       <button class="btn btn-primary" style="width:100%" @click="submitReview" :disabled="reviewLoading">
         {{reviewLoading?'Submitting...':'Submit Review'}}
@@ -505,7 +479,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
         <div style="display:flex;justify-content:space-between;align-items:flex-start;">
           <div>
             <div style="font-weight:700;font-size:1.1rem;">{{b.skill||'Session'}}</div>
-            <div style="color:var(--muted);font-size:0.9rem;">With {{b.to_name||'Member'}} · {{b.date}} at {{b.time}}</div>
+            <div style="color:var(--muted);font-size:0.9rem;">With {{b.to_name||'Member'}} &middot; {{b.date}} at {{b.time}}</div>
             <div style="color:var(--muted);font-size:0.85rem;margin-top:0.25rem;">{{b.duration}} minutes</div>
             <p style="margin-top:0.5rem;color:var(--text);font-size:0.95rem;">{{b.message}}</p>
           </div>
@@ -523,133 +497,117 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
 
 </div>
 
-<footer v-if="!showSetup && !fatalError && !configNeeded">
-  <p>SkillSwap — Trade skills, not money.</p>
+<footer v-if="!showSetup && !fatalError">
+  <p>SkillSwap &mdash; Trade skills, not money.</p>
   <p style="margin-top:0.5rem;font-size:0.85rem;">Built with Supabase & Vue.js</p>
 </footer>
 
 </div>
 
 <script>
+const SUPABASE_URL = 'https://sgyugzriwxljaiwbsogg.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNneXVnenJpd3hsamFpd2Jzb2dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4MzIyNTAsImV4cCI6MjEwMDQwODI1MH0.2XfwboDhKhWTGEaJdnyFJKd5YJUuY-8D0HUxByD8bWk';
+
+let sb = null;
+let fatalError = '';
+let fatalDetail = '';
+
 try {
-  const { createApp } = Vue;
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+} catch(e) {
+  fatalError = 'Failed to connect to Supabase';
+  fatalDetail = e.message;
+  console.error('Supabase init error:', e);
+}
 
-  // ============================================
-  // REPLACE THESE WITH YOUR SUPABASE CREDENTIALS
-  // ============================================
-  // Go to: https://supabase.com/dashboard
-  // Click your project → Project Settings → API
-  // Copy the URL and the "anon public" key
-  // ============================================
-  const SUPABASE_URL = 'https://your-project.supabase.co';
-  const SUPABASE_KEY = 'your-anon-key';
+const { createApp } = Vue;
 
-  let sb = null;
-  let configNeeded = false;
-  let fatalError = '';
-  let fatalDetail = '';
+createApp({
+  data() {
+    return {
+      page: 'browse',
+      currentUser: null,
+      users: [],
+      messages: [],
+      bookings: [],
+      reviews: [],
+      notifications: [],
+      searchQuery: '',
+      fatalError: fatalError,
+      fatalDetail: fatalDetail,
 
-  // Check if credentials are still placeholders
-  if (SUPABASE_URL === 'https://sgyugzriwxljaiwbsogg.supabase.co
-' || SUPABASE_KEY === 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNneXVnenJpd3hsamFpd2Jzb2dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4MzIyNTAsImV4cCI6MjEwMDQwODI1MH0.2XfwboDhKhWTGEaJdnyFJKd5YJUuY-8D0HUxByD8bWk') {
-    configNeeded = true;
-  } else {
-    try {
-      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    } catch(e) {
-      fatalError = 'Failed to connect to Supabase';
-      fatalDetail = e.message;
-      console.error('Supabase init error:', e);
-    }
-  }
+      showLogin: false,
+      loginEmail: '',
+      loginPassword: '',
+      loginError: '',
+      loginLoading: false,
 
-  createApp({
-    data() {
-      return {
-        page: 'browse',
-        currentUser: null,
-        users: [],
-        messages: [],
-        bookings: [],
-        reviews: [],
-        notifications: [],
-        searchQuery: '',
-        configNeeded: configNeeded,
-        fatalError: fatalError,
-        fatalDetail: fatalDetail,
+      showSignup: false,
+      signupName: '',
+      signupEmail: '',
+      signupPassword: '',
+      signupPhone: '',
+      signupAge: '',
+      signupSkills: [],
+      signupWants: [],
+      signupBio: '',
+      newSkill: '',
+      newWant: '',
+      signupError: '',
+      signupLoading: false,
 
-        showLogin: false,
-        loginEmail: '',
-        loginPassword: '',
-        loginError: '',
-        loginLoading: false,
+      showEditProfile: false,
+      editName: '',
+      editPhone: '',
+      editAge: '',
+      editSkills: [],
+      editWants: [],
+      editBio: '',
+      newEditSkill: '',
+      newEditWant: '',
+      editLoading: false,
 
-        showSignup: false,
-        signupName: '',
-        signupEmail: '',
-        signupPassword: '',
-        signupPhone: '',
-        signupAge: '',
-        signupSkills: [],
-        signupWants: [],
-        signupBio: '',
-        newSkill: '',
-        newWant: '',
-        signupError: '',
-        signupLoading: false,
+      showDeleteAccount: false,
+      deleteConfirmText: '',
+      deleteError: '',
+      deleteLoading: false,
 
-        showEditProfile: false,
-        editName: '',
-        editPhone: '',
-        editAge: '',
-        editSkills: [],
-        editWants: [],
-        editBio: '',
-        newEditSkill: '',
-        newEditWant: '',
-        editLoading: false,
+      showClearAll: false,
+      clearConfirmText: '',
+      clearError: '',
+      clearLoading: false,
 
-        showDeleteAccount: false,
-        deleteConfirmText: '',
-        deleteError: '',
-        deleteLoading: false,
+      viewingUser: null,
 
-        showClearAll: false,
-        clearConfirmText: '',
-        clearError: '',
-        clearLoading: false,
+      showBookingModal: false,
+      bookingTo: null,
+      bookingSkill: '',
+      bookingDate: '',
+      bookingTime: '',
+      bookingDuration: 60,
+      bookingMessage: '',
+      bookingLoading: false,
 
-        viewingUser: null,
+      showReviewModal: false,
+      reviewTo: null,
+      reviewRating: 0,
+      reviewDuration: 30,
+      reviewSkill: '',
+      reviewText: '',
+      reviewLoading: false,
 
-        showBookingModal: false,
-        bookingTo: null,
-        bookingSkill: '',
-        bookingDate: '',
-        bookingTime: '',
-        bookingDuration: 60,
-        bookingMessage: '',
-        bookingLoading: false,
+      chatUsers: [],
+      chatWith: null,
+      chatInput: '',
+      typing: false,
 
-        showReviewModal: false,
-        reviewTo: null,
-        reviewRating: 0,
-        reviewDuration: 30,
-        reviewSkill: '',
-        reviewText: '',
-        reviewLoading: false,
+      toasts: [],
+      toastId: 0,
 
-        chatUsers: [],
-        chatWith: null,
-        chatInput: '',
-        typing: false,
-
-        toasts: [],
-        toastId: 0,
-
-        showSetup: false,
-        setupChecking: false,
-        setupError: '',
-        setupSQL: `CREATE TABLE IF NOT EXISTS public.users (
+      showSetup: false,
+      setupChecking: false,
+      setupError: '',
+      setupSQL: `CREATE TABLE IF NOT EXISTS public.users (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
@@ -720,474 +678,472 @@ CREATE POLICY "Allow all" ON public.notifications FOR ALL USING (true) WITH CHEC
 
 GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;`
-      };
+    };
+  },
+
+  computed: {
+    filteredUsers() {
+      if (!this.searchQuery) return this.users.filter(u => u.id !== this.currentUser?.id);
+      const q = this.searchQuery.toLowerCase();
+      return this.users.filter(u => {
+        if (u.id === this.currentUser?.id) return false;
+        return (u.name||'').toLowerCase().includes(q) ||
+               (u.skills||[]).some(s => s.toLowerCase().includes(q)) ||
+               (u.wants||[]).some(s => s.toLowerCase().includes(q));
+      });
     },
+    currentChatMessages() {
+      if (!this.chatWith || !this.currentUser) return [];
+      return this.messages.filter(m => 
+        (m.sender_id === this.currentUser.id && m.receiver_id === this.chatWith.id) ||
+        (m.sender_id === this.chatWith.id && m.receiver_id === this.currentUser.id)
+      ).sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+    }
+  },
 
-    computed: {
-      filteredUsers() {
-        if (!this.searchQuery) return this.users.filter(u => u.id !== this.currentUser?.id);
-        const q = this.searchQuery.toLowerCase();
-        return this.users.filter(u => {
-          if (u.id === this.currentUser?.id) return false;
-          return (u.name||'').toLowerCase().includes(q) ||
-                 (u.skills||[]).some(s => s.toLowerCase().includes(q)) ||
-                 (u.wants||[]).some(s => s.toLowerCase().includes(q));
-        });
-      },
-      currentChatMessages() {
-        if (!this.chatWith || !this.currentUser) return [];
-        return this.messages.filter(m => 
-          (m.sender_id === this.currentUser.id && m.receiver_id === this.chatWith.id) ||
-          (m.sender_id === this.chatWith.id && m.receiver_id === this.currentUser.id)
-        ).sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
-      }
-    },
+  async mounted() {
+    const ls = document.getElementById('loading-screen');
+    const appEl = document.getElementById('app');
+    if (ls) ls.style.display = 'none';
+    if (appEl) appEl.style.display = 'block';
 
-    async mounted() {
-      if (this.configNeeded || this.fatalError) return;
-      await this.checkSetup();
-      const saved = localStorage.getItem('skillswap_user');
-      if (saved) {
-        try {
-          this.currentUser = JSON.parse(saved);
-          await this.loadUsers();
-          await this.loadBookings();
-          this.subscribeMessages();
-        } catch(e) {
-          localStorage.removeItem('skillswap_user');
-        }
-      }
-    },
-
-    methods: {
-      async checkSetup() {
-        if (!sb) return;
-        this.setupChecking = true;
-        this.setupError = '';
-        try {
-          const { error } = await sb.from('users').select('id').limit(1);
-          if (error && (error.message.includes('does not exist') || error.message.includes('schema cache') || error.code === '42P01')) {
-            this.showSetup = true;
-          } else {
-            this.showSetup = false;
-          }
-        } catch(e) {
-          this.showSetup = true;
-        }
-        this.setupChecking = false;
-      },
-
-      copySQL() {
-        navigator.clipboard.writeText(this.setupSQL).then(() => {
-          this.showToast('SQL copied to clipboard!', 'success');
-        });
-      },
-
-      async loadUsers() {
-        if (!sb) return;
-        try {
-          const { data, error } = await sb.from('users').select('*');
-          if (error) throw error;
-          this.users = data || [];
-        } catch(e) {
-          console.error('loadUsers error:', e);
-        }
-      },
-
-      async loadBookings() {
-        if (!sb || !this.currentUser) return;
-        try {
-          const { data, error } = await sb.from('bookings').select('*').or('from_id.eq.'+this.currentUser.id+',to_id.eq.'+this.currentUser.id);
-          if (error) throw error;
-          this.bookings = data || [];
-        } catch(e) {
-          console.error('loadBookings error:', e);
-        }
-      },
-
-      async handleLogin() {
-        if (!sb) return;
-        this.loginError = '';
-        if (!this.loginEmail || !this.loginPassword) {
-          this.loginError = 'Please fill in all fields';
-          return;
-        }
-        this.loginLoading = true;
-        try {
-          const { data, error } = await sb.from('users')
-            .select('*')
-            .eq('email', this.loginEmail)
-            .eq('password', this.loginPassword)
-            .single();
-          if (error || !data) {
-            this.loginError = 'Invalid email or password';
-            this.loginLoading = false;
-            return;
-          }
-          this.currentUser = data;
-          localStorage.setItem('skillswap_user', JSON.stringify(data));
-          this.showLogin = false;
-          this.showToast('Welcome back, ' + data.name + '!', 'success');
-          await this.loadUsers();
-          await this.loadBookings();
-          this.subscribeMessages();
-        } catch(e) {
-          this.loginError = 'Login failed: ' + e.message;
-        }
-        this.loginLoading = false;
-      },
-
-      async handleSignup() {
-        if (!sb) return;
-        this.signupError = '';
-        if (!this.signupName || !this.signupEmail || !this.signupPassword) {
-          this.signupError = 'Name, email, and password are required';
-          return;
-        }
-        this.signupLoading = true;
-        try {
-          const { data: existing } = await sb.from('users').select('id').eq('email', this.signupEmail).single();
-          if (existing) {
-            this.signupError = 'Email already registered';
-            this.signupLoading = false;
-            return;
-          }
-        } catch(e) {}
-
-        try {
-          const newUser = {
-            name: this.signupName,
-            email: this.signupEmail,
-            password: this.signupPassword,
-            phone: this.signupPhone,
-            age: this.signupAge ? parseInt(this.signupAge) : null,
-            skills: this.signupSkills,
-            wants: this.signupWants,
-            bio: this.signupBio,
-            credits: 25
-          };
-          const { data, error } = await sb.from('users').insert(newUser).select().single();
-          if (error) throw error;
-          this.currentUser = data;
-          localStorage.setItem('skillswap_user', JSON.stringify(data));
-          this.showSignup = false;
-          this.showToast('Account created! You got 25 credits.', 'success');
-          await this.loadUsers();
-          this.subscribeMessages();
-        } catch(e) {
-          this.signupError = 'Signup failed: ' + e.message;
-        }
-        this.signupLoading = false;
-      },
-
-      logout() {
-        this.currentUser = null;
-        this.chatWith = null;
-        this.chatUsers = [];
-        this.messages = [];
+    if (this.fatalError) return;
+    await this.checkSetup();
+    const saved = localStorage.getItem('skillswap_user');
+    if (saved) {
+      try {
+        this.currentUser = JSON.parse(saved);
+        await this.loadUsers();
+        await this.loadBookings();
+        this.subscribeMessages();
+      } catch(e) {
         localStorage.removeItem('skillswap_user');
-        this.page = 'browse';
-        this.showToast('Logged out', 'success');
-      },
-
-      addSkill() {
-        if (this.newSkill.trim() && !this.signupSkills.includes(this.newSkill.trim())) {
-          this.signupSkills.push(this.newSkill.trim());
-          this.newSkill = '';
-        }
-      },
-      addWant() {
-        if (this.newWant.trim() && !this.signupWants.includes(this.newWant.trim())) {
-          this.signupWants.push(this.newWant.trim());
-          this.newWant = '';
-        }
-      },
-
-      openEditProfile() {
-        this.editName = this.currentUser.name || '';
-        this.editPhone = this.currentUser.phone || '';
-        this.editAge = this.currentUser.age || '';
-        this.editSkills = [...(this.currentUser.skills || [])];
-        this.editWants = [...(this.currentUser.wants || [])];
-        this.editBio = this.currentUser.bio || '';
-        this.showEditProfile = true;
-      },
-      addEditSkill() {
-        if (this.newEditSkill.trim() && !this.editSkills.includes(this.newEditSkill.trim())) {
-          this.editSkills.push(this.newEditSkill.trim());
-          this.newEditSkill = '';
-        }
-      },
-      addEditWant() {
-        if (this.newEditWant.trim() && !this.editWants.includes(this.newEditWant.trim())) {
-          this.editWants.push(this.newEditWant.trim());
-          this.newEditWant = '';
-        }
-      },
-      async saveProfile() {
-        if (!sb) return;
-        this.editLoading = true;
-        try {
-          const updates = {
-            name: this.editName,
-            phone: this.editPhone,
-            age: this.editAge ? parseInt(this.editAge) : null,
-            skills: this.editSkills,
-            wants: this.editWants,
-            bio: this.editBio
-          };
-          const { data, error } = await sb.from('users').update(updates).eq('id', this.currentUser.id).select().single();
-          if (error) throw error;
-          this.currentUser = data;
-          localStorage.setItem('skillswap_user', JSON.stringify(data));
-          this.showEditProfile = false;
-          await this.loadUsers();
-          this.showToast('Profile updated!', 'success');
-        } catch(e) {
-          this.showToast('Failed to update profile: ' + e.message, 'error');
-        }
-        this.editLoading = false;
-      },
-
-      async deleteAccount() {
-        if (!sb) return;
-        this.deleteError = '';
-        if (this.deleteConfirmText !== 'DELETE') {
-          this.deleteError = 'Please type DELETE to confirm';
-          return;
-        }
-        this.deleteLoading = true;
-        try {
-          const uid = this.currentUser.id;
-          await sb.from('messages').delete().or('sender_id.eq.'+uid+',receiver_id.eq.'+uid);
-          await sb.from('reviews').delete().or('from_id.eq.'+uid+',to_id.eq.'+uid);
-          await sb.from('bookings').delete().or('from_id.eq.'+uid+',to_id.eq.'+uid);
-          await sb.from('notifications').delete().eq('user_id', uid);
-          await sb.from('users').delete().eq('id', uid);
-          this.showDeleteAccount = false;
-          this.logout();
-          this.showToast('Account deleted permanently', 'success');
-          await this.loadUsers();
-        } catch(e) {
-          this.deleteError = 'Delete failed: ' + e.message;
-        }
-        this.deleteLoading = false;
-      },
-
-      async clearAllData() {
-        if (!sb) return;
-        this.clearError = '';
-        if (this.clearConfirmText !== 'CLEAR ALL') {
-          this.clearError = 'Please type CLEAR ALL to confirm';
-          return;
-        }
-        this.clearLoading = true;
-        try {
-          await sb.from('messages').delete().neq('id', 0);
-          await sb.from('reviews').delete().neq('id', 0);
-          await sb.from('bookings').delete().neq('id', 0);
-          await sb.from('notifications').delete().neq('id', 0);
-          await sb.from('users').delete().neq('id', 0);
-          this.showClearAll = false;
-          this.logout();
-          this.showToast('All data cleared', 'success');
-          await this.loadUsers();
-        } catch(e) {
-          this.clearError = 'Clear failed: ' + e.message;
-        }
-        this.clearLoading = false;
-      },
-
-      openProfile(u) {
-        this.viewingUser = u;
-      },
-
-      openBooking(u) {
-        this.bookingTo = u;
-        this.bookingSkill = '';
-        this.bookingDate = '';
-        this.bookingTime = '';
-        this.bookingDuration = 60;
-        this.bookingMessage = '';
-        this.showBookingModal = true;
-      },
-
-      async confirmBooking() {
-        if (!sb) return;
-        if (!this.bookingSkill || !this.bookingDate || !this.bookingTime) {
-          this.showToast('Please fill in all required fields', 'error');
-          return;
-        }
-        this.bookingLoading = true;
-        try {
-          const booking = {
-            from_id: this.currentUser.id,
-            to_id: this.bookingTo.id,
-            skill: this.bookingSkill,
-            date: this.bookingDate,
-            time: this.bookingTime,
-            duration: parseInt(this.bookingDuration) || 60,
-            message: this.bookingMessage,
-            status: 'Pending'
-          };
-          const { error } = await sb.from('bookings').insert(booking);
-          if (error) throw error;
-          await sb.from('notifications').insert({
-            user_id: this.bookingTo.id,
-            text: this.currentUser.name + ' booked a ' + this.bookingSkill + ' session',
-            icon: 'calendar'
-          });
-          this.showBookingModal = false;
-          this.showToast('Booking request sent!', 'success');
-          await this.loadBookings();
-        } catch(e) {
-          this.showToast('Booking failed: ' + e.message, 'error');
-        }
-        this.bookingLoading = false;
-      },
-
-      calculateCredits() {
-        const dur = parseInt(this.reviewDuration) || 0;
-        const rat = parseInt(this.reviewRating) || 0;
-        return Math.round((dur / 10) * rat);
-      },
-
-      async submitReview() {
-        if (!sb) return;
-        if (!this.reviewRating || !this.reviewSkill || !this.reviewText) {
-          this.showToast('Please fill in all fields', 'error');
-          return;
-        }
-        this.reviewLoading = true;
-        try {
-          const credits = this.calculateCredits();
-          const review = {
-            from_id: this.currentUser.id,
-            to_id: this.reviewTo.id,
-            rating: this.reviewRating,
-            duration: parseInt(this.reviewDuration) || 30,
-            skill: this.reviewSkill,
-            text: this.reviewText,
-            from_name: this.currentUser.name
-          };
-          const { error } = await sb.from('reviews').insert(review);
-          if (error) throw error;
-
-          const { data: toUser } = await sb.from('users').select('credits').eq('id', this.reviewTo.id).single();
-          await sb.from('users').update({ credits: (toUser?.credits || 0) + credits }).eq('id', this.reviewTo.id);
-
-          await sb.from('notifications').insert({
-            user_id: this.reviewTo.id,
-            text: this.currentUser.name + ' left you a ' + this.reviewRating + '-star review',
-            icon: 'star'
-          });
-
-          this.showReviewModal = false;
-          this.showToast('Review submitted! They earned ' + credits + ' credits.', 'success');
-        } catch(e) {
-          this.showToast('Review failed: ' + e.message, 'error');
-        }
-        this.reviewLoading = false;
-      },
-
-      async loadChatUsers() {
-        if (!sb || !this.currentUser) return;
-        try {
-          const { data: msgs } = await sb.from('messages')
-            .select('sender_id,receiver_id')
-            .or('sender_id.eq.'+this.currentUser.id+',receiver_id.eq.'+this.currentUser.id);
-          const ids = new Set();
-          (msgs||[]).forEach(m => {
-            const other = m.sender_id === this.currentUser.id ? m.receiver_id : m.sender_id;
-            ids.add(other);
-          });
-          this.chatUsers = this.users.filter(u => ids.has(u.id));
-        } catch(e) {}
-      },
-
-      async openChat(u) {
-        this.chatWith = u;
-        await this.loadMessages();
-        this.scrollToBottom();
-      },
-
-      async loadMessages() {
-        if (!sb) return;
-        try {
-          const { data, error } = await sb.from('messages').select('*');
-          if (error) throw error;
-          this.messages = data || [];
-        } catch(e) {}
-      },
-
-      lastMessagePreview(uid) {
-        const msgs = this.messages.filter(m => 
-          (m.sender_id === this.currentUser.id && m.receiver_id === uid) ||
-          (m.sender_id === uid && m.receiver_id === this.currentUser.id)
-        ).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-        return msgs.length ? msgs[0].text : 'No messages yet';
-      },
-
-      async sendMessage() {
-        if (!sb || !this.chatInput.trim() || !this.chatWith) return;
-        const text = this.chatInput.trim();
-        this.chatInput = '';
-        try {
-          const { error } = await sb.from('messages').insert({
-            sender_id: this.currentUser.id,
-            receiver_id: this.chatWith.id,
-            text: text
-          });
-          if (error) throw error;
-          await this.loadMessages();
-          this.scrollToBottom();
-          if (!this.chatUsers.find(u => u.id === this.chatWith.id)) {
-            this.chatUsers.push(this.chatWith);
-          }
-        } catch(e) {
-          this.showToast('Message failed: ' + e.message, 'error');
-        }
-      },
-
-      startChat(u) {
-        this.page = 'chat';
-        this.openChat(u);
-      },
-
-      scrollToBottom() {
-        this.$nextTick(() => {
-          const el = this.$refs.chatMessages;
-          if (el) el.scrollTop = el.scrollHeight;
-        });
-      },
-
-      subscribeMessages() {
-        if (!sb) return;
-        sb.channel('messages')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, async () => {
-            await this.loadMessages();
-            if (this.chatWith) this.scrollToBottom();
-          })
-          .subscribe();
-      },
-
-      showToast(msg, type='success') {
-        const id = ++this.toastId;
-        this.toasts.push({ id, message: msg, type });
-        setTimeout(() => this.removeToast(id), 4000);
-      },
-      removeToast(id) {
-        this.toasts = this.toasts.filter(t => t.id !== id);
       }
     }
-  }).mount('#app');
+  },
 
-} catch(e) {
-  // If Vue or anything else crashes, show it on screen
-  document.getElementById('fatal-error').style.display = 'block';
-  document.getElementById('fatal-msg').textContent = e.message;
-  console.error('FATAL ERROR:', e);
-}
+  methods: {
+    async checkSetup() {
+      if (!sb) return;
+      this.setupChecking = true;
+      this.setupError = '';
+      try {
+        const { error } = await sb.from('users').select('id').limit(1);
+        if (error && (error.message.includes('does not exist') || error.message.includes('schema cache') || error.code === '42P01')) {
+          this.showSetup = true;
+        } else {
+          this.showSetup = false;
+        }
+      } catch(e) {
+        this.showSetup = true;
+      }
+      this.setupChecking = false;
+    },
+
+    copySQL() {
+      navigator.clipboard.writeText(this.setupSQL).then(() => {
+        this.showToast('SQL copied to clipboard!', 'success');
+      });
+    },
+
+    async loadUsers() {
+      if (!sb) return;
+      try {
+        const { data, error } = await sb.from('users').select('*');
+        if (error) throw error;
+        this.users = data || [];
+      } catch(e) {
+        console.error('loadUsers error:', e);
+      }
+    },
+
+    async loadBookings() {
+      if (!sb || !this.currentUser) return;
+      try {
+        const { data, error } = await sb.from('bookings').select('*').or('from_id.eq.'+this.currentUser.id+',to_id.eq.'+this.currentUser.id);
+        if (error) throw error;
+        this.bookings = data || [];
+      } catch(e) {
+        console.error('loadBookings error:', e);
+      }
+    },
+
+    async handleLogin() {
+      if (!sb) return;
+      this.loginError = '';
+      if (!this.loginEmail || !this.loginPassword) {
+        this.loginError = 'Please fill in all fields';
+        return;
+      }
+      this.loginLoading = true;
+      try {
+        const { data, error } = await sb.from('users')
+          .select('*')
+          .eq('email', this.loginEmail)
+          .eq('password', this.loginPassword)
+          .single();
+        if (error || !data) {
+          this.loginError = 'Invalid email or password';
+          this.loginLoading = false;
+          return;
+        }
+        this.currentUser = data;
+        localStorage.setItem('skillswap_user', JSON.stringify(data));
+        this.showLogin = false;
+        this.showToast('Welcome back, ' + data.name + '!', 'success');
+        await this.loadUsers();
+        await this.loadBookings();
+        this.subscribeMessages();
+      } catch(e) {
+        this.loginError = 'Login failed: ' + e.message;
+      }
+      this.loginLoading = false;
+    },
+
+    async handleSignup() {
+      if (!sb) return;
+      this.signupError = '';
+      if (!this.signupName || !this.signupEmail || !this.signupPassword) {
+        this.signupError = 'Name, email, and password are required';
+        return;
+      }
+      this.signupLoading = true;
+      try {
+        const { data: existing } = await sb.from('users').select('id').eq('email', this.signupEmail).single();
+        if (existing) {
+          this.signupError = 'Email already registered';
+          this.signupLoading = false;
+          return;
+        }
+      } catch(e) {}
+
+      try {
+        const newUser = {
+          name: this.signupName,
+          email: this.signupEmail,
+          password: this.signupPassword,
+          phone: this.signupPhone,
+          age: this.signupAge ? parseInt(this.signupAge) : null,
+          skills: this.signupSkills,
+          wants: this.signupWants,
+          bio: this.signupBio,
+          credits: 25
+        };
+        const { data, error } = await sb.from('users').insert(newUser).select().single();
+        if (error) throw error;
+        this.currentUser = data;
+        localStorage.setItem('skillswap_user', JSON.stringify(data));
+        this.showSignup = false;
+        this.showToast('Account created! You got 25 credits.', 'success');
+        await this.loadUsers();
+        this.subscribeMessages();
+      } catch(e) {
+        this.signupError = 'Signup failed: ' + e.message;
+      }
+      this.signupLoading = false;
+    },
+
+    logout() {
+      this.currentUser = null;
+      this.chatWith = null;
+      this.chatUsers = [];
+      this.messages = [];
+      localStorage.removeItem('skillswap_user');
+      this.page = 'browse';
+      this.showToast('Logged out', 'success');
+    },
+
+    addSkill() {
+      if (this.newSkill.trim() && !this.signupSkills.includes(this.newSkill.trim())) {
+        this.signupSkills.push(this.newSkill.trim());
+        this.newSkill = '';
+      }
+    },
+    addWant() {
+      if (this.newWant.trim() && !this.signupWants.includes(this.newWant.trim())) {
+        this.signupWants.push(this.newWant.trim());
+        this.newWant = '';
+      }
+    },
+
+    openEditProfile() {
+      this.editName = this.currentUser.name || '';
+      this.editPhone = this.currentUser.phone || '';
+      this.editAge = this.currentUser.age || '';
+      this.editSkills = [...(this.currentUser.skills || [])];
+      this.editWants = [...(this.currentUser.wants || [])];
+      this.editBio = this.currentUser.bio || '';
+      this.showEditProfile = true;
+    },
+    addEditSkill() {
+      if (this.newEditSkill.trim() && !this.editSkills.includes(this.newEditSkill.trim())) {
+        this.editSkills.push(this.newEditSkill.trim());
+        this.newEditSkill = '';
+      }
+    },
+    addEditWant() {
+      if (this.newEditWant.trim() && !this.editWants.includes(this.newEditWant.trim())) {
+        this.editWants.push(this.newEditWant.trim());
+        this.newEditWant = '';
+      }
+    },
+    async saveProfile() {
+      if (!sb) return;
+      this.editLoading = true;
+      try {
+        const updates = {
+          name: this.editName,
+          phone: this.editPhone,
+          age: this.editAge ? parseInt(this.editAge) : null,
+          skills: this.editSkills,
+          wants: this.editWants,
+          bio: this.editBio
+        };
+        const { data, error } = await sb.from('users').update(updates).eq('id', this.currentUser.id).select().single();
+        if (error) throw error;
+        this.currentUser = data;
+        localStorage.setItem('skillswap_user', JSON.stringify(data));
+        this.showEditProfile = false;
+        await this.loadUsers();
+        this.showToast('Profile updated!', 'success');
+      } catch(e) {
+        this.showToast('Failed to update profile: ' + e.message, 'error');
+      }
+      this.editLoading = false;
+    },
+
+    async deleteAccount() {
+      if (!sb) return;
+      this.deleteError = '';
+      if (this.deleteConfirmText !== 'DELETE') {
+        this.deleteError = 'Please type DELETE to confirm';
+        return;
+      }
+      this.deleteLoading = true;
+      try {
+        const uid = this.currentUser.id;
+        await sb.from('messages').delete().or('sender_id.eq.'+uid+',receiver_id.eq.'+uid);
+        await sb.from('reviews').delete().or('from_id.eq.'+uid+',to_id.eq.'+uid);
+        await sb.from('bookings').delete().or('from_id.eq.'+uid+',to_id.eq.'+uid);
+        await sb.from('notifications').delete().eq('user_id', uid);
+        await sb.from('users').delete().eq('id', uid);
+        this.showDeleteAccount = false;
+        this.logout();
+        this.showToast('Account deleted permanently', 'success');
+        await this.loadUsers();
+      } catch(e) {
+        this.deleteError = 'Delete failed: ' + e.message;
+      }
+      this.deleteLoading = false;
+    },
+
+    async clearAllData() {
+      if (!sb) return;
+      this.clearError = '';
+      if (this.clearConfirmText !== 'CLEAR ALL') {
+        this.clearError = 'Please type CLEAR ALL to confirm';
+        return;
+      }
+      this.clearLoading = true;
+      try {
+        await sb.from('messages').delete().neq('id', 0);
+        await sb.from('reviews').delete().neq('id', 0);
+        await sb.from('bookings').delete().neq('id', 0);
+        await sb.from('notifications').delete().neq('id', 0);
+        await sb.from('users').delete().neq('id', 0);
+        this.showClearAll = false;
+        this.logout();
+        this.showToast('All data cleared', 'success');
+        await this.loadUsers();
+      } catch(e) {
+        this.clearError = 'Clear failed: ' + e.message;
+      }
+      this.clearLoading = false;
+    },
+
+    openProfile(u) {
+      this.viewingUser = u;
+    },
+
+    openBooking(u) {
+      this.bookingTo = u;
+      this.bookingSkill = '';
+      this.bookingDate = '';
+      this.bookingTime = '';
+      this.bookingDuration = 60;
+      this.bookingMessage = '';
+      this.showBookingModal = true;
+    },
+
+    async confirmBooking() {
+      if (!sb) return;
+      if (!this.bookingSkill || !this.bookingDate || !this.bookingTime) {
+        this.showToast('Please fill in all required fields', 'error');
+        return;
+      }
+      this.bookingLoading = true;
+      try {
+        const booking = {
+          from_id: this.currentUser.id,
+          to_id: this.bookingTo.id,
+          skill: this.bookingSkill,
+          date: this.bookingDate,
+          time: this.bookingTime,
+          duration: parseInt(this.bookingDuration) || 60,
+          message: this.bookingMessage,
+          status: 'Pending'
+        };
+        const { error } = await sb.from('bookings').insert(booking);
+        if (error) throw error;
+        await sb.from('notifications').insert({
+          user_id: this.bookingTo.id,
+          text: this.currentUser.name + ' booked a ' + this.bookingSkill + ' session',
+          icon: 'calendar'
+        });
+        this.showBookingModal = false;
+        this.showToast('Booking request sent!', 'success');
+        await this.loadBookings();
+      } catch(e) {
+        this.showToast('Booking failed: ' + e.message, 'error');
+      }
+      this.bookingLoading = false;
+    },
+
+    calculateCredits() {
+      const dur = parseInt(this.reviewDuration) || 0;
+      const rat = parseInt(this.reviewRating) || 0;
+      return Math.round((dur / 10) * rat);
+    },
+
+    async submitReview() {
+      if (!sb) return;
+      if (!this.reviewRating || !this.reviewSkill || !this.reviewText) {
+        this.showToast('Please fill in all fields', 'error');
+        return;
+      }
+      this.reviewLoading = true;
+      try {
+        const credits = this.calculateCredits();
+        const review = {
+          from_id: this.currentUser.id,
+          to_id: this.reviewTo.id,
+          rating: this.reviewRating,
+          duration: parseInt(this.reviewDuration) || 30,
+          skill: this.reviewSkill,
+          text: this.reviewText,
+          from_name: this.currentUser.name
+        };
+        const { error } = await sb.from('reviews').insert(review);
+        if (error) throw error;
+
+        const { data: toUser } = await sb.from('users').select('credits').eq('id', this.reviewTo.id).single();
+        await sb.from('users').update({ credits: (toUser?.credits || 0) + credits }).eq('id', this.reviewTo.id);
+
+        await sb.from('notifications').insert({
+          user_id: this.reviewTo.id,
+          text: this.currentUser.name + ' left you a ' + this.reviewRating + '-star review',
+          icon: 'star'
+        });
+
+        this.showReviewModal = false;
+        this.showToast('Review submitted! They earned ' + credits + ' credits.', 'success');
+      } catch(e) {
+        this.showToast('Review failed: ' + e.message, 'error');
+      }
+      this.reviewLoading = false;
+    },
+
+    async loadChatUsers() {
+      if (!sb || !this.currentUser) return;
+      try {
+        const { data: msgs } = await sb.from('messages')
+          .select('sender_id,receiver_id')
+          .or('sender_id.eq.'+this.currentUser.id+',receiver_id.eq.'+this.currentUser.id);
+        const ids = new Set();
+        (msgs||[]).forEach(m => {
+          const other = m.sender_id === this.currentUser.id ? m.receiver_id : m.sender_id;
+          ids.add(other);
+        });
+        this.chatUsers = this.users.filter(u => ids.has(u.id));
+      } catch(e) {}
+    },
+
+    async openChat(u) {
+      this.chatWith = u;
+      await this.loadMessages();
+      this.scrollToBottom();
+    },
+
+    async loadMessages() {
+      if (!sb) return;
+      try {
+        const { data, error } = await sb.from('messages').select('*');
+        if (error) throw error;
+        this.messages = data || [];
+      } catch(e) {}
+    },
+
+    lastMessagePreview(uid) {
+      const msgs = this.messages.filter(m => 
+        (m.sender_id === this.currentUser.id && m.receiver_id === uid) ||
+        (m.sender_id === uid && m.receiver_id === this.currentUser.id)
+      ).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+      return msgs.length ? msgs[0].text : 'No messages yet';
+    },
+
+    async sendMessage() {
+      if (!sb || !this.chatInput.trim() || !this.chatWith) return;
+      const text = this.chatInput.trim();
+      this.chatInput = '';
+      try {
+        const { error } = await sb.from('messages').insert({
+          sender_id: this.currentUser.id,
+          receiver_id: this.chatWith.id,
+          text: text
+        });
+        if (error) throw error;
+        await this.loadMessages();
+        this.scrollToBottom();
+        if (!this.chatUsers.find(u => u.id === this.chatWith.id)) {
+          this.chatUsers.push(this.chatWith);
+        }
+      } catch(e) {
+        this.showToast('Message failed: ' + e.message, 'error');
+      }
+    },
+
+    startChat(u) {
+      this.page = 'chat';
+      this.openChat(u);
+    },
+
+    scrollToBottom() {
+      this.$nextTick(() => {
+        const el = this.$refs.chatMessages;
+        if (el) el.scrollTop = el.scrollHeight;
+      });
+    },
+
+    subscribeMessages() {
+      if (!sb) return;
+      sb.channel('messages')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, async () => {
+          await this.loadMessages();
+          if (this.chatWith) this.scrollToBottom();
+        })
+        .subscribe();
+    },
+
+    showToast(msg, type='success') {
+      const id = ++this.toastId;
+      this.toasts.push({ id, message: msg, type });
+      setTimeout(() => this.removeToast(id), 4000);
+    },
+    removeToast(id) {
+      this.toasts = this.toasts.filter(t => t.id !== id);
+    }
+  }
+}).mount('#app');
 </script>
 
 </body>
