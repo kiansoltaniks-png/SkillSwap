@@ -3,149 +3,214 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SkillSwap</title>
+<title>SkillSwap - Trade Skills, Not Money</title>
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--primary:#0d9488;--primary-dark:#0f766e;--primary-light:#ccfbf1;--danger:#e74c3c;--danger-dark:#c0392b;--bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;--radius:12px;--shadow:0 4px 6px -1px rgba(0,0,0,0.1);}
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif;}
-body{background:var(--bg);color:var(--text);line-height:1.5;}
-.container{max-width:1200px;margin:0 auto;padding:1rem;}
-header{background:var(--card);border-bottom:1px solid var(--border);padding:1rem 0;position:sticky;top:0;z-index:100;}
+:root{--primary:#0d9488;--primary-dark:#0f766e;--primary-light:#ccfbf1;--accent:#f59e0b;--danger:#ef4444;--danger-dark:#b91c1c;--bg:#f8fafc;--card:#ffffff;--text:#0f172a;--text-light:#475569;--muted:#94a3b8;--border:#e2e8f0;--radius:16px;--shadow:0 1px 3px rgba(0,0,0,0.1);--shadow-lg:0 10px 40px rgba(0,0,0,0.1);}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',system-ui,sans-serif;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);line-height:1.6;}
+.container{max-width:1200px;margin:0 auto;padding:0 1.5rem;}
+header{background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:1rem 0;position:sticky;top:0;z-index:100;}
 header .container{display:flex;align-items:center;justify-content:space-between;}
-.logo{font-size:1.5rem;font-weight:800;color:var(--primary);}
-nav{display:flex;gap:1rem;align-items:center;}
-nav a,nav button{color:var(--text);text-decoration:none;font-weight:500;background:none;border:none;cursor:pointer;font-size:1rem;padding:0.5rem 1rem;border-radius:8px;transition:0.2s;}
-nav a:hover,nav button:hover{background:#f1f5f9;}
-.btn{padding:0.6rem 1.2rem;border-radius:8px;border:none;font-weight:600;cursor:pointer;transition:0.2s;font-size:0.95rem;}
-.btn-primary{background:var(--primary);color:#fff;}
-.btn-primary:hover{background:var(--primary-dark);}
+.logo{font-size:1.6rem;font-weight:900;color:var(--primary);letter-spacing:-0.5px;display:flex;align-items:center;gap:0.5rem;}
+.logo-icon{width:36px;height:36px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.2rem;}
+nav{display:flex;gap:0.5rem;align-items:center;}
+nav a,nav button{color:var(--text-light);text-decoration:none;font-weight:600;background:none;border:none;cursor:pointer;font-size:0.95rem;padding:0.6rem 1.2rem;border-radius:10px;transition:all 0.2s;}
+nav a:hover,nav button:hover{color:var(--primary);background:var(--primary-light);}
+.btn{padding:0.7rem 1.5rem;border-radius:12px;border:none;font-weight:600;cursor:pointer;transition:all 0.2s;font-size:0.95rem;display:inline-flex;align-items:center;gap:0.5rem;}
+.btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 14px rgba(13,148,136,0.3);}
+.btn-primary:hover{background:var(--primary-dark);transform:translateY(-2px);box-shadow:0 6px 20px rgba(13,148,136,0.4);}
 .btn-danger{background:var(--danger);color:#fff;}
-.btn-danger:hover{background:var(--danger-dark);}
-.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
-.btn-outline:hover{background:#f8fafc;}
-.btn-sm{padding:0.4rem 0.8rem;font-size:0.85rem;}
-.btn-lg{padding:0.9rem 2rem;font-size:1.1rem;}
-.card{background:var(--card);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:1rem;}
+.btn-danger:hover{background:var(--danger-dark);transform:translateY(-2px);}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text);}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light);}
+.btn-sm{padding:0.5rem 1rem;font-size:0.85rem;}
+.btn-lg{padding:1rem 2.2rem;font-size:1.05rem;}
+.btn-white{background:#fff;color:var(--primary);}
+.btn-white:hover{background:#f0fdf4;}
+.card{background:var(--card);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);border:1px solid var(--border);transition:all 0.3s;}
+.card:hover{box-shadow:var(--shadow-lg);transform:translateY(-4px);}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem;}
-.member-card{background:var(--card);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);border:1px solid var(--border);transition:0.2s;cursor:pointer;}
-.member-card:hover{transform:translateY(-4px);box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);}
+
+/* HERO */
+.hero{position:relative;min-height:85vh;display:flex;align-items:center;overflow:hidden;background:linear-gradient(135deg,#0f766e 0%,#0d9488 50%,#14b8a6 100%);}
+.hero-bg{position:absolute;inset:0;opacity:0.15;background-image:url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1920&q=80');background-size:cover;background-position:center;}
+.hero .container{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;}
+.hero-content{color:#fff;}
+.hero h1{font-size:3.8rem;font-weight:900;line-height:1.1;margin-bottom:1.5rem;letter-spacing:-1.5px;}
+.hero p{font-size:1.25rem;opacity:0.9;margin-bottom:2.5rem;max-width:500px;line-height:1.7;}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap;}
+.hero-stats{display:flex;gap:3rem;margin-top:3rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,0.2);}
+.hero-stat-num{font-size:2rem;font-weight:800;}
+.hero-stat-label{font-size:0.9rem;opacity:0.8;}
+.hero-image{position:relative;}
+.hero-image img{width:100%;border-radius:24px;box-shadow:0 25px 60px rgba(0,0,0,0.3);transform:rotate(2deg);transition:transform 0.5s;}
+.hero-image img:hover{transform:rotate(0deg) scale(1.02);}
+
+/* SECTIONS */
+.section{padding:6rem 0;}
+.section-header{text-align:center;max-width:600px;margin:0 auto 4rem;}
+.section-header h2{font-size:2.5rem;font-weight:800;margin-bottom:1rem;letter-spacing:-1px;}
+.section-header p{color:var(--text-light);font-size:1.1rem;}
+
+/* FEATURES */
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem;}
+.feature-card{background:var(--card);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);transition:all 0.3s;}
+.feature-card:hover{transform:translateY(-8px);box-shadow:var(--shadow-lg);}
+.feature-img{height:200px;background-size:cover;background-position:center;position:relative;}
+.feature-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.4),transparent);}
+.feature-badge{position:absolute;top:1rem;left:1rem;background:rgba(255,255,255,0.9);backdrop-filter:blur(8px);padding:0.4rem 0.8rem;border-radius:20px;font-size:0.8rem;font-weight:700;color:var(--primary);z-index:2;}
+.feature-body{padding:1.5rem;}
+.feature-body h3{font-size:1.2rem;margin-bottom:0.5rem;}
+.feature-body p{color:var(--text-light);font-size:0.95rem;line-height:1.6;}
+
+/* HOW IT WORKS */
+.steps-bg{background:linear-gradient(180deg,#f0fdf4 0%,var(--bg) 100%);}
+.steps{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;}
+.step{background:var(--card);border-radius:var(--radius);padding:2.5rem 2rem;width:280px;text-align:center;border:1px solid var(--border);box-shadow:var(--shadow);position:relative;transition:all 0.3s;}
+.step:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);}
+.step-num{width:56px;height:56px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.3rem;margin:0 auto 1.5rem;box-shadow:0 8px 20px rgba(13,148,136,0.3);}
+.step h4{font-size:1.2rem;margin-bottom:0.75rem;}
+.step p{color:var(--text-light);font-size:0.95rem;line-height:1.6;}
+.step-connector{position:absolute;top:50%;right:-2rem;width:2rem;height:2px;background:var(--primary);opacity:0.3;display:none;}
+
+/* CATEGORIES */
+.categories-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1.5rem;}
+.category-card{background:var(--card);border-radius:var(--radius);padding:1.5rem;text-align:center;border:1.5px solid var(--border);cursor:pointer;transition:all 0.3s;}
+.category-card:hover{border-color:var(--primary);transform:translateY(-4px);box-shadow:var(--shadow-lg);}
+.category-icon{font-size:2.5rem;margin-bottom:1rem;}
+.category-card h4{font-size:1rem;margin-bottom:0.25rem;}
+.category-card p{color:var(--muted);font-size:0.85rem;}
+
+/* TESTIMONIALS */
+.testimonials-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:2rem;}
+.testimonial-card{background:var(--card);border-radius:var(--radius);padding:2rem;border:1px solid var(--border);position:relative;}
+.testimonial-card::before{content:'"';position:absolute;top:1rem;right:1.5rem;font-size:4rem;color:var(--primary-light);font-family:serif;line-height:1;}
+.testimonial-text{color:var(--text-light);font-size:1rem;line-height:1.7;margin-bottom:1.5rem;font-style:italic;}
+.testimonial-author{display:flex;align-items:center;gap:1rem;}
+.testimonial-avatar{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--primary-light);}
+.testimonial-name{font-weight:700;}
+.testimonial-role{color:var(--muted);font-size:0.85rem;}
+.stars{color:#fbbf24;letter-spacing:2px;margin-bottom:0.5rem;}
+
+/* MEMBERS PREVIEW */
+.members-preview{background:linear-gradient(135deg,#f0fdf4 0%,#ecfdf5 100%);}
+.member-card{background:var(--card);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);border:1px solid var(--border);transition:all 0.3s;cursor:pointer;}
+.member-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);}
 .member-avatar{width:64px;height:64px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;margin-bottom:1rem;}
 .member-name{font-weight:700;font-size:1.1rem;margin-bottom:0.25rem;}
 .member-meta{color:var(--muted);font-size:0.9rem;margin-bottom:0.75rem;}
 .skills{display:flex;flex-wrap:wrap;gap:0.4rem;}
-.skill-tag{background:var(--primary-light);color:var(--primary-dark);padding:0.25rem 0.6rem;border-radius:20px;font-size:0.8rem;font-weight:600;}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:200;padding:1rem;}
-.modal{background:var(--card);border-radius:var(--radius);width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:2rem;position:relative;}
-.modal h2{margin-bottom:1.5rem;font-size:1.4rem;}
-.form-group{margin-bottom:1rem;}
-.form-group label{display:block;font-weight:600;margin-bottom:0.4rem;font-size:0.9rem;}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:0.6rem;border:1px solid var(--border);border-radius:8px;font-size:1rem;}
-.form-group textarea{min-height:80px;resize:vertical;}
-.skills-input{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;}
-.skill-pill{background:var(--primary);color:#fff;padding:0.3rem 0.7rem;border-radius:20px;font-size:0.85rem;display:flex;align-items:center;gap:0.3rem;}
-.skill-pill button{background:none;border:none;color:#fff;font-size:1rem;cursor:pointer;line-height:1;}
-.star-rating{font-size:1.8rem;color:#cbd5e1;cursor:pointer;}
-.star-rating .filled{color:#fbbf24;}
-.chat-sidebar{width:280px;border-right:1px solid var(--border);overflow-y:auto;max-height:500px;}
-.chat-contact{padding:1rem;border-bottom:1px solid var(--border);cursor:pointer;transition:0.2s;}
-.chat-contact:hover,.chat-contact.active{background:#f8fafc;}
-.chat-contact-name{font-weight:600;}
-.chat-contact-preview{font-size:0.85rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.chat-main{flex:1;display:flex;flex-direction:column;min-height:500px;}
-.chat-header{padding:1rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
-.chat-messages{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.5rem;}
-.message{max-width:70%;padding:0.75rem 1rem;border-radius:12px;font-size:0.95rem;}
-.message-sent{align-self:flex-end;background:var(--primary);color:#fff;border-bottom-right-radius:4px;}
-.message-received{align-self:flex-start;background:#f1f5f9;border-bottom-left-radius:4px;}
-.chat-input-area{display:flex;gap:0.5rem;padding:1rem;border-top:1px solid var(--border);}
-.chat-input{flex:1;padding:0.6rem;border:1px solid var(--border);border-radius:8px;}
-.chat-send-btn{background:var(--primary);color:#fff;border:none;border-radius:8px;padding:0 1.2rem;cursor:pointer;font-weight:600;}
-.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.5rem;box-shadow:var(--shadow);z-index:300;display:flex;align-items:center;gap:0.75rem;animation:slideIn 0.3s ease;}
-@keyframes slideIn{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-.toast-close{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);}
-.empty-state{text-align:center;padding:3rem;color:var(--muted);}
-.empty-state h3{margin-bottom:0.5rem;color:var(--text);}
-.badge{display:inline-flex;align-items:center;gap:0.3rem;background:#fef3c7;color:#92400e;padding:0.3rem 0.7rem;border-radius:20px;font-size:0.8rem;font-weight:600;}
-.setup-banner{background:#fef3c7;border:1px solid #fbbf24;border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem;}
-.setup-banner h3{color:#92400e;margin-bottom:0.5rem;}
-.setup-banner pre{background:#1e293b;color:#e2e8f0;padding:1rem;border-radius:8px;overflow-x:auto;font-size:0.85rem;margin:1rem 0;}
-.setup-banner button{margin-top:0.5rem;}
-.profile-header{display:flex;gap:1.5rem;align-items:flex-start;margin-bottom:1.5rem;}
-.profile-avatar{width:96px;height:96px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:700;}
-.profile-info{flex:1;}
-.profile-name{font-size:1.5rem;font-weight:800;margin-bottom:0.25rem;}
-.profile-meta{color:var(--muted);margin-bottom:0.75rem;}
-.section-title{font-size:1.1rem;font-weight:700;margin:1.5rem 0 0.75rem;}
-.credits-badge{background:#f0fdf4;color:#166534;padding:0.4rem 1rem;border-radius:20px;font-weight:700;display:inline-flex;align-items:center;gap:0.4rem;}
-.error-banner{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:1.5rem;border-radius:var(--radius);margin-bottom:1.5rem;}
-.error-banner h3{margin-bottom:0.5rem;}
-.error-banner pre{background:#fff;padding:0.75rem;border-radius:6px;margin-top:0.5rem;font-size:0.85rem;overflow-x:auto;}
-footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border-top:1px solid var(--border);margin-top:2rem;}
-#loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:500;}
-#loading-screen h2{color:var(--primary);margin-bottom:1rem;}
-#loading-screen p{color:var(--muted);}
-
-/* HERO */
-.hero{background:linear-gradient(135deg,#0d9488 0%,#0f766e 100%);color:#fff;padding:5rem 1rem;text-align:center;border-radius:0 0 var(--radius) var(--radius);margin-bottom:3rem;}
-.hero h1{font-size:3rem;font-weight:800;margin-bottom:1rem;}
-.hero p{font-size:1.25rem;opacity:0.9;margin-bottom:2rem;max-width:600px;margin-left:auto;margin-right:auto;}
-.hero .btn{background:#fff;color:var(--primary);font-weight:700;}
-.hero .btn:hover{background:#f0fdf4;}
-
-/* FEATURES */
-.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem;margin:3rem 0;}
-.feature-card{background:var(--card);border-radius:var(--radius);padding:2rem;text-align:center;border:1px solid var(--border);box-shadow:var(--shadow);}
-.feature-icon{font-size:2.5rem;margin-bottom:1rem;}
-.feature-card h3{font-size:1.2rem;margin-bottom:0.5rem;}
-.feature-card p{color:var(--muted);font-size:0.95rem;}
-
-/* HOW IT WORKS */
-.steps{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin:3rem 0;}
-.step{background:var(--card);border-radius:var(--radius);padding:1.5rem;width:220px;text-align:center;border:1px solid var(--border);box-shadow:var(--shadow);}
-.step-num{width:40px;height:40px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;margin:0 auto 1rem;}
-.step h4{margin-bottom:0.5rem;}
-.step p{color:var(--muted);font-size:0.9rem;}
-
-/* STATS */
-.stats{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;margin:2rem 0;}
-.stat{text-align:center;}
-.stat-num{font-size:2.5rem;font-weight:800;color:var(--primary);}
-.stat-label{color:var(--muted);font-size:0.9rem;}
+.skill-tag{background:var(--primary-light);color:var(--primary-dark);padding:0.3rem 0.7rem;border-radius:20px;font-size:0.8rem;font-weight:600;}
 
 /* CTA */
-.cta-section{background:var(--primary-light);border-radius:var(--radius);padding:3rem;text-align:center;margin:3rem 0;}
-.cta-section h2{margin-bottom:1rem;}
-.cta-section p{color:var(--muted);margin-bottom:1.5rem;}
+.cta-section{position:relative;background:linear-gradient(135deg,#0f766e 0%,#0d9488 100%);border-radius:var(--radius);padding:5rem 3rem;text-align:center;margin:4rem 0;overflow:hidden;color:#fff;}
+.cta-section::before{content:'';position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&q=80');background-size:cover;opacity:0.1;}
+.cta-section h2{position:relative;font-size:2.5rem;font-weight:800;margin-bottom:1rem;}
+.cta-section p{position:relative;opacity:0.9;margin-bottom:2rem;font-size:1.1rem;}
 
-/* DEMO TAG */
-.demo-tag{background:#fef3c7;color:#92400e;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.75rem;font-weight:600;margin-left:0.5rem;}
+/* FAQ */
+.faq-item{background:var(--card);border-radius:12px;border:1px solid var(--border);margin-bottom:1rem;overflow:hidden;}
+.faq-question{padding:1.25rem 1.5rem;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background 0.2s;}
+.faq-question:hover{background:#f8fafc;}
+.faq-answer{padding:0 1.5rem 1.25rem;color:var(--text-light);line-height:1.7;font-size:0.95rem;}
+.faq-icon{transition:transform 0.3s;color:var(--primary);}
+.faq-icon.open{transform:rotate(180deg);}
 
-/* LOGIN WALL */
-.login-wall{background:var(--card);border:2px dashed var(--border);border-radius:var(--radius);padding:2rem;text-align:center;margin:1rem 0;}
-.login-wall p{color:var(--muted);margin-bottom:1rem;}
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:200;padding:1rem;}
+.modal{background:var(--card);border-radius:var(--radius);width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:2rem;position:relative;box-shadow:0 25px 50px rgba(0,0,0,0.2);}
+.modal h2{margin-bottom:1.5rem;font-size:1.5rem;font-weight:800;}
+.form-group{margin-bottom:1.25rem;}
+.form-group label{display:block;font-weight:600;margin-bottom:0.5rem;font-size:0.9rem;color:var(--text-light);}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:10px;font-size:1rem;transition:all 0.2s;background:#fff;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light);}
+.form-group textarea{min-height:100px;resize:vertical;}
+.skills-input{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;}
+.skill-pill{background:var(--primary);color:#fff;padding:0.35rem 0.8rem;border-radius:20px;font-size:0.85rem;display:flex;align-items:center;gap:0.4rem;}
+.skill-pill button{background:none;border:none;color:#fff;font-size:1.1rem;cursor:pointer;line-height:1;}
+.star-rating{font-size:2rem;color:#e2e8f0;cursor:pointer;}
+.star-rating .filled{color:#fbbf24;}
+.chat-sidebar{width:300px;border-right:1px solid var(--border);overflow-y:auto;max-height:600px;background:#fff;}
+.chat-contact{padding:1rem 1.25rem;border-bottom:1px solid var(--border);cursor:pointer;transition:0.2s;}
+.chat-contact:hover,.chat-contact.active{background:#f8fafc;}
+.chat-contact-name{font-weight:600;font-size:0.95rem;}
+.chat-contact-preview{font-size:0.85rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:0.2rem;}
+.chat-main{flex:1;display:flex;flex-direction:column;min-height:600px;background:#fff;}
+.chat-header{padding:1.25rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:#fff;}
+.chat-messages{flex:1;overflow-y:auto;padding:1.5rem;display:flex;flex-direction:column;gap:0.75rem;background:#f8fafc;}
+.message{max-width:75%;padding:0.9rem 1.2rem;border-radius:16px;font-size:0.95rem;line-height:1.5;}
+.message-sent{align-self:flex-end;background:var(--primary);color:#fff;border-bottom-right-radius:4px;}
+.message-received{align-self:flex-start;background:#fff;border:1px solid var(--border);border-bottom-left-radius:4px;}
+.chat-input-area{display:flex;gap:0.75rem;padding:1.25rem;border-top:1px solid var(--border);background:#fff;}
+.chat-input{flex:1;padding:0.8rem 1rem;border:1.5px solid var(--border);border-radius:12px;font-size:1rem;}
+.chat-input:focus{outline:none;border-color:var(--primary);}
+.chat-send-btn{background:var(--primary);color:#fff;border:none;border-radius:12px;padding:0 1.5rem;cursor:pointer;font-weight:600;transition:0.2s;}
+.chat-send-btn:hover{background:var(--primary-dark);}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.5rem;box-shadow:var(--shadow-lg);z-index:300;display:flex;align-items:center;gap:0.75rem;animation:slideIn 0.3s ease;}
+@keyframes slideIn{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.toast-close{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);}
+.empty-state{text-align:center;padding:4rem 2rem;color:var(--muted);}
+.empty-state h3{margin-bottom:0.5rem;color:var(--text);font-size:1.3rem;}
+.badge{display:inline-flex;align-items:center;gap:0.3rem;background:#fef3c7;color:#92400e;padding:0.35rem 0.8rem;border-radius:20px;font-size:0.8rem;font-weight:600;}
+.setup-banner{background:#fef3c7;border:1px solid #fbbf24;border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem;}
+.setup-banner h3{color:#92400e;margin-bottom:0.5rem;}
+.setup-banner pre{background:#1e293b;color:#e2e8f0;padding:1rem;border-radius:10px;overflow-x:auto;font-size:0.8rem;margin:1rem 0;}
+.profile-header{display:flex;gap:1.5rem;align-items:flex-start;margin-bottom:1.5rem;}
+.profile-avatar{width:100px;height:100px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:700;box-shadow:0 8px 20px rgba(13,148,136,0.2);}
+.profile-info{flex:1;}
+.profile-name{font-size:1.8rem;font-weight:800;margin-bottom:0.25rem;}
+.profile-meta{color:var(--muted);margin-bottom:1rem;}
+.section-title{font-size:1.2rem;font-weight:700;margin:2rem 0 1rem;color:var(--text);}
+.credits-badge{background:#f0fdf4;color:#166534;padding:0.5rem 1.2rem;border-radius:20px;font-weight:700;display:inline-flex;align-items:center;gap:0.5rem;font-size:1rem;border:1.5px solid #bbf7d0;}
+.error-banner{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:1.5rem;border-radius:var(--radius);margin-bottom:1.5rem;}
+.error-banner h3{margin-bottom:0.5rem;}
+.login-wall{background:var(--card);border:2px dashed var(--border);border-radius:var(--radius);padding:2.5rem;text-align:center;margin:1rem 0;}
+.login-wall p{color:var(--muted);margin-bottom:1.5rem;font-size:1.05rem;}
+footer{background:#0f172a;color:#94a3b8;padding:4rem 0 2rem;margin-top:4rem;}
+footer .container{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;}
+footer h4{color:#fff;margin-bottom:1.5rem;font-size:1rem;}
+footer a{color:#94a3b8;text-decoration:none;display:block;margin-bottom:0.75rem;transition:color 0.2s;}
+footer a:hover{color:#fff;}
+footer p{line-height:1.7;}
+.footer-bottom{text-align:center;padding-top:2rem;margin-top:2rem;border-top:1px solid #1e293b;color:#64748b;font-size:0.9rem;}
+#loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:500;}
+#loading-screen h2{color:var(--primary);margin-bottom:1rem;font-size:2rem;}
+#loading-screen p{color:var(--muted);}
+#loading-screen .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:1rem;}
+@keyframes spin{to{transform:rotate(360deg);}}
 
+@media(max-width:900px){
+  .hero .container{grid-template-columns:1fr;text-align:center;}
+  .hero h1{font-size:2.5rem;}
+  .hero-image{display:none;}
+  .hero-stats{justify-content:center;}
+  footer .container{grid-template-columns:1fr 1fr;}
+}
 @media(max-width:768px){
-  .hero h1{font-size:2rem;}
   .grid{grid-template-columns:1fr;}
   .profile-header{flex-direction:column;align-items:center;text-align:center;}
   .chat-sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);}
-  .steps{flex-direction:column;align-items:center;}
+  footer .container{grid-template-columns:1fr;}
 }
 </style>
 </head>
 <body>
 
 <div id="loading-screen">
+  <div class="spinner"></div>
   <h2>SkillSwap</h2>
-  <p>Loading...</p>
+  <p>Loading your community...</p>
 </div>
 
 <div id="app" style="display:none;">
 
 <header v-if="!showSetup && !fatalError">
   <div class="container">
-    <div class="logo">SkillSwap</div>
+    <div class="logo"><div class="logo-icon">⇄</div>SkillSwap</div>
     <nav v-if="currentUser">
       <a href="#" @click.prevent="page='browse'">Browse</a>
       <a href="#" @click.prevent="page='chat';loadChatUsers()">Chat</a>
@@ -155,23 +220,24 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
     </nav>
     <nav v-else>
       <a href="#" @click.prevent="page='browse'">Browse Members</a>
+      <a href="#" @click.prevent="scrollTo('features')">How It Works</a>
       <button class="btn btn-primary" @click="showLogin=true">Log In</button>
       <button class="btn btn-outline" @click="showSignup=true">Sign Up</button>
     </nav>
   </div>
 </header>
 
-<div class="container" style="padding-top:2rem;">
+<div class="container" style="padding-top:0;">
 
   <!-- FATAL ERROR -->
-  <div v-if="fatalError" class="error-banner">
+  <div v-if="fatalError" class="error-banner" style="margin-top:2rem;">
     <h3>Startup Error</h3>
     <p>{{fatalError}}</p>
-    <pre>{{fatalDetail}}</pre>
+    <pre style="background:#fff;padding:0.75rem;border-radius:6px;margin-top:0.5rem;font-size:0.85rem;overflow-x:auto;">{{fatalDetail}}</pre>
   </div>
 
   <!-- SETUP BANNER -->
-  <div v-if="showSetup && !fatalError" class="setup-banner">
+  <div v-if="showSetup && !fatalError" class="setup-banner" style="margin-top:2rem;">
     <h3>Database Setup Required</h3>
     <p>Your Supabase tables do not exist yet. Run this SQL in your Supabase SQL Editor:</p>
     <pre>{{setupSQL}}</pre>
@@ -185,21 +251,22 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
   <!-- LOGIN MODAL -->
   <div v-if="showLogin && !showSetup && !fatalError" class="modal-overlay" @click.self="showLogin=false">
     <div class="modal">
-      <h2>Log In</h2>
+      <h2>Welcome Back</h2>
+      <p style="color:var(--muted);margin-bottom:1.5rem;">Log in to continue trading skills.</p>
       <div class="form-group">
-        <label>Email</label>
-        <input type="email" v-model="loginEmail" placeholder="your@email.com" @keyup.enter="handleLogin">
+        <label>Email Address</label>
+        <input type="email" v-model="loginEmail" placeholder="you@example.com" @keyup.enter="handleLogin">
       </div>
       <div class="form-group">
         <label>Password</label>
-        <input type="password" v-model="loginPassword" placeholder="Your password" @keyup.enter="handleLogin">
+        <input type="password" v-model="loginPassword" placeholder="Enter your password" @keyup.enter="handleLogin">
       </div>
-      <div v-if="loginError" style="color:var(--danger);margin-bottom:1rem;">{{loginError}}</div>
+      <div v-if="loginError" style="color:var(--danger);margin-bottom:1rem;font-size:0.9rem;">{{loginError}}</div>
       <button class="btn btn-primary" style="width:100%" @click="handleLogin" :disabled="loginLoading">
         {{loginLoading?'Logging in...':'Log In'}}
       </button>
-      <p style="text-align:center;margin-top:1rem;color:var(--muted)">Do not have an account? 
-        <a href="#" @click.prevent="showLogin=false;showSignup=true" style="color:var(--primary)">Sign Up</a>
+      <p style="text-align:center;margin-top:1.5rem;color:var(--muted)">Do not have an account? 
+        <a href="#" @click.prevent="showLogin=false;showSignup=true" style="color:var(--primary);font-weight:600;">Sign Up</a>
       </p>
     </div>
   </div>
@@ -207,147 +274,322 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
   <!-- SIGNUP MODAL -->
   <div v-if="showSignup && !showSetup && !fatalError" class="modal-overlay" @click.self="showSignup=false">
     <div class="modal">
-      <h2>Create Account</h2>
+      <h2>Create Your Account</h2>
+      <p style="color:var(--muted);margin-bottom:1.5rem;">Join the community and start trading skills.</p>
       <div class="form-group">
         <label>Full Name</label>
         <input type="text" v-model="signupName" placeholder="Your full name">
       </div>
       <div class="form-group">
-        <label>Email</label>
-        <input type="email" v-model="signupEmail" placeholder="your@email.com">
+        <label>Email Address</label>
+        <input type="email" v-model="signupEmail" placeholder="you@example.com">
       </div>
       <div class="form-group">
         <label>Password</label>
-        <input type="password" v-model="signupPassword" placeholder="Create a password">
+        <input type="password" v-model="signupPassword" placeholder="Create a strong password">
       </div>
       <div class="form-group">
-        <label>Phone</label>
+        <label>Phone (optional)</label>
         <input type="tel" v-model="signupPhone" placeholder="(555) 123-4567">
       </div>
       <div class="form-group">
-        <label>Age</label>
+        <label>Age (optional)</label>
         <input type="number" v-model="signupAge" placeholder="25">
       </div>
       <div class="form-group">
         <label>Skills You Can Teach</label>
-        <input type="text" v-model="newSkill" @keyup.enter="addSkill" placeholder="e.g. Python, Guitar... Press Enter">
+        <input type="text" v-model="newSkill" @keyup.enter="addSkill" placeholder="e.g. Python, Guitar... Press Enter to add">
         <div class="skills-input">
           <span class="skill-pill" v-for="(s,i) in signupSkills" :key="i">{{s}}<button @click="signupSkills.splice(i,1)">×</button></span>
         </div>
       </div>
       <div class="form-group">
         <label>Skills You Want to Learn</label>
-        <input type="text" v-model="newWant" @keyup.enter="addWant" placeholder="e.g. Spanish, Cooking... Press Enter">
+        <input type="text" v-model="newWant" @keyup.enter="addWant" placeholder="e.g. Spanish, Cooking... Press Enter to add">
         <div class="skills-input">
           <span class="skill-pill" v-for="(s,i) in signupWants" :key="i">{{s}}<button @click="signupWants.splice(i,1)">×</button></span>
         </div>
       </div>
       <div class="form-group">
-        <label>Bio</label>
+        <label>Bio (optional)</label>
         <textarea v-model="signupBio" placeholder="Tell us about yourself..."></textarea>
       </div>
-      <div v-if="signupError" style="color:var(--danger);margin-bottom:1rem;">{{signupError}}</div>
+      <div v-if="signupError" style="color:var(--danger);margin-bottom:1rem;font-size:0.9rem;">{{signupError}}</div>
       <button class="btn btn-primary" style="width:100%" @click="handleSignup" :disabled="signupLoading">
-        {{signupLoading?'Creating Account...':'Create Account'}}
+        {{signupLoading?'Creating Account...':'Create Free Account'}}
       </button>
-      <p style="text-align:center;margin-top:1rem;color:var(--muted)">Already have an account? 
-        <a href="#" @click.prevent="showSignup=false;showLogin=true" style="color:var(--primary)">Log In</a>
+      <p style="text-align:center;margin-top:1.5rem;color:var(--muted)">Already have an account? 
+        <a href="#" @click.prevent="showSignup=false;showLogin=true" style="color:var(--primary);font-weight:600;">Log In</a>
       </p>
     </div>
   </div>
 
-  <!-- ====== LANDING PAGE (when not logged in and page is home) ====== -->
+  <!-- ====== LANDING PAGE ====== -->
   <div v-if="!currentUser && page==='home' && !showSetup && !fatalError">
-    <div class="hero">
-      <h1>Trade Skills, Not Money</h1>
-      <p>Join a community where people teach each other what they know. Earn credits by teaching, spend credits by learning. No cash needed.</p>
-      <button class="btn btn-lg" @click="showSignup=true">Get Started Free</button>
-    </div>
 
-    <div style="text-align:center;margin-bottom:1rem;">
-      <h2 style="font-size:1.8rem;">How It Works</h2>
-    </div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <h4>Sign Up</h4>
-        <p>Create your profile and list skills you can teach and want to learn.</p>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="container">
+        <div class="hero-content">
+          <h1>Trade Skills.<br>Not Money.</h1>
+          <p>Join a global community where people teach each other what they know. Earn credits by teaching. Spend credits by learning. No cash ever needed.</p>
+          <div class="hero-btns">
+            <button class="btn btn-lg btn-white" @click="showSignup=true">Get Started Free</button>
+            <button class="btn btn-lg btn-outline" style="border-color:rgba(255,255,255,0.4);color:#fff;" @click="page='browse'">Browse Members</button>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <div class="hero-stat-num">{{users.length}}+</div>
+              <div class="hero-stat-label">Members</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-num">{{totalSkills}}+</div>
+              <div class="hero-stat-label">Skills Listed</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-num">{{bookings.length}}+</div>
+              <div class="hero-stat-label">Sessions Booked</div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-image">
+          <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80" alt="People collaborating">
+        </div>
       </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <h4>Connect</h4>
-        <p>Browse members, message people, and book skill-swap sessions.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <h4>Trade</h4>
-        <p>Teach someone and earn credits. Use those credits to learn from others.</p>
-      </div>
-    </div>
+    </section>
 
-    <div style="text-align:center;margin-bottom:1rem;">
-      <h2 style="font-size:1.8rem;">Features</h2>
-    </div>
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">🎓</div>
-        <h3>Teach & Earn</h3>
-        <p>Share your expertise and earn credits for every session you teach.</p>
+    <!-- FEATURES -->
+    <section class="section" id="features">
+      <div class="section-header">
+        <h2>Why SkillSwap?</h2>
+        <p>A complete ecosystem for peer-to-peer learning without the price tag.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">📚</div>
-        <h3>Learn Anything</h3>
-        <p>Use your credits to book sessions with experts in any skill you want.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-img" style="background-image:url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80')"></div>
+          <div class="feature-body">
+            <span class="feature-badge">Teach & Earn</span>
+            <h3>Share Your Expertise</h3>
+            <p>Turn your knowledge into credits. The more you teach, the more you can learn from others in the community.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-img" style="background-image:url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&q=80')"></div>
+          <div class="feature-body">
+            <span class="feature-badge">Learn Anything</span>
+            <h3>Discover New Skills</h3>
+            <p>From coding to cooking, guitar to graphic design. Browse hundreds of skills from real people in your community.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-img" style="background-image:url('https://images.unsplash.com/photo-1573164713988-8665fc963095?w=600&q=80')"></div>
+          <div class="feature-body">
+            <span class="feature-badge">Real-Time</span>
+            <h3>Instant Messaging</h3>
+            <p>Chat with members in real time. Coordinate sessions, ask questions, and build connections before you meet.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-img" style="background-image:url('https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&q=80')"></div>
+          <div class="feature-body">
+            <span class="feature-badge">Trust</span>
+            <h3>Reviews & Ratings</h3>
+            <p>Every session ends with honest feedback. Build your reputation and find the best teachers in the community.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-img" style="background-image:url('https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&q=80')"></div>
+          <div class="feature-body">
+            <span class="feature-badge">Scheduling</span>
+            <h3>Easy Booking</h3>
+            <p>Pick a skill, choose a date and time, and send a booking request. It takes less than 30 seconds.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-img" style="background-image:url('https://images.unsplash.com/photo-1553729459-afe8d2f5e663?w=600&q=80')"></div>
+          <div class="feature-body">
+            <span class="feature-badge">Free Forever</span>
+            <h3>Credit Economy</h3>
+            <p>No subscriptions. No hidden fees. Credits are earned by teaching and spent on learning. Simple as that.</p>
+          </div>
+        </div>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">💬</div>
-        <h3>Real-Time Chat</h3>
-        <p>Message members instantly to coordinate sessions and ask questions.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">⭐</div>
-        <h3>Reviews & Ratings</h3>
-        <p>Leave honest reviews after sessions to build trust in the community.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">📅</div>
-        <h3>Easy Booking</h3>
-        <p>Schedule sessions with date, time, and duration in just a few clicks.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🪙</div>
-        <h3>Credit System</h3>
-        <p>No money changes hands. Credits are earned by teaching and spent on learning.</p>
-      </div>
-    </div>
+    </section>
 
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-num">{{users.length}}</div>
-        <div class="stat-label">Members</div>
+    <!-- HOW IT WORKS -->
+    <section class="section steps-bg">
+      <div class="section-header">
+        <h2>How It Works</h2>
+        <p>Three simple steps to start your skill-trading journey.</p>
       </div>
-      <div class="stat">
-        <div class="stat-num">{{totalSkills}}</div>
-        <div class="stat-label">Skills Listed</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h4>Create Your Profile</h4>
+          <p>Sign up in seconds. List what you can teach and what you want to learn. Get 25 free credits to start.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h4>Find & Connect</h4>
+          <p>Browse members by skill. Message them, check their reviews, and book a session that works for both of you.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h4>Teach, Learn, Repeat</h4>
+          <p>Teach a session to earn credits. Use those credits to book a session and learn something new. Repeat.</p>
+        </div>
       </div>
-      <div class="stat">
-        <div class="stat-num">{{bookings.length}}</div>
-        <div class="stat-label">Sessions Booked</div>
-      </div>
-    </div>
+    </section>
 
-    <div class="cta-section">
-      <h2>Ready to start trading skills?</h2>
-      <p>Join {{users.length}} members already swapping knowledge on SkillSwap.</p>
-      <button class="btn btn-primary btn-lg" @click="showSignup=true">Create Free Account</button>
-    </div>
+    <!-- POPULAR CATEGORIES -->
+    <section class="section">
+      <div class="section-header">
+        <h2>Popular Skills</h2>
+        <p>Browse the most in-demand categories on SkillSwap right now.</p>
+      </div>
+      <div class="categories-grid">
+        <div class="category-card" @click="page='browse';searchQuery='programming'">
+          <div class="category-icon">💻</div>
+          <h4>Programming</h4>
+          <p>Python, JavaScript, Web Dev</p>
+        </div>
+        <div class="category-card" @click="page='browse';searchQuery='music'">
+          <div class="category-icon">🎸</div>
+          <h4>Music</h4>
+          <p>Guitar, Piano, Production</p>
+        </div>
+        <div class="category-card" @click="page='browse';searchQuery='design'">
+          <div class="category-icon">🎨</div>
+          <h4>Design</h4>
+          <p>UI/UX, Photoshop, Branding</p>
+        </div>
+        <div class="category-card" @click="page='browse';searchQuery='language'">
+          <div class="category-icon">🌍</div>
+          <h4>Languages</h4>
+          <p>Spanish, French, Mandarin</p>
+        </div>
+        <div class="category-card" @click="page='browse';searchQuery='cooking'">
+          <div class="category-icon">🍳</div>
+          <h4>Cooking</h4>
+          <p>Baking, Vegan, BBQ</p>
+        </div>
+        <div class="category-card" @click="page='browse';searchQuery='fitness'">
+          <div class="category-icon">💪</div>
+          <h4>Fitness</h4>
+          <p>Yoga, Calisthenics, Boxing</p>
+        </div>
+        <div class="category-card" @click="page='browse';searchQuery='photography'">
+          <div class="category-icon">📷</div>
+          <h4>Photography</h4>
+          <p>Portrait, Drone, Editing</p>
+        </div>
+        <div class="category-card" @click="page='browse';searchQuery='business'">
+          <div class="category-icon">📈</div>
+          <h4>Business</h4>
+          <p>Marketing, Finance, Sales</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="section" style="background:#fff;">
+      <div class="section-header">
+        <h2>What Members Say</h2>
+        <p>Real stories from real people in the SkillSwap community.</p>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">I taught guitar lessons and earned enough credits to learn Python from a software engineer. Best trade I have ever made.</p>
+          <div class="testimonial-author">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" class="testimonial-avatar" alt="User">
+            <div>
+              <div class="testimonial-name">Marcus Chen</div>
+              <div class="testimonial-role">Guitarist & Developer</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">SkillSwap helped me find a Spanish tutor without spending a dime. I just taught them photography in exchange. Genius idea.</p>
+          <div class="testimonial-author">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80" class="testimonial-avatar" alt="User">
+            <div>
+              <div class="testimonial-name">Sarah Williams</div>
+              <div class="testimonial-role">Photographer</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">The credit system is so simple. I taught someone Excel, they taught me chess. No awkward money conversations. Just learning.</p>
+          <div class="testimonial-author">
+            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80" class="testimonial-avatar" alt="User">
+            <div>
+              <div class="testimonial-name">David Park</div>
+              <div class="testimonial-role">Data Analyst</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MEMBERS PREVIEW -->
+    <section class="section members-preview" v-if="users.length > 0">
+      <div class="section-header">
+        <h2>Meet the Community</h2>
+        <p>Some of the amazing people already trading skills on SkillSwap.</p>
+      </div>
+      <div class="grid">
+        <div class="member-card" v-for="u in users.slice(0,6)" :key="u.id" @click="openProfile(u)">
+          <div class="member-avatar">{{u.name?u.name.charAt(0).toUpperCase():'?'}}</div>
+          <div class="member-name">{{u.name}}</div>
+          <div class="member-meta">{{u.age?u.age+' years old':''}}</div>
+          <div class="skills">
+            <span class="skill-tag" v-for="s in (u.skills||[]).slice(0,3)" :key="s">{{s}}</span>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:2rem;">
+        <button class="btn btn-primary btn-lg" @click="page='browse'">View All Members</button>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section">
+      <div class="section-header">
+        <h2>Frequently Asked Questions</h2>
+        <p>Everything you need to know about SkillSwap.</p>
+      </div>
+      <div style="max-width:800px;margin:0 auto;">
+        <div class="faq-item" v-for="(faq,i) in faqs" :key="i">
+          <div class="faq-question" @click="faq.open=!faq.open">
+            <span>{{faq.q}}</span>
+            <span class="faq-icon" :class="{open:faq.open}">▼</span>
+          </div>
+          <div class="faq-answer" v-if="faq.open">{{faq.a}}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+      <h2>Ready to Start Trading Skills?</h2>
+      <p>Join {{users.length}} members already learning and teaching on SkillSwap. It is free forever.</p>
+      <button class="btn btn-lg btn-white" @click="showSignup=true">Create Free Account</button>
+    </section>
+
   </div>
 
-  <!-- ====== BROWSE PAGE (works for everyone) ====== -->
-  <div v-if="page==='browse' && !showSetup && !fatalError">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
-      <h1>Browse Members</h1>
-      <input type="text" v-model="searchQuery" placeholder="Search skills or names..." style="padding:0.5rem 1rem;border:1px solid var(--border);border-radius:8px;width:280px;">
+  <!-- ====== BROWSE PAGE ====== -->
+  <div v-if="page==='browse' && !showSetup && !fatalError" style="padding-top:2rem;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
+      <div>
+        <h1 style="font-size:2rem;font-weight:800;">Browse Members</h1>
+        <p style="color:var(--muted);margin-top:0.25rem;">Find people to teach you or learn from you.</p>
+      </div>
+      <input type="text" v-model="searchQuery" placeholder="Search skills or names..." style="padding:0.75rem 1.25rem;border:1.5px solid var(--border);border-radius:12px;width:300px;font-size:1rem;">
     </div>
     <div class="grid">
       <div class="member-card" v-for="u in filteredUsers" :key="u.id" @click="openProfile(u)">
@@ -361,13 +603,13 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
     </div>
     <div v-if="filteredUsers.length===0" class="empty-state">
       <h3>No members found</h3>
-      <p>Be the first to join! Sign up and create your profile.</p>
+      <p>Be the first to join. Sign up and create your profile today.</p>
       <button class="btn btn-primary" style="margin-top:1rem;" @click="showSignup=true">Sign Up</button>
     </div>
   </div>
 
   <!-- ====== PROFILE PAGE ====== -->
-  <div v-if="page==='profile' && currentUser && !showSetup && !fatalError">
+  <div v-if="page==='profile' && currentUser && !showSetup && !fatalError" style="padding-top:2rem;">
     <div class="card">
       <div class="profile-header">
         <div class="profile-avatar">{{currentUser.name?currentUser.name.charAt(0).toUpperCase():'?'}}</div>
@@ -392,10 +634,10 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
         <span v-if="!(currentUser.wants||[]).length" style="color:var(--muted)">No wants added yet.</span>
       </div>
       <div class="section-title">Bio</div>
-      <p style="color:var(--muted);white-space:pre-wrap;">{{currentUser.bio||'No bio yet.'}}</p>
+      <p style="color:var(--text-light);white-space:pre-wrap;line-height:1.7;">{{currentUser.bio||'No bio yet.'}}</p>
     </div>
     <div class="card">
-      <h3 style="margin-bottom:1rem;">Danger Zone</h3>
+      <h3 style="margin-bottom:1rem;font-size:1.2rem;">Danger Zone</h3>
       <p style="color:var(--muted);margin-bottom:1rem;">Clear all data from the database. This cannot be undone.</p>
       <button class="btn btn-danger" @click="showClearAll=true">Clear All Site Data</button>
     </div>
@@ -492,7 +734,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
         <span class="skill-tag" v-for="s in viewingUser.wants||[]" :key="s">{{s}}</span>
       </div>
       <div class="section-title">Bio</div>
-      <p style="color:var(--muted);white-space:pre-wrap;margin-bottom:1rem;">{{viewingUser.bio||'No bio.'}}</p>
+      <p style="color:var(--text-light);white-space:pre-wrap;margin-bottom:1.5rem;line-height:1.7;">{{viewingUser.bio||'No bio.'}}</p>
       <div v-if="!currentUser" class="login-wall">
         <p>Log in or sign up to message or book a session with {{viewingUser.name}}.</p>
         <button class="btn btn-primary" @click="viewingUser=null;showLogin=true">Log In</button>
@@ -506,18 +748,18 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
   </div>
 
   <!-- CHAT PAGE -->
-  <div v-if="page==='chat' && currentUser && !showSetup && !fatalError" style="display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--card);">
+  <div v-if="page==='chat' && currentUser && !showSetup && !fatalError" style="display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--card);margin-top:2rem;">
     <div class="chat-sidebar">
       <div class="chat-contact" v-for="u in chatUsers" :key="u.id" :class="{active:chatWith&&chatWith.id===u.id}" @click="openChat(u)">
         <div class="chat-contact-name">{{u.name}}</div>
         <div class="chat-contact-preview">{{lastMessagePreview(u.id)}}</div>
       </div>
-      <div v-if="chatUsers.length===0" style="padding:1rem;color:var(--muted);font-size:0.9rem;">No conversations yet.</div>
+      <div v-if="chatUsers.length===0" style="padding:1.5rem;color:var(--muted);font-size:0.9rem;text-align:center;">No conversations yet.<br>Click Message on a member profile to start.</div>
     </div>
     <div class="chat-main" v-if="chatWith">
       <div class="chat-header">
         <div>
-          <h4 style="margin:0;">{{chatWith.name}}</h4>
+          <h4 style="margin:0;font-size:1.1rem;">{{chatWith.name}}</h4>
           <p style="margin:0;color:var(--muted);font-size:0.85rem;">{{(chatWith.skills||[]).slice(0,2).join(', ')}}</p>
         </div>
         <div style="display:flex;gap:0.5rem;">
@@ -536,7 +778,8 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
         <button class="chat-send-btn" @click="sendMessage">Send</button>
       </div>
     </div>
-    <div v-else class="chat-main" style="justify-content:center;align-items:center;color:var(--muted);">
+    <div v-else class="chat-main" style="justify-content:center;align-items:center;color:var(--muted);flex-direction:column;gap:1rem;">
+      <div style="font-size:3rem;">💬</div>
       <p>Select a conversation to start chatting</p>
     </div>
   </div>
@@ -545,7 +788,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
   <div v-if="showBookingModal" class="modal-overlay" @click.self="showBookingModal=false">
     <div class="modal">
       <h2>Book a Session</h2>
-      <p style="color:var(--muted);margin-bottom:1rem;">Booking with <strong>{{bookingTo.name}}</strong></p>
+      <p style="color:var(--muted);margin-bottom:1.5rem;">Booking with <strong>{{bookingTo.name}}</strong></p>
       <div class="form-group">
         <label>Skill</label>
         <select v-model="bookingSkill">
@@ -579,7 +822,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
   <div v-if="showReviewModal" class="modal-overlay" @click.self="showReviewModal=false">
     <div class="modal">
       <h2>Leave a Review</h2>
-      <p style="color:var(--muted);margin-bottom:1rem;">Reviewing <strong>{{reviewTo.name}}</strong></p>
+      <p style="color:var(--muted);margin-bottom:1.5rem;">Reviewing <strong>{{reviewTo.name}}</strong></p>
       <div class="form-group">
         <label>Rating</label>
         <div class="star-rating">
@@ -598,8 +841,8 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
         <label>Review</label>
         <textarea v-model="reviewText" placeholder="How was your session?"></textarea>
       </div>
-      <div style="background:#f0fdf4;padding:1rem;border-radius:8px;margin-bottom:1rem;">
-        <p style="color:var(--primary-dark);font-weight:600;">Credits they will earn: {{calculateCredits()}}</p>
+      <div style="background:#f0fdf4;padding:1rem;border-radius:12px;margin-bottom:1.5rem;">
+        <p style="color:var(--primary-dark);font-weight:700;">Credits they will earn: {{calculateCredits()}}</p>
         <p style="color:var(--muted);font-size:0.85rem;">Formula: ({{reviewDuration||0}} / 10) x {{reviewRating||0}} = {{calculateCredits()}} credits</p>
       </div>
       <button class="btn btn-primary" style="width:100%" @click="submitReview" :disabled="reviewLoading">
@@ -609,20 +852,23 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
   </div>
 
   <!-- BOOKINGS PAGE -->
-  <div v-if="page==='bookings' && currentUser && !showSetup && !fatalError">
-    <h1 style="margin-bottom:1.5rem;">My Bookings</h1>
+  <div v-if="page==='bookings' && currentUser && !showSetup && !fatalError" style="padding-top:2rem;">
+    <h1 style="font-size:2rem;font-weight:800;margin-bottom:0.5rem;">My Bookings</h1>
+    <p style="color:var(--muted);margin-bottom:2rem;">Track your upcoming and past skill sessions.</p>
     <div v-if="bookings.length===0" class="empty-state">
+      <div style="font-size:3rem;margin-bottom:1rem;">📅</div>
       <h3>No bookings yet</h3>
       <p>Browse members and book a session to get started.</p>
+      <button class="btn btn-primary" style="margin-top:1rem;" @click="page='browse'">Browse Members</button>
     </div>
     <div class="grid" style="grid-template-columns:1fr;">
       <div class="card" v-for="b in bookings" :key="b.id">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;">
           <div>
-            <div style="font-weight:700;font-size:1.1rem;">{{b.skill||'Session'}}</div>
-            <div style="color:var(--muted);font-size:0.9rem;">With {{b.to_name||'Member'}} &middot; {{b.date}} at {{b.time}}</div>
-            <div style="color:var(--muted);font-size:0.85rem;margin-top:0.25rem;">{{b.duration}} minutes</div>
-            <p style="margin-top:0.5rem;color:var(--text);font-size:0.95rem;">{{b.message}}</p>
+            <div style="font-weight:700;font-size:1.2rem;">{{b.skill||'Session'}}</div>
+            <div style="color:var(--muted);font-size:0.95rem;margin-top:0.25rem;">With {{b.to_name||'Member'}} &middot; {{b.date}} at {{b.time}}</div>
+            <div style="color:var(--muted);font-size:0.9rem;margin-top:0.25rem;">{{b.duration}} minutes</div>
+            <p style="margin-top:0.75rem;color:var(--text-light);font-size:0.95rem;line-height:1.6;">{{b.message}}</p>
           </div>
           <span class="badge">{{b.status||'Pending'}}</span>
         </div>
@@ -631,7 +877,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
   </div>
 
   <!-- TOASTS -->
-  <div v-for="t in toasts" :key="t.id" class="toast" :style="{borderLeft:'4px solid '+(t.type==='error'?'#e74c3c':'#0d9488')}">
+  <div v-for="t in toasts" :key="t.id" class="toast" :style="{borderLeft:'4px solid '+(t.type==='error'?'#ef4444':'#0d9488')}">
     <span>{{t.message}}</span>
     <button class="toast-close" @click="removeToast(t.id)">×</button>
   </div>
@@ -639,8 +885,33 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
 </div>
 
 <footer v-if="!showSetup && !fatalError">
-  <p>SkillSwap &mdash; Trade skills, not money.</p>
-  <p style="margin-top:0.5rem;font-size:0.85rem;">Built with Supabase & Vue.js</p>
+  <div class="container">
+    <div>
+      <div class="logo" style="margin-bottom:1rem;color:#fff;"><div class="logo-icon">⇄</div>SkillSwap</div>
+      <p style="max-width:300px;">A peer-to-peer learning platform where knowledge is the only currency that matters.</p>
+    </div>
+    <div>
+      <h4>Platform</h4>
+      <a href="#" @click.prevent="page='browse'">Browse Members</a>
+      <a href="#" @click.prevent="page='home';scrollTo('features')">How It Works</a>
+      <a href="#" @click.prevent="showSignup=true">Sign Up</a>
+      <a href="#" @click.prevent="showLogin=true">Log In</a>
+    </div>
+    <div>
+      <h4>Community</h4>
+      <a href="#" @click.prevent="page='browse'">Find Teachers</a>
+      <a href="#" @click.prevent="page='browse'">Find Students</a>
+      <a href="#" @click.prevent="page='home'">Popular Skills</a>
+    </div>
+    <div>
+      <h4>Support</h4>
+      <a href="#" @click.prevent="page='home'">FAQ</a>
+      <a href="#" @click.prevent="page='profile'">Contact</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>SkillSwap &mdash; Trade skills, not money. Built with Supabase & Vue.js.</p>
+  </div>
 </footer>
 
 </div>
@@ -818,7 +1089,15 @@ CREATE POLICY "Allow all" ON public.bookings FOR ALL USING (true) WITH CHECK (tr
 CREATE POLICY "Allow all" ON public.notifications FOR ALL USING (true) WITH CHECK (true);
 
 GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated;
-GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;`
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;`,
+
+      faqs: [
+        {q:'Is SkillSwap really free?',a:'Yes. SkillSwap is completely free to use. You earn credits by teaching others, and you spend those credits to learn from others. No real money is ever involved.',open:false},
+        {q:'How do credits work?',a:'When you sign up, you get 25 free credits. After each teaching session, the student leaves a review and you earn credits based on the rating and duration. You can then spend those credits to book sessions with other teachers.',open:false},
+        {q:'Can I teach anything?',a:'Absolutely. From coding and design to cooking and fitness. If you have a skill, someone else probably wants to learn it. List as many as you want on your profile.',open:false},
+        {q:'How are sessions conducted?',a:'That is up to you and the other person. You can meet in person, video call, or chat. SkillSwap provides the booking and messaging tools. You handle the session itself.',open:false},
+        {q:'Is it safe?',a:'We recommend messaging members first to get to know them. Reviews and ratings help you find trusted teachers. Always meet in public places for in-person sessions.',open:false}
+      ]
     };
   },
 
@@ -871,6 +1150,13 @@ GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;`
   },
 
   methods: {
+    scrollTo(id) {
+      this.$nextTick(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({behavior:'smooth'});
+      });
+    },
+
     async checkSetup() {
       if (!sb) return;
       this.setupChecking = true;
