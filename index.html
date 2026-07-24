@@ -85,14 +85,33 @@ nav a:hover,nav button:hover{background:#f1f5f9;}
 .tab.active{border-bottom-color:var(--primary);color:var(--primary);}
 .tab-content{display:none;}
 .tab-content.active{display:block;}
+.error-banner{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:1.5rem;border-radius:var(--radius);margin-bottom:1.5rem;}
+.error-banner h3{margin-bottom:0.5rem;}
+.error-banner pre{background:#fff;padding:0.75rem;border-radius:6px;margin-top:0.5rem;font-size:0.85rem;overflow-x:auto;}
 footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border-top:1px solid var(--border);margin-top:2rem;}
 @media(max-width:768px){.grid{grid-template-columns:1fr;}.profile-header{flex-direction:column;align-items:center;text-align:center;}.chat-sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);}}
 </style>
 </head>
 <body>
+
+<!-- This shows if JS is disabled or crashes -->
+<noscript>
+  <div style="padding:2rem;text-align:center;font-family:sans-serif;">
+    <h2>JavaScript is required</h2>
+    <p>Please enable JavaScript to use SkillSwap.</p>
+  </div>
+</noscript>
+
 <div id="app">
 
-<header v-if="!showSetup">
+<!-- FATAL ERROR DISPLAY (outside Vue, shows if Vue crashes) -->
+<div id="fatal-error" style="display:none;padding:2rem;text-align:center;">
+  <h2 style="color:#e74c3c;">Something went wrong</h2>
+  <p id="fatal-msg" style="color:#666;margin-top:1rem;"></p>
+  <p style="margin-top:1rem;color:#999;font-size:0.9rem;">Open your browser console (F12 → Console) for details.</p>
+</div>
+
+<header v-if="!showSetup && !fatalError">
   <div class="container">
     <div class="logo">SkillSwap</div>
     <nav v-if="currentUser">
@@ -111,8 +130,25 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
 
 <div class="container" style="padding-top:2rem;">
 
+  <!-- FATAL ERROR INSIDE VUE -->
+  <div v-if="fatalError" class="error-banner">
+    <h3>⚠️ Startup Error</h3>
+    <p>{{fatalError}}</p>
+    <pre>{{fatalDetail}}</pre>
+    <p style="margin-top:0.5rem;font-size:0.9rem;">Check your Supabase URL and Key. Open browser console (F12) for more info.</p>
+  </div>
+
+  <!-- CONFIG REQUIRED -->
+  <div v-if="configNeeded && !fatalError" class="error-banner" style="background:#fef3c7;border-color:#fbbf24;color:#92400e;">
+    <h3>🔧 Configuration Required</h3>
+    <p>You need to set your Supabase credentials in the code.</p>
+    <p style="margin-top:0.5rem;"><strong>Step 1:</strong> Go to your Supabase Dashboard → Project Settings → API</p>
+    <p><strong>Step 2:</strong> Copy your <code>URL</code> and <code>anon public</code> API key</p>
+    <p><strong>Step 3:</strong> Replace the placeholders at the top of this file's &lt;script&gt; section</p>
+  </div>
+
   <!-- SETUP BANNER -->
-  <div v-if="showSetup" class="setup-banner">
+  <div v-if="showSetup && !fatalError" class="setup-banner">
     <h3>Database Setup Required</h3>
     <p>Your Supabase database tables don't exist yet. Run this SQL in your Supabase SQL Editor:</p>
     <pre id="setup-sql">{{setupSQL}}</pre>
@@ -124,7 +160,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
   </div>
 
   <!-- LOGIN MODAL -->
-  <div v-if="showLogin && !showSetup" class="modal-overlay" @click.self="showLogin=false">
+  <div v-if="showLogin && !showSetup && !fatalError" class="modal-overlay" @click.self="showLogin=false">
     <div class="modal">
       <h2>Log In</h2>
       <div class="form-group">
@@ -146,7 +182,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
   </div>
 
   <!-- SIGNUP MODAL -->
-  <div v-if="showSignup && !showSetup" class="modal-overlay" @click.self="showSignup=false">
+  <div v-if="showSignup && !showSetup && !fatalError" class="modal-overlay" @click.self="showSignup=false">
     <div class="modal">
       <h2>Create Account</h2>
       <div class="form-group">
@@ -198,7 +234,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
   </div>
 
   <!-- BROWSE PAGE -->
-  <div v-if="page==='browse' && currentUser && !showSetup">
+  <div v-if="page==='browse' && currentUser && !showSetup && !fatalError">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
       <h1>Browse Members</h1>
       <input type="text" v-model="searchQuery" placeholder="Search skills or names..." style="padding:0.5rem 1rem;border:1px solid var(--border);border-radius:8px;width:280px;">
@@ -220,7 +256,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
   </div>
 
   <!-- PROFILE PAGE -->
-  <div v-if="page==='profile' && currentUser && !showSetup">
+  <div v-if="page==='profile' && currentUser && !showSetup && !fatalError">
     <div class="card">
       <div class="profile-header">
         <div class="profile-avatar">{{currentUser.name?currentUser.name.charAt(0).toUpperCase():'?'}}</div>
@@ -355,7 +391,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
   </div>
 
   <!-- CHAT PAGE -->
-  <div v-if="page==='chat' && currentUser && !showSetup" style="display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--card);">
+  <div v-if="page==='chat' && currentUser && !showSetup && !fatalError" style="display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--card);">
     <div class="chat-sidebar">
       <div class="chat-contact" v-for="u in chatUsers" :key="u.id" :class="{active:chatWith&&chatWith.id===u.id}" @click="openChat(u)">
         <div class="chat-contact-name">{{u.name}}</div>
@@ -458,7 +494,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
   </div>
 
   <!-- BOOKINGS PAGE -->
-  <div v-if="page==='bookings' && currentUser && !showSetup">
+  <div v-if="page==='bookings' && currentUser && !showSetup && !fatalError">
     <h1 style="margin-bottom:1.5rem;">My Bookings</h1>
     <div v-if="bookings.length===0" class="empty-state">
       <h3>No bookings yet</h3>
@@ -487,7 +523,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
 
 </div>
 
-<footer v-if="!showSetup">
+<footer v-if="!showSetup && !fatalError && !configNeeded">
   <p>SkillSwap — Trade skills, not money.</p>
   <p style="margin-top:0.5rem;font-size:0.85rem;">Built with Supabase & Vue.js</p>
 </footer>
@@ -495,98 +531,124 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem;border
 </div>
 
 <script>
-const { createApp } = Vue;
+try {
+  const { createApp } = Vue;
 
-// IMPORTANT: Replace these with your actual Supabase credentials
-const SUPABASE_URL = 'https://sgyugzriwxljaiwbsogg.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_SEdzPoAu4GSDIVfEQGtf2Q_oAf7jjvZ';
-// Create client using the global supabase object from CDN
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  // ============================================
+  // REPLACE THESE WITH YOUR SUPABASE CREDENTIALS
+  // ============================================
+  // Go to: https://supabase.com/dashboard
+  // Click your project → Project Settings → API
+  // Copy the URL and the "anon public" key
+  // ============================================
+  const SUPABASE_URL = 'https://your-project.supabase.co';
+  const SUPABASE_KEY = 'your-anon-key';
 
-createApp({
-  data() {
-    return {
-      page: 'browse',
-      currentUser: null,
-      users: [],
-      messages: [],
-      bookings: [],
-      reviews: [],
-      notifications: [],
-      searchQuery: '',
+  let sb = null;
+  let configNeeded = false;
+  let fatalError = '';
+  let fatalDetail = '';
 
-      showLogin: false,
-      loginEmail: '',
-      loginPassword: '',
-      loginError: '',
-      loginLoading: false,
+  // Check if credentials are still placeholders
+  if (SUPABASE_URL === 'https://your-project.supabase.co' || SUPABASE_KEY === 'your-anon-key') {
+    configNeeded = true;
+  } else {
+    try {
+      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    } catch(e) {
+      fatalError = 'Failed to connect to Supabase';
+      fatalDetail = e.message;
+      console.error('Supabase init error:', e);
+    }
+  }
 
-      showSignup: false,
-      signupName: '',
-      signupEmail: '',
-      signupPassword: '',
-      signupPhone: '',
-      signupAge: '',
-      signupSkills: [],
-      signupWants: [],
-      signupBio: '',
-      newSkill: '',
-      newWant: '',
-      signupError: '',
-      signupLoading: false,
+  createApp({
+    data() {
+      return {
+        page: 'browse',
+        currentUser: null,
+        users: [],
+        messages: [],
+        bookings: [],
+        reviews: [],
+        notifications: [],
+        searchQuery: '',
+        configNeeded: configNeeded,
+        fatalError: fatalError,
+        fatalDetail: fatalDetail,
 
-      showEditProfile: false,
-      editName: '',
-      editPhone: '',
-      editAge: '',
-      editSkills: [],
-      editWants: [],
-      editBio: '',
-      newEditSkill: '',
-      newEditWant: '',
-      editLoading: false,
+        showLogin: false,
+        loginEmail: '',
+        loginPassword: '',
+        loginError: '',
+        loginLoading: false,
 
-      showDeleteAccount: false,
-      deleteConfirmText: '',
-      deleteError: '',
-      deleteLoading: false,
+        showSignup: false,
+        signupName: '',
+        signupEmail: '',
+        signupPassword: '',
+        signupPhone: '',
+        signupAge: '',
+        signupSkills: [],
+        signupWants: [],
+        signupBio: '',
+        newSkill: '',
+        newWant: '',
+        signupError: '',
+        signupLoading: false,
 
-      showClearAll: false,
-      clearConfirmText: '',
-      clearError: '',
-      clearLoading: false,
+        showEditProfile: false,
+        editName: '',
+        editPhone: '',
+        editAge: '',
+        editSkills: [],
+        editWants: [],
+        editBio: '',
+        newEditSkill: '',
+        newEditWant: '',
+        editLoading: false,
 
-      viewingUser: null,
+        showDeleteAccount: false,
+        deleteConfirmText: '',
+        deleteError: '',
+        deleteLoading: false,
 
-      showBookingModal: false,
-      bookingTo: null,
-      bookingSkill: '',
-      bookingDate: '',
-      bookingTime: '',
-      bookingDuration: 60,
-      bookingMessage: '',
-      bookingLoading: false,
+        showClearAll: false,
+        clearConfirmText: '',
+        clearError: '',
+        clearLoading: false,
 
-      showReviewModal: false,
-      reviewTo: null,
-      reviewRating: 0,
-      reviewDuration: 30,
-      reviewSkill: '',
-      reviewText: '',
-      reviewLoading: false,
+        viewingUser: null,
 
-      chatUsers: [],
-      chatWith: null,
-      chatInput: '',
-      typing: false,
+        showBookingModal: false,
+        bookingTo: null,
+        bookingSkill: '',
+        bookingDate: '',
+        bookingTime: '',
+        bookingDuration: 60,
+        bookingMessage: '',
+        bookingLoading: false,
 
-      toasts: [],
-      toastId: 0,
+        showReviewModal: false,
+        reviewTo: null,
+        reviewRating: 0,
+        reviewDuration: 30,
+        reviewSkill: '',
+        reviewText: '',
+        reviewLoading: false,
 
-      showSetup: false,
-      setupChecking: false,
-      setupError: '',
-      setupSQL: `CREATE TABLE IF NOT EXISTS public.users (
+        chatUsers: [],
+        chatWith: null,
+        chatInput: '',
+        typing: false,
+
+        toasts: [],
+        toastId: 0,
+
+        showSetup: false,
+        setupChecking: false,
+        setupError: '',
+        setupSQL: `CREATE TABLE IF NOT EXISTS public.users (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
@@ -657,458 +719,474 @@ CREATE POLICY "Allow all" ON public.notifications FOR ALL USING (true) WITH CHEC
 
 GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;`
-    };
-  },
-
-  computed: {
-    filteredUsers() {
-      if (!this.searchQuery) return this.users.filter(u => u.id !== this.currentUser?.id);
-      const q = this.searchQuery.toLowerCase();
-      return this.users.filter(u => {
-        if (u.id === this.currentUser?.id) return false;
-        return (u.name||'').toLowerCase().includes(q) ||
-               (u.skills||[]).some(s => s.toLowerCase().includes(q)) ||
-               (u.wants||[]).some(s => s.toLowerCase().includes(q));
-      });
+      };
     },
-    currentChatMessages() {
-      if (!this.chatWith || !this.currentUser) return [];
-      return this.messages.filter(m => 
-        (m.sender_id === this.currentUser.id && m.receiver_id === this.chatWith.id) ||
-        (m.sender_id === this.chatWith.id && m.receiver_id === this.currentUser.id)
-      ).sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
-    }
-  },
 
-  async mounted() {
-    // Check if tables exist
-    await this.checkSetup();
-
-    // Load saved session
-    const saved = localStorage.getItem('skillswap_user');
-    if (saved) {
-      try {
-        this.currentUser = JSON.parse(saved);
-        await this.loadUsers();
-        await this.loadBookings();
-        this.subscribeMessages();
-      } catch(e) {
-        localStorage.removeItem('skillswap_user');
+    computed: {
+      filteredUsers() {
+        if (!this.searchQuery) return this.users.filter(u => u.id !== this.currentUser?.id);
+        const q = this.searchQuery.toLowerCase();
+        return this.users.filter(u => {
+          if (u.id === this.currentUser?.id) return false;
+          return (u.name||'').toLowerCase().includes(q) ||
+                 (u.skills||[]).some(s => s.toLowerCase().includes(q)) ||
+                 (u.wants||[]).some(s => s.toLowerCase().includes(q));
+        });
+      },
+      currentChatMessages() {
+        if (!this.chatWith || !this.currentUser) return [];
+        return this.messages.filter(m => 
+          (m.sender_id === this.currentUser.id && m.receiver_id === this.chatWith.id) ||
+          (m.sender_id === this.chatWith.id && m.receiver_id === this.currentUser.id)
+        ).sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
       }
-    }
-  },
+    },
 
-  methods: {
-    async checkSetup() {
-      this.setupChecking = true;
-      this.setupError = '';
-      try {
-        const { error } = await sb.from('users').select('id').limit(1);
-        if (error && (error.message.includes('does not exist') || error.message.includes('schema cache') || error.code === '42P01')) {
+    async mounted() {
+      if (this.configNeeded || this.fatalError) return;
+      await this.checkSetup();
+      const saved = localStorage.getItem('skillswap_user');
+      if (saved) {
+        try {
+          this.currentUser = JSON.parse(saved);
+          await this.loadUsers();
+          await this.loadBookings();
+          this.subscribeMessages();
+        } catch(e) {
+          localStorage.removeItem('skillswap_user');
+        }
+      }
+    },
+
+    methods: {
+      async checkSetup() {
+        if (!sb) return;
+        this.setupChecking = true;
+        this.setupError = '';
+        try {
+          const { error } = await sb.from('users').select('id').limit(1);
+          if (error && (error.message.includes('does not exist') || error.message.includes('schema cache') || error.code === '42P01')) {
+            this.showSetup = true;
+          } else {
+            this.showSetup = false;
+          }
+        } catch(e) {
           this.showSetup = true;
-        } else {
-          this.showSetup = false;
         }
-      } catch(e) {
-        this.showSetup = true;
-      }
-      this.setupChecking = false;
-    },
+        this.setupChecking = false;
+      },
 
-    copySQL() {
-      navigator.clipboard.writeText(this.setupSQL).then(() => {
-        this.showToast('SQL copied to clipboard!', 'success');
-      });
-    },
+      copySQL() {
+        navigator.clipboard.writeText(this.setupSQL).then(() => {
+          this.showToast('SQL copied to clipboard!', 'success');
+        });
+      },
 
-    async loadUsers() {
-      try {
-        const { data, error } = await sb.from('users').select('*');
-        if (error) throw error;
-        this.users = data || [];
-      } catch(e) {
-        console.error('loadUsers error:', e);
-      }
-    },
+      async loadUsers() {
+        if (!sb) return;
+        try {
+          const { data, error } = await sb.from('users').select('*');
+          if (error) throw error;
+          this.users = data || [];
+        } catch(e) {
+          console.error('loadUsers error:', e);
+        }
+      },
 
-    async loadBookings() {
-      if (!this.currentUser) return;
-      try {
-        const { data, error } = await sb.from('bookings').select('*').or('from_id.eq.'+this.currentUser.id+',to_id.eq.'+this.currentUser.id);
-        if (error) throw error;
-        this.bookings = data || [];
-      } catch(e) {
-        console.error('loadBookings error:', e);
-      }
-    },
+      async loadBookings() {
+        if (!sb || !this.currentUser) return;
+        try {
+          const { data, error } = await sb.from('bookings').select('*').or('from_id.eq.'+this.currentUser.id+',to_id.eq.'+this.currentUser.id);
+          if (error) throw error;
+          this.bookings = data || [];
+        } catch(e) {
+          console.error('loadBookings error:', e);
+        }
+      },
 
-    async handleLogin() {
-      this.loginError = '';
-      if (!this.loginEmail || !this.loginPassword) {
-        this.loginError = 'Please fill in all fields';
-        return;
-      }
-      this.loginLoading = true;
-      try {
-        const { data, error } = await sb.from('users')
-          .select('*')
-          .eq('email', this.loginEmail)
-          .eq('password', this.loginPassword)
-          .single();
-        if (error || !data) {
-          this.loginError = 'Invalid email or password';
-          this.loginLoading = false;
+      async handleLogin() {
+        if (!sb) return;
+        this.loginError = '';
+        if (!this.loginEmail || !this.loginPassword) {
+          this.loginError = 'Please fill in all fields';
           return;
         }
-        this.currentUser = data;
-        localStorage.setItem('skillswap_user', JSON.stringify(data));
-        this.showLogin = false;
-        this.showToast('Welcome back, ' + data.name + '!', 'success');
-        await this.loadUsers();
-        await this.loadBookings();
-        this.subscribeMessages();
-      } catch(e) {
-        this.loginError = 'Login failed: ' + e.message;
-      }
-      this.loginLoading = false;
-    },
+        this.loginLoading = true;
+        try {
+          const { data, error } = await sb.from('users')
+            .select('*')
+            .eq('email', this.loginEmail)
+            .eq('password', this.loginPassword)
+            .single();
+          if (error || !data) {
+            this.loginError = 'Invalid email or password';
+            this.loginLoading = false;
+            return;
+          }
+          this.currentUser = data;
+          localStorage.setItem('skillswap_user', JSON.stringify(data));
+          this.showLogin = false;
+          this.showToast('Welcome back, ' + data.name + '!', 'success');
+          await this.loadUsers();
+          await this.loadBookings();
+          this.subscribeMessages();
+        } catch(e) {
+          this.loginError = 'Login failed: ' + e.message;
+        }
+        this.loginLoading = false;
+      },
 
-    async handleSignup() {
-      this.signupError = '';
-      if (!this.signupName || !this.signupEmail || !this.signupPassword) {
-        this.signupError = 'Name, email, and password are required';
-        return;
-      }
-      this.signupLoading = true;
-      try {
-        const { data: existing } = await sb.from('users').select('id').eq('email', this.signupEmail).single();
-        if (existing) {
-          this.signupError = 'Email already registered';
-          this.signupLoading = false;
+      async handleSignup() {
+        if (!sb) return;
+        this.signupError = '';
+        if (!this.signupName || !this.signupEmail || !this.signupPassword) {
+          this.signupError = 'Name, email, and password are required';
           return;
         }
-      } catch(e) {}
+        this.signupLoading = true;
+        try {
+          const { data: existing } = await sb.from('users').select('id').eq('email', this.signupEmail).single();
+          if (existing) {
+            this.signupError = 'Email already registered';
+            this.signupLoading = false;
+            return;
+          }
+        } catch(e) {}
 
-      try {
-        const newUser = {
-          name: this.signupName,
-          email: this.signupEmail,
-          password: this.signupPassword,
-          phone: this.signupPhone,
-          age: this.signupAge ? parseInt(this.signupAge) : null,
-          skills: this.signupSkills,
-          wants: this.signupWants,
-          bio: this.signupBio,
-          credits: 25
-        };
-        const { data, error } = await sb.from('users').insert(newUser).select().single();
-        if (error) throw error;
-        this.currentUser = data;
-        localStorage.setItem('skillswap_user', JSON.stringify(data));
-        this.showSignup = false;
-        this.showToast('Account created! You got 25 credits.', 'success');
-        await this.loadUsers();
-        this.subscribeMessages();
-      } catch(e) {
-        this.signupError = 'Signup failed: ' + e.message;
-      }
-      this.signupLoading = false;
-    },
+        try {
+          const newUser = {
+            name: this.signupName,
+            email: this.signupEmail,
+            password: this.signupPassword,
+            phone: this.signupPhone,
+            age: this.signupAge ? parseInt(this.signupAge) : null,
+            skills: this.signupSkills,
+            wants: this.signupWants,
+            bio: this.signupBio,
+            credits: 25
+          };
+          const { data, error } = await sb.from('users').insert(newUser).select().single();
+          if (error) throw error;
+          this.currentUser = data;
+          localStorage.setItem('skillswap_user', JSON.stringify(data));
+          this.showSignup = false;
+          this.showToast('Account created! You got 25 credits.', 'success');
+          await this.loadUsers();
+          this.subscribeMessages();
+        } catch(e) {
+          this.signupError = 'Signup failed: ' + e.message;
+        }
+        this.signupLoading = false;
+      },
 
-    logout() {
-      this.currentUser = null;
-      this.chatWith = null;
-      this.chatUsers = [];
-      this.messages = [];
-      localStorage.removeItem('skillswap_user');
-      this.page = 'browse';
-      this.showToast('Logged out', 'success');
-    },
+      logout() {
+        this.currentUser = null;
+        this.chatWith = null;
+        this.chatUsers = [];
+        this.messages = [];
+        localStorage.removeItem('skillswap_user');
+        this.page = 'browse';
+        this.showToast('Logged out', 'success');
+      },
 
-    addSkill() {
-      if (this.newSkill.trim() && !this.signupSkills.includes(this.newSkill.trim())) {
-        this.signupSkills.push(this.newSkill.trim());
-        this.newSkill = '';
-      }
-    },
-    addWant() {
-      if (this.newWant.trim() && !this.signupWants.includes(this.newWant.trim())) {
-        this.signupWants.push(this.newWant.trim());
-        this.newWant = '';
-      }
-    },
+      addSkill() {
+        if (this.newSkill.trim() && !this.signupSkills.includes(this.newSkill.trim())) {
+          this.signupSkills.push(this.newSkill.trim());
+          this.newSkill = '';
+        }
+      },
+      addWant() {
+        if (this.newWant.trim() && !this.signupWants.includes(this.newWant.trim())) {
+          this.signupWants.push(this.newWant.trim());
+          this.newWant = '';
+        }
+      },
 
-    openEditProfile() {
-      this.editName = this.currentUser.name || '';
-      this.editPhone = this.currentUser.phone || '';
-      this.editAge = this.currentUser.age || '';
-      this.editSkills = [...(this.currentUser.skills || [])];
-      this.editWants = [...(this.currentUser.wants || [])];
-      this.editBio = this.currentUser.bio || '';
-      this.showEditProfile = true;
-    },
-    addEditSkill() {
-      if (this.newEditSkill.trim() && !this.editSkills.includes(this.newEditSkill.trim())) {
-        this.editSkills.push(this.newEditSkill.trim());
-        this.newEditSkill = '';
-      }
-    },
-    addEditWant() {
-      if (this.newEditWant.trim() && !this.editWants.includes(this.newEditWant.trim())) {
-        this.editWants.push(this.newEditWant.trim());
-        this.newEditWant = '';
-      }
-    },
-    async saveProfile() {
-      this.editLoading = true;
-      try {
-        const updates = {
-          name: this.editName,
-          phone: this.editPhone,
-          age: this.editAge ? parseInt(this.editAge) : null,
-          skills: this.editSkills,
-          wants: this.editWants,
-          bio: this.editBio
-        };
-        const { data, error } = await sb.from('users').update(updates).eq('id', this.currentUser.id).select().single();
-        if (error) throw error;
-        this.currentUser = data;
-        localStorage.setItem('skillswap_user', JSON.stringify(data));
-        this.showEditProfile = false;
-        await this.loadUsers();
-        this.showToast('Profile updated!', 'success');
-      } catch(e) {
-        this.showToast('Failed to update profile: ' + e.message, 'error');
-      }
-      this.editLoading = false;
-    },
+      openEditProfile() {
+        this.editName = this.currentUser.name || '';
+        this.editPhone = this.currentUser.phone || '';
+        this.editAge = this.currentUser.age || '';
+        this.editSkills = [...(this.currentUser.skills || [])];
+        this.editWants = [...(this.currentUser.wants || [])];
+        this.editBio = this.currentUser.bio || '';
+        this.showEditProfile = true;
+      },
+      addEditSkill() {
+        if (this.newEditSkill.trim() && !this.editSkills.includes(this.newEditSkill.trim())) {
+          this.editSkills.push(this.newEditSkill.trim());
+          this.newEditSkill = '';
+        }
+      },
+      addEditWant() {
+        if (this.newEditWant.trim() && !this.editWants.includes(this.newEditWant.trim())) {
+          this.editWants.push(this.newEditWant.trim());
+          this.newEditWant = '';
+        }
+      },
+      async saveProfile() {
+        if (!sb) return;
+        this.editLoading = true;
+        try {
+          const updates = {
+            name: this.editName,
+            phone: this.editPhone,
+            age: this.editAge ? parseInt(this.editAge) : null,
+            skills: this.editSkills,
+            wants: this.editWants,
+            bio: this.editBio
+          };
+          const { data, error } = await sb.from('users').update(updates).eq('id', this.currentUser.id).select().single();
+          if (error) throw error;
+          this.currentUser = data;
+          localStorage.setItem('skillswap_user', JSON.stringify(data));
+          this.showEditProfile = false;
+          await this.loadUsers();
+          this.showToast('Profile updated!', 'success');
+        } catch(e) {
+          this.showToast('Failed to update profile: ' + e.message, 'error');
+        }
+        this.editLoading = false;
+      },
 
-    async deleteAccount() {
-      this.deleteError = '';
-      if (this.deleteConfirmText !== 'DELETE') {
-        this.deleteError = 'Please type DELETE to confirm';
-        return;
-      }
-      this.deleteLoading = true;
-      try {
-        const uid = this.currentUser.id;
-        await sb.from('messages').delete().or('sender_id.eq.'+uid+',receiver_id.eq.'+uid);
-        await sb.from('reviews').delete().or('from_id.eq.'+uid+',to_id.eq.'+uid);
-        await sb.from('bookings').delete().or('from_id.eq.'+uid+',to_id.eq.'+uid);
-        await sb.from('notifications').delete().eq('user_id', uid);
-        await sb.from('users').delete().eq('id', uid);
-        this.showDeleteAccount = false;
-        this.logout();
-        this.showToast('Account deleted permanently', 'success');
-        await this.loadUsers();
-      } catch(e) {
-        this.deleteError = 'Delete failed: ' + e.message;
-      }
-      this.deleteLoading = false;
-    },
+      async deleteAccount() {
+        if (!sb) return;
+        this.deleteError = '';
+        if (this.deleteConfirmText !== 'DELETE') {
+          this.deleteError = 'Please type DELETE to confirm';
+          return;
+        }
+        this.deleteLoading = true;
+        try {
+          const uid = this.currentUser.id;
+          await sb.from('messages').delete().or('sender_id.eq.'+uid+',receiver_id.eq.'+uid);
+          await sb.from('reviews').delete().or('from_id.eq.'+uid+',to_id.eq.'+uid);
+          await sb.from('bookings').delete().or('from_id.eq.'+uid+',to_id.eq.'+uid);
+          await sb.from('notifications').delete().eq('user_id', uid);
+          await sb.from('users').delete().eq('id', uid);
+          this.showDeleteAccount = false;
+          this.logout();
+          this.showToast('Account deleted permanently', 'success');
+          await this.loadUsers();
+        } catch(e) {
+          this.deleteError = 'Delete failed: ' + e.message;
+        }
+        this.deleteLoading = false;
+      },
 
-    async clearAllData() {
-      this.clearError = '';
-      if (this.clearConfirmText !== 'CLEAR ALL') {
-        this.clearError = 'Please type CLEAR ALL to confirm';
-        return;
-      }
-      this.clearLoading = true;
-      try {
-        await sb.from('messages').delete().neq('id', 0);
-        await sb.from('reviews').delete().neq('id', 0);
-        await sb.from('bookings').delete().neq('id', 0);
-        await sb.from('notifications').delete().neq('id', 0);
-        await sb.from('users').delete().neq('id', 0);
-        this.showClearAll = false;
-        this.logout();
-        this.showToast('All data cleared', 'success');
-        await this.loadUsers();
-      } catch(e) {
-        this.clearError = 'Clear failed: ' + e.message;
-      }
-      this.clearLoading = false;
-    },
+      async clearAllData() {
+        if (!sb) return;
+        this.clearError = '';
+        if (this.clearConfirmText !== 'CLEAR ALL') {
+          this.clearError = 'Please type CLEAR ALL to confirm';
+          return;
+        }
+        this.clearLoading = true;
+        try {
+          await sb.from('messages').delete().neq('id', 0);
+          await sb.from('reviews').delete().neq('id', 0);
+          await sb.from('bookings').delete().neq('id', 0);
+          await sb.from('notifications').delete().neq('id', 0);
+          await sb.from('users').delete().neq('id', 0);
+          this.showClearAll = false;
+          this.logout();
+          this.showToast('All data cleared', 'success');
+          await this.loadUsers();
+        } catch(e) {
+          this.clearError = 'Clear failed: ' + e.message;
+        }
+        this.clearLoading = false;
+      },
 
-    openProfile(u) {
-      this.viewingUser = u;
-    },
+      openProfile(u) {
+        this.viewingUser = u;
+      },
 
-    openBooking(u) {
-      this.bookingTo = u;
-      this.bookingSkill = '';
-      this.bookingDate = '';
-      this.bookingTime = '';
-      this.bookingDuration = 60;
-      this.bookingMessage = '';
-      this.showBookingModal = true;
-    },
+      openBooking(u) {
+        this.bookingTo = u;
+        this.bookingSkill = '';
+        this.bookingDate = '';
+        this.bookingTime = '';
+        this.bookingDuration = 60;
+        this.bookingMessage = '';
+        this.showBookingModal = true;
+      },
 
-    async confirmBooking() {
-      if (!this.bookingSkill || !this.bookingDate || !this.bookingTime) {
-        this.showToast('Please fill in all required fields', 'error');
-        return;
-      }
-      this.bookingLoading = true;
-      try {
-        const booking = {
-          from_id: this.currentUser.id,
-          to_id: this.bookingTo.id,
-          skill: this.bookingSkill,
-          date: this.bookingDate,
-          time: this.bookingTime,
-          duration: parseInt(this.bookingDuration) || 60,
-          message: this.bookingMessage,
-          status: 'Pending'
-        };
-        const { error } = await sb.from('bookings').insert(booking);
-        if (error) throw error;
-        await sb.from('notifications').insert({
-          user_id: this.bookingTo.id,
-          text: this.currentUser.name + ' booked a ' + this.bookingSkill + ' session',
-          icon: 'calendar'
-        });
-        this.showBookingModal = false;
-        this.showToast('Booking request sent!', 'success');
-        await this.loadBookings();
-      } catch(e) {
-        this.showToast('Booking failed: ' + e.message, 'error');
-      }
-      this.bookingLoading = false;
-    },
+      async confirmBooking() {
+        if (!sb) return;
+        if (!this.bookingSkill || !this.bookingDate || !this.bookingTime) {
+          this.showToast('Please fill in all required fields', 'error');
+          return;
+        }
+        this.bookingLoading = true;
+        try {
+          const booking = {
+            from_id: this.currentUser.id,
+            to_id: this.bookingTo.id,
+            skill: this.bookingSkill,
+            date: this.bookingDate,
+            time: this.bookingTime,
+            duration: parseInt(this.bookingDuration) || 60,
+            message: this.bookingMessage,
+            status: 'Pending'
+          };
+          const { error } = await sb.from('bookings').insert(booking);
+          if (error) throw error;
+          await sb.from('notifications').insert({
+            user_id: this.bookingTo.id,
+            text: this.currentUser.name + ' booked a ' + this.bookingSkill + ' session',
+            icon: 'calendar'
+          });
+          this.showBookingModal = false;
+          this.showToast('Booking request sent!', 'success');
+          await this.loadBookings();
+        } catch(e) {
+          this.showToast('Booking failed: ' + e.message, 'error');
+        }
+        this.bookingLoading = false;
+      },
 
-    calculateCredits() {
-      const dur = parseInt(this.reviewDuration) || 0;
-      const rat = parseInt(this.reviewRating) || 0;
-      return Math.round((dur / 10) * rat);
-    },
+      calculateCredits() {
+        const dur = parseInt(this.reviewDuration) || 0;
+        const rat = parseInt(this.reviewRating) || 0;
+        return Math.round((dur / 10) * rat);
+      },
 
-    async submitReview() {
-      if (!this.reviewRating || !this.reviewSkill || !this.reviewText) {
-        this.showToast('Please fill in all fields', 'error');
-        return;
-      }
-      this.reviewLoading = true;
-      try {
-        const credits = this.calculateCredits();
-        const review = {
-          from_id: this.currentUser.id,
-          to_id: this.reviewTo.id,
-          rating: this.reviewRating,
-          duration: parseInt(this.reviewDuration) || 30,
-          skill: this.reviewSkill,
-          text: this.reviewText,
-          from_name: this.currentUser.name
-        };
-        const { error } = await sb.from('reviews').insert(review);
-        if (error) throw error;
+      async submitReview() {
+        if (!sb) return;
+        if (!this.reviewRating || !this.reviewSkill || !this.reviewText) {
+          this.showToast('Please fill in all fields', 'error');
+          return;
+        }
+        this.reviewLoading = true;
+        try {
+          const credits = this.calculateCredits();
+          const review = {
+            from_id: this.currentUser.id,
+            to_id: this.reviewTo.id,
+            rating: this.reviewRating,
+            duration: parseInt(this.reviewDuration) || 30,
+            skill: this.reviewSkill,
+            text: this.reviewText,
+            from_name: this.currentUser.name
+          };
+          const { error } = await sb.from('reviews').insert(review);
+          if (error) throw error;
 
-        const { data: toUser } = await sb.from('users').select('credits').eq('id', this.reviewTo.id).single();
-        await sb.from('users').update({ credits: (toUser?.credits || 0) + credits }).eq('id', this.reviewTo.id);
+          const { data: toUser } = await sb.from('users').select('credits').eq('id', this.reviewTo.id).single();
+          await sb.from('users').update({ credits: (toUser?.credits || 0) + credits }).eq('id', this.reviewTo.id);
 
-        await sb.from('notifications').insert({
-          user_id: this.reviewTo.id,
-          text: this.currentUser.name + ' left you a ' + this.reviewRating + '-star review',
-          icon: 'star'
-        });
+          await sb.from('notifications').insert({
+            user_id: this.reviewTo.id,
+            text: this.currentUser.name + ' left you a ' + this.reviewRating + '-star review',
+            icon: 'star'
+          });
 
-        this.showReviewModal = false;
-        this.showToast('Review submitted! They earned ' + credits + ' credits.', 'success');
-      } catch(e) {
-        this.showToast('Review failed: ' + e.message, 'error');
-      }
-      this.reviewLoading = false;
-    },
+          this.showReviewModal = false;
+          this.showToast('Review submitted! They earned ' + credits + ' credits.', 'success');
+        } catch(e) {
+          this.showToast('Review failed: ' + e.message, 'error');
+        }
+        this.reviewLoading = false;
+      },
 
-    async loadChatUsers() {
-      if (!this.currentUser) return;
-      try {
-        const { data: msgs } = await sb.from('messages')
-          .select('sender_id,receiver_id')
-          .or('sender_id.eq.'+this.currentUser.id+',receiver_id.eq.'+this.currentUser.id);
-        const ids = new Set();
-        (msgs||[]).forEach(m => {
-          const other = m.sender_id === this.currentUser.id ? m.receiver_id : m.sender_id;
-          ids.add(other);
-        });
-        this.chatUsers = this.users.filter(u => ids.has(u.id));
-      } catch(e) {}
-    },
+      async loadChatUsers() {
+        if (!sb || !this.currentUser) return;
+        try {
+          const { data: msgs } = await sb.from('messages')
+            .select('sender_id,receiver_id')
+            .or('sender_id.eq.'+this.currentUser.id+',receiver_id.eq.'+this.currentUser.id);
+          const ids = new Set();
+          (msgs||[]).forEach(m => {
+            const other = m.sender_id === this.currentUser.id ? m.receiver_id : m.sender_id;
+            ids.add(other);
+          });
+          this.chatUsers = this.users.filter(u => ids.has(u.id));
+        } catch(e) {}
+      },
 
-    async openChat(u) {
-      this.chatWith = u;
-      await this.loadMessages();
-      this.scrollToBottom();
-    },
-
-    async loadMessages() {
-      try {
-        const { data, error } = await sb.from('messages').select('*');
-        if (error) throw error;
-        this.messages = data || [];
-      } catch(e) {}
-    },
-
-    lastMessagePreview(uid) {
-      const msgs = this.messages.filter(m => 
-        (m.sender_id === this.currentUser.id && m.receiver_id === uid) ||
-        (m.sender_id === uid && m.receiver_id === this.currentUser.id)
-      ).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-      return msgs.length ? msgs[0].text : 'No messages yet';
-    },
-
-    async sendMessage() {
-      if (!this.chatInput.trim() || !this.chatWith) return;
-      const text = this.chatInput.trim();
-      this.chatInput = '';
-      try {
-        const { error } = await sb.from('messages').insert({
-          sender_id: this.currentUser.id,
-          receiver_id: this.chatWith.id,
-          text: text
-        });
-        if (error) throw error;
+      async openChat(u) {
+        this.chatWith = u;
         await this.loadMessages();
         this.scrollToBottom();
-        if (!this.chatUsers.find(u => u.id === this.chatWith.id)) {
-          this.chatUsers.push(this.chatWith);
-        }
-      } catch(e) {
-        this.showToast('Message failed: ' + e.message, 'error');
-      }
-    },
+      },
 
-    startChat(u) {
-      this.page = 'chat';
-      this.openChat(u);
-    },
+      async loadMessages() {
+        if (!sb) return;
+        try {
+          const { data, error } = await sb.from('messages').select('*');
+          if (error) throw error;
+          this.messages = data || [];
+        } catch(e) {}
+      },
 
-    scrollToBottom() {
-      this.$nextTick(() => {
-        const el = this.$refs.chatMessages;
-        if (el) el.scrollTop = el.scrollHeight;
-      });
-    },
+      lastMessagePreview(uid) {
+        const msgs = this.messages.filter(m => 
+          (m.sender_id === this.currentUser.id && m.receiver_id === uid) ||
+          (m.sender_id === uid && m.receiver_id === this.currentUser.id)
+        ).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+        return msgs.length ? msgs[0].text : 'No messages yet';
+      },
 
-    subscribeMessages() {
-      sb.channel('messages')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, async () => {
+      async sendMessage() {
+        if (!sb || !this.chatInput.trim() || !this.chatWith) return;
+        const text = this.chatInput.trim();
+        this.chatInput = '';
+        try {
+          const { error } = await sb.from('messages').insert({
+            sender_id: this.currentUser.id,
+            receiver_id: this.chatWith.id,
+            text: text
+          });
+          if (error) throw error;
           await this.loadMessages();
-          if (this.chatWith) this.scrollToBottom();
-        })
-        .subscribe();
-    },
+          this.scrollToBottom();
+          if (!this.chatUsers.find(u => u.id === this.chatWith.id)) {
+            this.chatUsers.push(this.chatWith);
+          }
+        } catch(e) {
+          this.showToast('Message failed: ' + e.message, 'error');
+        }
+      },
 
-    showToast(msg, type='success') {
-      const id = ++this.toastId;
-      this.toasts.push({ id, message: msg, type });
-      setTimeout(() => this.removeToast(id), 4000);
-    },
-    removeToast(id) {
-      this.toasts = this.toasts.filter(t => t.id !== id);
+      startChat(u) {
+        this.page = 'chat';
+        this.openChat(u);
+      },
+
+      scrollToBottom() {
+        this.$nextTick(() => {
+          const el = this.$refs.chatMessages;
+          if (el) el.scrollTop = el.scrollHeight;
+        });
+      },
+
+      subscribeMessages() {
+        if (!sb) return;
+        sb.channel('messages')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, async () => {
+            await this.loadMessages();
+            if (this.chatWith) this.scrollToBottom();
+          })
+          .subscribe();
+      },
+
+      showToast(msg, type='success') {
+        const id = ++this.toastId;
+        this.toasts.push({ id, message: msg, type });
+        setTimeout(() => this.removeToast(id), 4000);
+      },
+      removeToast(id) {
+        this.toasts = this.toasts.filter(t => t.id !== id);
+      }
     }
-  }
-}).mount('#app');
+  }).mount('#app');
+
+} catch(e) {
+  // If Vue or anything else crashes, show it on screen
+  document.getElementById('fatal-error').style.display = 'block';
+  document.getElementById('fatal-msg').textContent = e.message;
+  console.error('FATAL ERROR:', e);
+}
 </script>
 
 </body>
